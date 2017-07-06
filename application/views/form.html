@@ -1,0 +1,69 @@
+<div class="content-wrapper">
+	<section class="content-header">
+		<h1>
+		Kegiatan
+	  </h1>
+		<ol class="breadcrumb">
+			<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+			<li class="active">Dashboard</li>
+		</ol>
+	</section>
+	<section class="content">
+		<div class="row">
+			<div class="col-md-8 col-md-push-2">
+				<div class="box">
+					<div class="box-header">
+						<h3 class="box-title">Kegiatan Baru</h3>
+					</div>
+					<form role="form">
+						<div class="box-body">
+							<div class="form-group">
+								<label for="exampleInputEmail1">Nama Kegiatan</label>
+								<input type="text" class="form-control" placeholder="Nama Kegiatan" name="nama_kegiatan">
+							</div>
+							<div class="form-group">
+								<label for="exampleInputPassword1">Deskripsi Kegiatan</label>
+								<div class="box-body pad">
+									<textarea id="editor1" name="editor1" rows="10" cols="80">
+										This is my textarea to be replaced with CKEditor.
+									</textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="exampleInputFile">Gambar Kegiatan</label>
+								<p class="help-block">Poster:</p>
+								<input type="file" id="exampleInputFile" name="poster">
+								<p class="help-block">Gambar Kegiatan:</p>
+								<input type="file" name="gambar_kegiatan">
+							</div>
+							<div class="form-group">
+								<label for="exampleInputPassword1">Tanggal Pelaksanaan</label>
+								<div class="input-group date">
+									<div class="input-group-addon">
+										<i class="fa fa-calendar"></i>
+									</div>
+									<input type="text" class="form-control pull-right" id="datepicker" name="tanggal">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="exampleInputPassword1">Lokasi Kegiatan</label>
+								<input type="password" class="form-control" placeholder="Password">
+							</div>
+							<div class="form-group">
+								<label for="exampleInputEmail1">Estimasi Jumlah Relawan</label>
+								<input type="number" class="form-control" name="est_relawan">
+							</div>
+							<div class="form-group">
+								<label for="exampleInputEmail1">Estimasi Dana</label>
+								<input type="number" class="form-control" name="est_dana">
+							</div>
+						</div>
+						<div class="box-footer">
+							<button type="submit" class="btn btn-primary pull-right"><i class="fa fa-arrow-right"></i> <span>Lanjut</span></button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+</div>
