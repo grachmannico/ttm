@@ -18,14 +18,25 @@
             </div>
             <div class="box-body">
               <div class="table-responsive">
+                <form action="<?php echo base_url()."PPG/mengelola_kegiatan"; ?>" method="POST">
+                  Tampilkan Kegiatan: 
+                  <select class="form-control" name="id_status_kegiatan">
+                    <option value="" selected>Semua Kegiatan</option>
+                    <option value="1">Promosi Kegiatan</option>
+                    <option value="2">Kegiatan Sedang Berjalan</option>
+                    <option value="3">Kegiatan Selesai Berjalan</option>
+                  </select>
+                  <button type="submit" class="btn btn-danger">Cari</button>
+                </form>
+                <br>
                 <table id="example1" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                  <th>Nama Kegiatan</th>
-                  <th>Status Kegiatan</th>
-                  <th>Tanggal Kegiatan</th>
-                  <th>Alamat</th>
-                  <th>Action</th>
+                  <th><center>Nama Kegiatan</center></th>
+                  <th><center>Status Kegiatan</center></th>
+                  <th><center>Tanggal Kegiatan</center></th>
+                  <th><center>Alamat</center></th>
+                  <th><center>Action</center></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -37,19 +48,24 @@
                   <td><?php echo $dk['alamat']; ?></td>
                   <td>
                     <div class="col-md-12">
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <center><form action="<?php echo base_url() . "PPG/edit_kegiatan"; ?>" method="POST">
                           <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $dk['id_kegiatan']; ?>"><i class="fa fa-edit"></i> Edit</button>
                         </form></center>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <center><form action="<?php echo base_url() . "PPG/hapus_kegiatan"; ?>" method="POST">
-                          <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $dk['id_kegiatan']; ?>"><i class="fa fa-trash"></i> Hapus</button>
+                          <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $dk['id_kegiatan']; ?>" onclick="return checkDelete()"><i class="fa fa-trash"></i> Hapus</button>
                         </form></center>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <center><form action="<?php echo base_url() . "PPG/detail_kegiatan"; ?>" method="POST">
                           <button type="submit" class="btn btn-primary btn-xs" name="kegiatan" value="<?php echo $dk['id_kegiatan']; ?>"><i class="fa fa-file-text"></i> Lihat Detail</button>
+                        </form></center>
+                      </div>
+                      <div class="col-md-3">
+                        <center><form action="<?php echo base_url() . "PPG/tambah_dokumentasi_kegiatan"; ?>" method="POST">
+                          <button type="submit" class="btn btn-primary btn-xs" name="dokumentasi" value="<?php echo $dk['id_kegiatan']; ?>"><i class="fa fa-plus-square"></i> Dokumentasi</button>
                         </form></center>
                       </div>
                     </div>

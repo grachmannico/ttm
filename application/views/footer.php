@@ -57,6 +57,30 @@
   });
 </script>
 
+<!-- disable f5 refresh -->
+<script type="text/javascript">
+  document.onkeydown = function (e) {
+  if (e.keyCode === 116) {
+      return false;
+    }
+  };
+</script>
+
+<!-- disable back button -->
+<script type="text/javascript">
+  history.pushState(null, null, document.URL);
+  window.addEventListener('popstate', function () {
+      history.pushState(null, null, document.URL);
+  });
+</script>
+
+<!-- confirm deletion -->
+<script language="JavaScript" type="text/javascript">
+function checkDelete(){
+    return confirm('Are you sure?');
+}
+</script>
+
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
      Both of these plugins are recommended to enhance the
      user experience. Slimscroll is required when using the

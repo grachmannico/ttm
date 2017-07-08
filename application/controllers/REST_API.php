@@ -7,7 +7,6 @@ class REST_API extends CI_Controller
     public function index()
     {
         echo "This is Web Service<br>";
-        $this->tampil_kegiatan();
     }
 
     public function auth()
@@ -112,7 +111,7 @@ class REST_API extends CI_Controller
         $id_status_kegiatan = $this->input->post("id_status_kegiatan");
         if ($id_status_kegiatan == "") {
             $data_kegiatan = $this->REST_API_model->get_kegiatan();
-            $this->load->view("rest_api/v_rest_api", array('data_kegiatan' => $data_kegiatan));
+            // $this->load->view("rest_api/v_rest_api", array('data_kegiatan' => $data_kegiatan));
             echo json_encode($data_kegiatan);
         } elseif ($id_status_kegiatan == 1) {
             $data_kegiatan = $this->REST_API_model->get_kegiatan("where id_status_kegiatan = $id_status_kegiatan");
@@ -225,14 +224,14 @@ class REST_API extends CI_Controller
         $email                  = $this->input->post("email");
         $list_konfirmasi_donasi = $this->REST_API_model->get_list_konfirmasi_donasi("and email = '$email'");
         echo json_encode($list_konfirmasi_donasi);
-        $this->load->view("rest_api/v_list_konfirmasi_donasi", array('list_konfirmasi_donasi' => $list_konfirmasi_donasi));
+        // $this->load->view("rest_api/v_list_konfirmasi_donasi", array('list_konfirmasi_donasi' => $list_konfirmasi_donasi));
     }
 
     public function form_konfirmasi_donasi()
     {
         $id_donasi         = $this->input->post("id_donasi");
         $konfirmasi_donasi = $this->REST_API_model->get_list_konfirmasi_donasi("and id_donasi = $id_donasi");
-        $this->load->view("rest_api/v_konfirmasi_donasi", array('konfirmasi_donasi' => $konfirmasi_donasi));
+        // $this->load->view("rest_api/v_konfirmasi_donasi", array('konfirmasi_donasi' => $konfirmasi_donasi));
         echo json_encode($konfirmasi_donasi);
     }
 
@@ -293,7 +292,7 @@ class REST_API extends CI_Controller
     {
         $id_kegiatan = $this->input->post("id_kegiatan");
         $email       = $this->input->post("email");
-        $this->load->view("rest_api/v_form_feedback", array('id_kegiatan' => $id_kegiatan, 'email' => $email));
+        // $this->load->view("rest_api/v_form_feedback", array('id_kegiatan' => $id_kegiatan, 'email' => $email));
     }
 
     public function kirim_feedback()
@@ -322,7 +321,7 @@ class REST_API extends CI_Controller
     {
         $id_kegiatan = $this->input->post("id_kegiatan");
         $feedback    = $this->REST_API_model->get_feedback_kegiatan("where id_kegiatan = $id_kegiatan");
-        $this->load->view("rest_api/v_lihat_feedback", array('feedback' => $feedback));
+        // $this->load->view("rest_api/v_lihat_feedback", array('feedback' => $feedback));
         echo json_encode($feedback);
     }
 
@@ -333,7 +332,7 @@ class REST_API extends CI_Controller
         // if (empty($balasan)) {
 
         // } else {
-        $this->load->view("rest_api/v_list_balasan_feedback", array('balasan' => $balasan));
+        // $this->load->view("rest_api/v_list_balasan_feedback", array('balasan' => $balasan));
         echo json_encode($balasan);
         // }
     }
@@ -351,7 +350,7 @@ class REST_API extends CI_Controller
         $execute = $this->REST_API_model->insert_data('balas_feedback', $balasan_feedback);
         if ($execute >= 1) {
             $balasan = $this->REST_API_model->get_balasan_feedback("where id_feedback_kegiatan = $id_feedback_kegiatan");
-            $this->load->view("rest_api/v_list_balasan_feedback", array('balasan' => $balasan));
+            // $this->load->view("rest_api/v_list_balasan_feedback", array('balasan' => $balasan));
             $json_data['status'] = "sukses";
             echo json_encode($json_data);
         } else {
@@ -366,10 +365,10 @@ class REST_API extends CI_Controller
         $invoice = $this->input->post("invoice");
         $barang  = $this->REST_API_model->get_barang();
         if ($invoice == "") {
-            $this->load->view("rest_api/v_garage_sale", array('barang' => $barang, 'email' => $email, 'invoice' => $invoice));
+            // $this->load->view("rest_api/v_garage_sale", array('barang' => $barang, 'email' => $email, 'invoice' => $invoice));
             echo json_encode($barang);
         } else if ($invoice != "") {
-            $this->load->view("rest_api/v_garage_sale", array('barang' => $barang, 'email' => $email, 'invoice' => $invoice));
+            // $this->load->view("rest_api/v_garage_sale", array('barang' => $barang, 'email' => $email, 'invoice' => $invoice));
             echo json_encode($barang);
         }
     }
@@ -382,10 +381,10 @@ class REST_API extends CI_Controller
         $barang                = $this->REST_API_model->get_barang("where id_barang_garage_sale = $id_barang_garage_sale");
         if ($invoice == "") {
             $invoice = "";
-            $this->load->view("rest_api/v_detail_barang", array('barang' => $barang, 'email' => $email, 'invoice' => $invoice));
+            // $this->load->view("rest_api/v_detail_barang", array('barang' => $barang, 'email' => $email, 'invoice' => $invoice));
             echo json_encode($barang);
         } else {
-            $this->load->view("rest_api/v_detail_barang", array('barang' => $barang, 'email' => $email, 'invoice' => $invoice));
+            // $this->load->view("rest_api/v_detail_barang", array('barang' => $barang, 'email' => $email, 'invoice' => $invoice));
             echo json_encode($barang);
         }
     }
@@ -546,7 +545,7 @@ class REST_API extends CI_Controller
     {
         $email          = $this->input->post("email");
         $list_pembelian = $this->REST_API_model->get_list_pembelian("where email = '$email' and id_status_pembelian = 1");
-        $this->load->view("rest_api/v_list_pembelian", array('list_pembelian' => $list_pembelian));
+        // $this->load->view("rest_api/v_list_pembelian", array('list_pembelian' => $list_pembelian));
         echo json_encode($list_pembelian);
     }
 
@@ -558,7 +557,7 @@ class REST_API extends CI_Controller
             echo "Tidak ada invoice<br>";
             echo json_encode($keranjang_belanja);
         } elseif ($invoice != "") {
-            $this->load->view("rest_api/v_detail_pembelian", array('keranjang_belanja' => $keranjang_belanja, 'invoice' => $invoice));
+            // $this->load->view("rest_api/v_detail_pembelian", array('keranjang_belanja' => $keranjang_belanja, 'invoice' => $invoice));
             echo json_encode($keranjang_belanja);
         }
     }
@@ -567,7 +566,7 @@ class REST_API extends CI_Controller
     {
         $invoice       = $this->input->post("invoice");
         $total_tagihan = $this->REST_API_model->get_total_tagihan("and id_invoice = '$invoice'");
-        $this->load->view("rest_api/v_form_konfirmasi_pembelian", array('total_tagihan' => $total_tagihan, 'invoice' => $invoice));
+        // $this->load->view("rest_api/v_form_konfirmasi_pembelian", array('total_tagihan' => $total_tagihan, 'invoice' => $invoice));
         echo json_encode($total_tagihan);
     }
 

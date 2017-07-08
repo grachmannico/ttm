@@ -10,7 +10,85 @@
     </section>
     <section class="content">
       <div class="row">
-        <div class="col-md-8 col-md-push-2">
+        <div class="col-md-10 col-md-push-1">
+          <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#tab_1" data-toggle="tab">Tambah Dokumentasi</a></li>
+              <li><a href="#tab_2" data-toggle="tab">Kelola Dokumentasi</a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="tab_1">
+                <div class="box box-danger">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">Form Tambah Dokumentasi Kegiatan</h3>
+                  </div>
+                  <form role="form" action="<?php echo base_url()."PPG/tambah_dokumentasi_kegiatan"; ?>" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
+                    <div class="box-body">
+                      <div class="form-group">
+                        <label for="exampleInputEmail1"><i class="fa fa-image"></i> Gambar Kegitan</label>
+                        <input name="gambar" size="20" type="file" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputEmail1"><i class="fa fa-file-text"></i> Deskripsi</label>
+                        <textarea id="editor1" name="deskripsi" rows="10" cols="80" required>
+                        
+                        </textarea>
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal</label>
+                        <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" placeholder="Tanggal" name="tanggal" required>
+                      </div>
+                    </div>
+                    <div class="box-footer">
+                      <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-plus-square"></i> <span>Tambah Dokumentasi</span></button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="tab-pane" id="tab_2">
+                <div class="box box-danger">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">Dokumentasi</h3>
+                  </div>
+                  <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                      <thead>
+                      <tr>
+                        <th>gambar kegiatan</th>
+                        <th>deskripsi</th>
+                        <th>tanggal</th>
+                        <th>action</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        <?php foreach ($dokumentasi as $d): ?>
+                        <tr>
+                          <td><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_kegiatan']; ?>" alt="" width="300px"></td>
+                          <td><?php echo $d['deskripsi']; ?></td>
+                          <td><?php echo $d['tanggal']; ?></td>
+                          <td>
+                            <form action="<?php echo base_url()."PPG/edit_dokumentasi_kegiatan"; ?>" method="POST">
+                              <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['id_gambar_kegiatan']; ?>"><i class="fa fa-edit"></i> Edit</button>
+                            </form>
+                            <form action="<?php echo base_url()."PPG/hapus_dokumentasi_kegiatan"; ?>" method="POST">
+                              <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
+                              <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $d['id_gambar_kegiatan']; ?>" onclick="return checkDelete()"><i class="fa fa-trash"></i> Hapus</button>
+                            </form>
+                          </td>
+                        </tr>
+                        <?php endforeach?>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+          </div>
+        </div>
+        <!-- <div class="col-md-8 col-md-push-2">
           <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Form Tambah Dokumentasi Kegiatan</h3>
@@ -20,7 +98,6 @@
               <div class="box-body">
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-image"></i> Gambar Kegitan</label>
-                  <!-- <input type="email" class="form-control" placeholder="Email Relawan" name="email" required> -->
                   <input name="gambar" size="20" type="file" required>
                 </div>
                 <div class="form-group">
@@ -65,8 +142,6 @@
                       <form action="<?php echo base_url()."PPG/edit_dokumentasi_kegiatan"; ?>" method="POST">
                         <button type="submit" name="edit" value="<?php echo $d['id_gambar_kegiatan']; ?>">Edit</button>
                       </form>
-                    <!-- </td>
-                    <td> -->
                       <form action="<?php echo base_url()."PPG/hapus_dokumentasi_kegiatan"; ?>" method="POST">
                         <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
                         <button type="submit" name="hapus" value="<?php echo $d['id_gambar_kegiatan']; ?>">Hapus</button>
@@ -78,7 +153,7 @@
               </table>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </section>
   </div>

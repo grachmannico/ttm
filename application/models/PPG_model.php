@@ -24,7 +24,7 @@ class PPG_model extends CI_Model
 
     public function get_kegiatan($where = "")
     {
-        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, s.status_kegiatan, k.tanggal_kegiatan, k.alamat
+        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, s.status_kegiatan, k.id_status_kegiatan, k.tanggal_kegiatan, k.alamat
             from kegiatan k
             join status_kegiatan s
             on k.id_status_kegiatan=s.id_status_kegiatan ' . $where);

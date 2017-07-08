@@ -8,15 +8,18 @@ class PPG extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        //map config
-        $this->load->helper(array('form', 'url'));
-        $this->load->config('map');
-        $this->def_lat = $this->config->item('default_lat');
-        $this->def_lng = $this->config->item('default_lng');
-        $this->load->library('googlemaps');
-
-        $this->load->view('header');
-        $this->load->view('ppg/sidebar-ppg');
+        if ($this->session->userdata('pangkat_divisi') == "Ketua Divisi" && $this->session->userdata('divisi') == "Penelitian Pengembangan dan Gerakan") {
+            $this->load->view('header');
+            $this->load->view('ppg/sidebar-ppg');
+            //map config
+            $this->load->helper(array('form', 'url'));
+            $this->load->config('map');
+            $this->def_lat = $this->config->item('default_lat');
+            $this->def_lng = $this->config->item('default_lng');
+            $this->load->library('googlemaps');
+        } else {
+            redirect("Auth");
+        }
     }
 
     public function index()
@@ -29,19 +32,14 @@ class PPG extends CI_Controller
     {
         $id_status_kegiatan = $this->input->post("id_status_kegiatan");
         if ($id_status_kegiatan == "") {
+            if ($this->session->flashdata('success_msg')) {
+                $this->load->view("success", array('success' => $this->session->flashdata('success_msg')));
+            }
             $data_kegiatan = $this->PPG_model->get_kegiatan();
             $this->load->view("ppg/v_mengelola_kegiatan", array('data_kegiatan' => $data_kegiatan));
             $this->load->view('footer');
-        } elseif ($id_status_kegiatan == 1) {
-            $data_kegiatan = $this->PPG_model->get_kegiatan("where id_status_kegiatan = $id_status_kegiatan");
-            $this->load->view("ppg/v_mengelola_kegiatan", array('data_kegiatan' => $data_kegiatan));
-            $this->load->view('footer');
-        } elseif ($id_status_kegiatan == 2) {
-            $data_kegiatan = $this->PPG_model->get_kegiatan("where id_status_kegiatan = $id_status_kegiatan");
-            $this->load->view("ppg/v_mengelola_kegiatan", array('data_kegiatan' => $data_kegiatan));
-            $this->load->view('footer');
-        } elseif ($id_status_kegiatan == 3) {
-            $data_kegiatan = $this->PPG_model->get_kegiatan("where id_status_kegiatan = $id_status_kegiatan");
+        } elseif ($id_status_kegiatan != "") {
+            $data_kegiatan = $this->PPG_model->get_kegiatan("where k.id_status_kegiatan = $id_status_kegiatan");
             $this->load->view("ppg/v_mengelola_kegiatan", array('data_kegiatan' => $data_kegiatan));
             $this->load->view('footer');
         }
@@ -118,16 +116,16 @@ class PPG extends CI_Controller
                 $execute = $this->PPG_model->insert_data('kegiatan', $tambah_kegiatan);
                 if ($execute >= 1) {
                     if ($id_status_kegiatan == 1) {
-                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
 
-                        //fcm
-                        // $title        = "Kegiatan Baru: " . $nama_kegiatan;
-                        // $body         = $pesan_ajakan;
-                        // $message      = "null";
-                        // $message_type = "kegiatan";
-                        // $intent       = "DetailKegiatanActivity";
-                        // $id_target    = $get_id_kegiatan[0]['id_kegiatan'];
-                        // $date_rcv     = date("Y-m-d");
+                        //Start FCM Code
+                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
+                        $title           = "Kegiatan Baru: " . $nama_kegiatan;
+                        $body            = $pesan_ajakan;
+                        $message         = "null";
+                        $message_type    = "kegiatan";
+                        $intent          = "DetailKegiatanActivity";
+                        $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
+                        $date_rcv        = date("Y-m-d");
 
                         $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
                         $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
@@ -145,16 +143,15 @@ class PPG extends CI_Controller
                         $fields  = array(
                             'registration_ids' => $ids,
                             'data'             => array(
-                                'title'       => "Kegiatan Baru: " . $nama_kegiatan,
-                                'body'        => $pesan_ajakan,
-                                'message'     => "null",
-                                'messagetype' => "kegiatan",
-                                'intent'      => "DetailKegiatanActivity",
-                                'idtarget'    => $get_id_kegiatan[0]['id_kegiatan'],
-                                'datercv'     => date("Y-m-d"),
+                                'title'       => $title,
+                                'body'        => $body,
+                                'message'     => $message,
+                                'messagetype' => $message_type,
+                                'intent'      => $intent,
+                                'idtarget'    => $id_target,
+                                'datercv'     => $date_rcv,
                             ),
                         );
-                        // print_r($fields);
 
                         $payload      = json_encode($fields);
                         $curl_session = curl_init();
@@ -168,10 +165,14 @@ class PPG extends CI_Controller
 
                         $result = curl_exec($curl_session);
                         curl_close($curl_session);
-                        echo "<hr>";
-                        print_r($result);
+                        // echo "<hr>";
+                        // print_r($result);
+                        //End FCM Code
 
-                        // redirect("PPG/mengelola_kegiatan");
+                        $pesan  = "Sukses Menambah Kegiatan $nama_kegiatan";
+                        $sukses = array('pesan' => $pesan);
+                        $this->session->set_flashdata('success_msg', $sukses);
+                        redirect("PPG/mengelola_kegiatan");
                     } elseif ($id_status_kegiatan == 2) {
                         $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
                         $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
@@ -182,7 +183,18 @@ class PPG extends CI_Controller
                         $this->load->view('footer');
                     }
                 } else {
-                    echo "gagal";
+                    $pesan      = "Gagal Menambah Kegiatan. Isi Seluruh Form Yang Tersedia.";
+                    $url_target = "PPG/tambah_kegiatan";
+                    $name       = "";
+                    $value      = "";
+                    $alert      = array(
+                        'pesan'      => $pesan,
+                        'url_target' => $url_target,
+                        'name'       => $name,
+                        'value'      => $value,
+                    );
+                    $this->load->view("alert", array('alert' => $alert));
+                    $this->load->view("footer");
                 }
             } else {
                 $data            = array('upload_data' => $this->upload->data());
@@ -203,6 +215,63 @@ class PPG extends CI_Controller
                 $execute = $this->PPG_model->insert_data('kegiatan', $tambah_kegiatan);
                 if ($execute >= 1) {
                     if ($id_status_kegiatan == 1) {
+
+                        //Start FCM Code
+                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
+                        $title           = "Kegiatan Baru: " . $nama_kegiatan;
+                        $body            = $pesan_ajakan;
+                        $message         = "null";
+                        $message_type    = "kegiatan";
+                        $intent          = "DetailKegiatanActivity";
+                        $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
+                        $date_rcv        = date("Y-m-d");
+
+                        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+                        $data        = $this->PPG_model->get_all_user();
+                        print_r($data);
+
+                        $ids = array();
+                        $i   = 0;
+                        foreach ($data as $d) {
+                            $ids[$i] = $d['fcm_token'];
+                            $i++;
+                        }
+
+                        $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                        $fields  = array(
+                            'registration_ids' => $ids,
+                            'data'             => array(
+                                'title'       => $title,
+                                'body'        => $body,
+                                'message'     => $message,
+                                'messagetype' => $message_type,
+                                'intent'      => $intent,
+                                'idtarget'    => $id_target,
+                                'datercv'     => $date_rcv,
+                            ),
+                        );
+
+                        $payload      = json_encode($fields);
+                        $curl_session = curl_init();
+                        curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                        curl_setopt($curl_session, CURLOPT_POST, true);
+                        curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                        curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                        curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                        $result = curl_exec($curl_session);
+                        curl_close($curl_session);
+                        // echo "<hr>";
+                        // print_r($result);
+                        //End FCM Code
+
+                        $pesan  = "Sukses Menambah Kegiatan $nama_kegiatan";
+                        $sukses = array('pesan' => $pesan);
+                        $this->session->set_flashdata('success_msg', $sukses);
+
                         redirect("PPG/mengelola_kegiatan");
                     } elseif ($id_status_kegiatan == 2) {
                         $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
@@ -235,7 +304,6 @@ class PPG extends CI_Controller
         $alamat                  = $this->input->post("alamat");
         $lat                     = $this->input->post("lat");
         $lng                     = $this->input->post("lng");
-        // $banner                  = $this->input->post("banner");
         if ($edit != "") {
             $detail_kegiatan = $this->PPG_model->get_detail_kegiatan("where id_kegiatan = $edit");
 
@@ -300,6 +368,62 @@ class PPG extends CI_Controller
                 $execute = $this->PPG_model->update_data('kegiatan', $update_kegiatan, $where);
                 if ($execute >= 1) {
                     if ($id_status_kegiatan == 1) {
+
+                        //Start FCM Code
+                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
+                        $title           = "Kegiatan " . $nama_kegiatan . " Diperbarui";
+                        $body            = "Kegiatan telah diperbarui, lihat sekarang.";
+                        $message         = "null";
+                        $message_type    = "kegiatan";
+                        $intent          = "DetailKegiatanActivity";
+                        $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
+                        $date_rcv        = date("Y-m-d");
+
+                        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+                        $data        = $this->PPG_model->get_all_user();
+                        print_r($data);
+
+                        $ids = array();
+                        $i   = 0;
+                        foreach ($data as $d) {
+                            $ids[$i] = $d['fcm_token'];
+                            $i++;
+                        }
+
+                        $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                        $fields  = array(
+                            'registration_ids' => $ids,
+                            'data'             => array(
+                                'title'       => $title,
+                                'body'        => $body,
+                                'message'     => $message,
+                                'messagetype' => $message_type,
+                                'intent'      => $intent,
+                                'idtarget'    => $id_target,
+                                'datercv'     => $date_rcv,
+                            ),
+                        );
+
+                        $payload      = json_encode($fields);
+                        $curl_session = curl_init();
+                        curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                        curl_setopt($curl_session, CURLOPT_POST, true);
+                        curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                        curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                        curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                        $result = curl_exec($curl_session);
+                        curl_close($curl_session);
+                        // echo "<hr>";
+                        // print_r($result);
+                        //End FCM Code
+
+                        $pesan  = "Sukses Meng-edit Kegiatan $nama_kegiatan";
+                        $sukses = array('pesan' => $pesan);
+                        $this->session->set_flashdata('success_msg', $sukses);
                         redirect("PPG/mengelola_kegiatan");
                     } elseif ($id_status_kegiatan == 2) {
                         $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
@@ -311,7 +435,18 @@ class PPG extends CI_Controller
                         $this->load->view('footer');
                     }
                 } else {
-                    echo "gagal";
+                    $pesan      = "Gagal Edit Kegiatan. Silahkan Cek Kembali.";
+                    $url_target = "PPG/edit_kegiatan";
+                    $name       = "edit";
+                    $value      = $id_kegiatan;
+                    $alert      = array(
+                        'pesan'      => $pesan,
+                        'url_target' => $url_target,
+                        'name'       => $name,
+                        'value'      => $value,
+                    );
+                    $this->load->view("alert", array('alert' => $alert));
+                    $this->load->view("footer");
                 }
             } else {
                 $data            = array('upload_data' => $this->upload->data());
@@ -333,6 +468,63 @@ class PPG extends CI_Controller
                 $execute = $this->PPG_model->update_data('kegiatan', $update_kegiatan, $where);
                 if ($execute >= 1) {
                     if ($id_status_kegiatan == 1) {
+
+                        //Start FCM Code
+                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
+                        $title           = "Kegiatan " . $nama_kegiatan . " Diperbarui";
+                        $body            = "Kegiatan telah diperbarui, lihat sekarang.";
+                        $message         = "null";
+                        $message_type    = "kegiatan";
+                        $intent          = "DetailKegiatanActivity";
+                        $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
+                        $date_rcv        = date("Y-m-d");
+
+                        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+                        $data        = $this->PPG_model->get_all_user();
+                        print_r($data);
+
+                        $ids = array();
+                        $i   = 0;
+                        foreach ($data as $d) {
+                            $ids[$i] = $d['fcm_token'];
+                            $i++;
+                        }
+
+                        $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                        $fields  = array(
+                            'registration_ids' => $ids,
+                            'data'             => array(
+                                'title'       => $title,
+                                'body'        => $body,
+                                'message'     => $message,
+                                'messagetype' => $message_type,
+                                'intent'      => $intent,
+                                'idtarget'    => $id_target,
+                                'datercv'     => $date_rcv,
+                            ),
+                        );
+
+                        $payload      = json_encode($fields);
+                        $curl_session = curl_init();
+                        curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                        curl_setopt($curl_session, CURLOPT_POST, true);
+                        curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                        curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                        curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                        $result = curl_exec($curl_session);
+                        curl_close($curl_session);
+                        // echo "<hr>";
+                        // print_r($result);
+                        //End FCM Code
+
+                        $pesan  = "Sukses Meng-edit Kegiatan $nama_kegiatan";
+                        $sukses = array('pesan' => $pesan);
+                        $this->session->set_flashdata('success_msg', $sukses);
+
                         redirect("PPG/mengelola_kegiatan");
                     } elseif ($id_status_kegiatan == 2) {
                         $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
@@ -344,21 +536,74 @@ class PPG extends CI_Controller
                         $this->load->view('footer');
                     }
                 } else {
-                    echo "gagal";
+                    $pesan      = "Gagal Edit Kegiatan. Silahkan Cek Kembali.";
+                    $url_target = "PPG/edit_kegiatan";
+                    $name       = "edit";
+                    $value      = $id_kegiatan;
+                    $alert      = array(
+                        'pesan'      => $pesan,
+                        'url_target' => $url_target,
+                        'name'       => $name,
+                        'value'      => $value,
+                    );
+                    $this->load->view("alert", array('alert' => $alert));
+                    $this->load->view("footer");
                 }
             }
+        } else {
+            $pesan      = "Gagal Edit Kegiatan. Silahkan Cek Kembali.";
+            $url_target = "PPG/edit_kegiatan";
+            $name       = "edit";
+            $value      = $id_kegiatan;
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
     public function hapus_kegiatan()
     {
-        $hapus   = $this->input->post("hapus");
-        $where   = array('id_kegiatan' => $hapus);
-        $execute = $this->PPG_model->delete_data('kegiatan', $where);
-        if ($execute >= 1) {
-            redirect("PPG/mengelola_kegiatan");
+        $hapus = $this->input->post("hapus");
+        if ($hapus != "") {
+            $where   = array('id_kegiatan' => $hapus);
+            $execute = $this->PPG_model->delete_data('kegiatan', $where);
+            if ($execute >= 1) {
+                $pesan  = "Sukses Menghapus Kegiatan";
+                $sukses = array('pesan' => $pesan);
+                $this->session->set_flashdata('success_msg', $sukses);
+                redirect("PPG/mengelola_kegiatan");
+            } else {
+                $pesan      = "Gagal Hapus Kegiatan. Silahkan Cek Kembali.";
+                $url_target = "PPG/mengelola_kegiatan";
+                $name       = "";
+                $value      = "";
+                $alert      = array(
+                    'pesan'      => $pesan,
+                    'url_target' => $url_target,
+                    'name'       => $name,
+                    'value'      => $value,
+                );
+                $this->load->view("alert", array('alert' => $alert));
+                $this->load->view("footer");
+            }
         } else {
-            echo "gagal";
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "PPG/";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -370,41 +615,177 @@ class PPG extends CI_Controller
             $jumlah_relawan  = $this->PPG_model->get_jumlah_relawan("where k.id_kegiatan = $kegiatan");
             $jumlah_donasi   = $this->PPG_model->get_jumlah_donasi("and k.id_kegiatan = $kegiatan");
             $dokumentasi     = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $kegiatan");
-            $this->load->view("ppg/v_detail_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'jumlah_relawan' => $jumlah_relawan, 'jumlah_donasi' => $jumlah_donasi, 'dokumentasi' => $dokumentasi));
+
+            //Start Map
+            // $center = $detail_kegiatan[0]['lat'] . "," . $detail_kegiatan[0]['lng'];
+            $this->def_lat = $detail_kegiatan[0]['lat'];
+            $this->def_lng = $detail_kegiatan[0]['lng'];
+            $center        = $this->def_lat . "," . $this->def_lng;
+            $cfg           = array(
+                'class'                       => 'map-canvas',
+                'map_div_id'                  => 'map-canvas',
+                'center'                      => $center,
+                'zoom'                        => 17,
+                'places'                      => true, //Aktifkan pencarian alamat
+                'placesAutocompleteInputID'   => 'cari', //set sumber pencarian input
+                'placesAutocompleteBoundsMap' => true,
+                'placesAutocompleteOnChange'  => 'showmap();', //Aksi ketika pencarian dipilih
+            );
+            $this->googlemaps->initialize($cfg);
+
+            $marker = array(
+                'position'  => $center,
+                'draggable' => false,
+                'title'     => 'Coba diDrag',
+                'ondragend' => "document.getElementById('lat').value = event.latLng.lat();
+                            document.getElementById('lng').value = event.latLng.lng();
+                            showmap();",
+            );
+            $this->googlemaps->add_marker($marker);
+
+            $d['map'] = $this->googlemaps->create_map();
+            $d['lat'] = $this->def_lat;
+            $d['lng'] = $this->def_lng;
+            //End Map
+
+            $this->load->view("ppg/v_detail_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'jumlah_relawan' => $jumlah_relawan, 'jumlah_donasi' => $jumlah_donasi, 'dokumentasi' => $dokumentasi, 'd' => $d));
             $this->load->view('footer');
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "PPG/";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
     public function tambah_dokumentasi_kegiatan()
     {
+        $dokumen     = $this->input->post("dokumentasi");
         $id_kegiatan = $this->input->post("id_kegiatan");
         $deskripsi   = $this->input->post("deskripsi");
         $tanggal     = $this->input->post("tanggal");
 
-        $config['upload_path']   = './uploads/dokumentasi/';
-        $config['allowed_types'] = 'gif|jpg|png';
-        $config['max_size']      = 2048;
-        $this->load->library('upload', $config);
+        // echo $dokumen."<br>";
+        // echo $id_kegiatan."<br>";
+        // echo $deskripsi."<br>";
+        // echo $tanggal."<br>";
 
-        if (!$this->upload->do_upload('gambar')) {
-            $error = array('error' => $this->upload->display_errors());
-            echo "error";
-        } else {
-            $data               = array('upload_data' => $this->upload->data());
-            $tambah_dokumentasi = array(
-                'deskripsi'       => $deskripsi,
-                'tanggal'         => $tanggal,
-                'id_kegiatan'     => $id_kegiatan,
-                'gambar_kegiatan' => $this->upload->data('file_name'),
-            );
-            $execute = $this->PPG_model->insert_data('gambar_kegiatan', $tambah_dokumentasi);
-            if ($execute >= 1) {
-                $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
+        if ($dokumen != "") {
+            $check_status_kegiatan = $this->PPG_model->get_kegiatan("where k.id_kegiatan = $dokumen");
+            if ($check_status_kegiatan[0]['id_status_kegiatan'] > 1) {
+                $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $dokumen");
+                $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $dokumen));
                 $this->load->view('footer');
             } else {
-                echo "gagal";
+                $pesan      = "Tidak Bisa Menambah Dokumentasi Karena Kegiatan Masih Dalam Promosi Kegiatan.";
+                $url_target = "PPG/mengelola_kegiatan";
+                $name       = "";
+                $value      = "";
+                $alert      = array(
+                    'pesan'      => $pesan,
+                    'url_target' => $url_target,
+                    'name'       => $name,
+                    'value'      => $value,
+                );
+                $this->load->view("alert", array('alert' => $alert));
+                $this->load->view("footer");
             }
+        } else if ($this->session->flashdata('dokumentasi')) {
+            $doc                   = $this->session->flashdata('dokumentasi');
+            $check_status_kegiatan = $this->PPG_model->get_kegiatan("where k.id_kegiatan = $doc[dokumentasi]");
+            if ($check_status_kegiatan[0]['id_status_kegiatan'] > 1) {
+                $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $doc[dokumentasi]");
+                $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $doc['dokumentasi']));
+                $this->load->view('footer');
+            } else {
+                $pesan      = "Tidak Bisa Menambah Dokumentasi Karena Kegiatan Masih Dalam Promosi Kegiatan.";
+                $url_target = "PPG/mengelola_kegiatan";
+                $name       = "";
+                $value      = "";
+                $alert      = array(
+                    'pesan'      => $pesan,
+                    'url_target' => $url_target,
+                    'name'       => $name,
+                    'value'      => $value,
+                );
+                $this->load->view("alert", array('alert' => $alert));
+                $this->load->view("footer");
+            }
+        } else if ($id_kegiatan != "" && $deskripsi != "" && $tanggal != "") {
+            $config['upload_path']   = './uploads/dokumentasi/';
+            $config['allowed_types'] = 'gif|jpg|png';
+            $config['max_size']      = 2048;
+            $this->load->library('upload', $config);
+
+            if (!$this->upload->do_upload('gambar')) {
+                // $error = array('error' => $this->upload->display_errors());
+                // echo "error";
+
+                $pesan      = "Gagal Menambah Dokumentasi. Pastiakan Anda Yang Anda Unggah Adalah Foto/Gambar.";
+                $url_target = "PPG/mengelola_kegiatan";
+                $name       = "";
+                $value      = "";
+                $alert      = array(
+                    'pesan'      => $pesan,
+                    'url_target' => $url_target,
+                    'name'       => $name,
+                    'value'      => $value,
+                );
+                $this->load->view("alert", array('alert' => $alert));
+                $this->load->view("footer");
+            } else {
+                $data               = array('upload_data' => $this->upload->data());
+                $tambah_dokumentasi = array(
+                    'deskripsi'       => $deskripsi,
+                    'tanggal'         => $tanggal,
+                    'id_kegiatan'     => $id_kegiatan,
+                    'gambar_kegiatan' => $this->upload->data('file_name'),
+                );
+                $execute = $this->PPG_model->insert_data('gambar_kegiatan', $tambah_dokumentasi);
+                if ($execute >= 1) {
+                    $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
+
+                    //Start FCM Code
+                    //End FCM Code
+
+                    $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
+                    $this->load->view('footer');
+                } else {
+                    $pesan      = "Gagal Menambah Dokumentasi. Silahkan Cek Kembali.";
+                    $url_target = "PPG/mengelola_kegiatan";
+                    $name       = "";
+                    $value      = "";
+                    $alert      = array(
+                        'pesan'      => $pesan,
+                        'url_target' => $url_target,
+                        'name'       => $name,
+                        'value'      => $value,
+                    );
+                    $this->load->view("alert", array('alert' => $alert));
+                    $this->load->view("footer");
+                }
+            }
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "PPG/mengelola_kegiatan";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -417,7 +798,6 @@ class PPG extends CI_Controller
         $tanggal            = $this->input->post("tanggal");
         if ($edit != "") {
             $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_gambar_kegiatan = $edit");
-            // print_r($dokumentasi);
             $this->load->view("ppg/v_form_edit_dokumentasi", array('dokumentasi' => $dokumentasi));
             $this->load->view('footer');
         } elseif ($id_gambar_kegiatan != "" && $id_kegiatan != "" && $deskripsi != "" && $tanggal != "") {
@@ -438,10 +818,29 @@ class PPG extends CI_Controller
                 $execute = $this->PPG_model->update_data('gambar_kegiatan', $update_dokumentasi, $where);
                 if ($execute >= 1) {
                     $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                    $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
-                    $this->load->view('footer');
+
+                    //Start FCM Code
+                    //End FCM Code
+
+                    $dokumentasi = array('dokumentasi' => $id_kegiatan);
+                    $this->session->set_flashdata('dokumentasi', $dokumentasi);
+                    redirect("PPG/tambah_dokumentasi_kegiatan");
+
+                    // $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
+                    // $this->load->view('footer');
                 } else {
-                    echo "gagal";
+                    $pesan      = "Gagal Meng-edit Dokumentasi. Silahkan Cek Kembali.";
+                    $url_target = "PPG/edit_dokumentasi_kegiatan";
+                    $name       = "edit";
+                    $value      = $id_gambar_kegiatan;
+                    $alert      = array(
+                        'pesan'      => $pesan,
+                        'url_target' => $url_target,
+                        'name'       => $name,
+                        'value'      => $value,
+                    );
+                    $this->load->view("alert", array('alert' => $alert));
+                    $this->load->view("footer");
                 }
             } else {
                 $update_dokumentasi = array(
@@ -454,29 +853,89 @@ class PPG extends CI_Controller
                 $execute = $this->PPG_model->update_data('gambar_kegiatan', $update_dokumentasi, $where);
                 if ($execute >= 1) {
                     $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                    $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
-                    $this->load->view('footer');
+
+                    //Start FCM Code
+                    //End FCM Code
+
+                    $dokumentasi = array('dokumentasi' => $id_kegiatan);
+                    $this->session->set_flashdata('dokumentasi', $dokumentasi);
+                    redirect("PPG/tambah_dokumentasi_kegiatan");
+
+                    // $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
+                    // $this->load->view('footer');
                 } else {
-                    echo "gagal";
+                    $pesan      = "Gagal Meng-edit Dokumentasi. Silahkan Cek Kembali.";
+                    $url_target = "PPG/edit_dokumentasi_kegiatan";
+                    $name       = "edit";
+                    $value      = $id_gambar_kegiatan;
+                    $alert      = array(
+                        'pesan'      => $pesan,
+                        'url_target' => $url_target,
+                        'name'       => $name,
+                        'value'      => $value,
+                    );
+                    $this->load->view("alert", array('alert' => $alert));
+                    $this->load->view("footer");
                 }
             }
         } else {
-            echo "gagal";
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "PPG/";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
     public function hapus_dokumentasi_kegiatan()
     {
-        $hapus       = $this->input->post("hapus");
+        $hapus = $this->input->post("hapus");
         $id_kegiatan = $this->input->post("id_kegiatan");
-        $where       = array('id_gambar_kegiatan' => $hapus);
-        $execute     = $this->PPG_model->delete_data('gambar_kegiatan', $where);
-        if ($execute >= 1) {
-            $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-            $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
-            $this->load->view('footer');
+        if ($hapus != "") {
+            $where       = array('id_gambar_kegiatan' => $hapus);
+            $execute     = $this->PPG_model->delete_data('gambar_kegiatan', $where);
+            if ($execute >= 1) {
+                $dokumentasi = array('dokumentasi' => $id_kegiatan);
+                $this->session->set_flashdata('dokumentasi', $dokumentasi);
+                redirect("PPG/tambah_dokumentasi_kegiatan");
+
+                // $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
+                // $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
+                // $this->load->view('footer');
+            } else {
+                $pesan      = "Gagal Hapus Dokumentasi. Silahkan Cek Kembali.";
+                $url_target = "PPG/mengelola_kegiatan";
+                $name       = "";
+                $value      = "";
+                $alert      = array(
+                    'pesan'      => $pesan,
+                    'url_target' => $url_target,
+                    'name'       => $name,
+                    'value'      => $value,
+                );
+                $this->load->view("alert", array('alert' => $alert));
+                $this->load->view("footer");
+            }
         } else {
-            echo "gagal";
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "PPG/";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -494,6 +953,19 @@ class PPG extends CI_Controller
             $feedback = $this->PPG_model->get_feedback_kegiatan("where k.id_kegiatan = $id_kegiatan");
             $this->load->view("ppg/v_list_feedback", array('feedback' => $feedback));
             $this->load->view('footer');
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "PPG/";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -525,8 +997,32 @@ class PPG extends CI_Controller
                 $this->load->view("ppg/v_balas_feedback", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $id_feedback_kegiatan, 'email' => $email, 'nama' => $nama));
                 $this->load->view('footer');
             } else {
-                echo "gagal";
+                $pesan      = "Gagal Membalas Feedback. Silahkan Cek Kembali.";
+                $url_target = "PPG/mengelola_feedback";
+                $name       = "";
+                $value      = "";
+                $alert      = array(
+                    'pesan'      => $pesan,
+                    'url_target' => $url_target,
+                    'name'       => $name,
+                    'value'      => $value,
+                );
+                $this->load->view("alert", array('alert' => $alert));
+                $this->load->view("footer");
             }
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "PPG/";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 }
