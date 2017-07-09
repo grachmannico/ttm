@@ -69,23 +69,60 @@ class PPG_model extends CI_Model
         return $data->result_array();
     }
 
-    public function get_feedback_kegiatan($where = "")
+    public function get_data_feedback_kegiatan($where = "")
     {
-        $data = $this->db->query('select f.id_feedback_kegiatan, k.nama_kegiatan, f.email, r.nama, f.komentar, f.rating
+        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, k.tanggal_kegiatan, coalesce(avg(r.rating), 0) as rating_relawan, coalesce(avg(d.rating), 0) as rating_donatur
             from kegiatan k
-            join feedback_kegiatan f
+            left join feedback_kegiatan_relawan r
+            on k.id_kegiatan=r.id_kegiatan
+            left join feedback_kegiatan_donatur d
+            on k.id_kegiatan=d.id_kegiatan '
+            . $where .
+            ' group by k.id_kegiatan');
+        return $data->result_array();
+    }
+
+    public function get_feedback_kegiatan_relawan($where = "")
+    {
+        $data = $this->db->query('select f.id_feedback_kegiatan, k.nama_kegiatan, r.email, r.nama, f.komentar, f.rating, f.tanggal
+            from kegiatan k
+            join feedback_kegiatan_relawan f
             on k.id_kegiatan=f.id_kegiatan
             join relawan r
             on f.email=r.email ' . $where);
         return $data->result_array();
     }
 
-    public function get_balasan_feedback_kegiatan($where = "")
+    public function get_feedback_kegiatan_donatur($where = "")
     {
-        $data = $this->db->query('select b.id_balas_feedback, b.email, r.nama, b.komentar
-            from balas_feedback b
+        $data = $this->db->query('select f.id_feedback_kegiatan, k.nama_kegiatan, d.email, d.nama, f.komentar, f.rating, f.tanggal
+            from kegiatan k
+            join feedback_kegiatan_donatur f
+            on k.id_kegiatan=f.id_kegiatan
+            join donatur d
+            on f.email=d.email ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_balasan_feedback_kegiatan_relawan($where = "")
+    {
+        $data = $this->db->query('select b.id_balas_feedback, b.email, r.nama, b.komentar, b.tanggal
+            from balas_feedback_relawan b
             join relawan r
-            on b.email=r.email ' . $where);
+            on b.email=r.email '
+            . $where .
+            ' order by b.id_balas_feedback');
+        return $data->result_array();
+    }
+
+    public function get_balasan_feedback_kegiatan_donatur($where = "")
+    {
+        $data = $this->db->query('select b.id_balas_feedback, b.email, d.nama, b.komentar, b.tanggal
+            from balas_feedback_donatur b
+            join donatur d
+            on b.email=d.email '
+            . $where .
+            ' order by b.id_balas_feedback');
         return $data->result_array();
     }
 

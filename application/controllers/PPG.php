@@ -593,7 +593,7 @@ class PPG extends CI_Controller
             }
         } else {
             $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
-            $url_target = "PPG/";
+            $url_target = "PPG/mengelola_kegiatan";
             $name       = "";
             $value      = "";
             $alert      = array(
@@ -652,7 +652,7 @@ class PPG extends CI_Controller
             $this->load->view('footer');
         } else {
             $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
-            $url_target = "PPG/";
+            $url_target = "PPG/mengelola_kegiatan";
             $name       = "";
             $value      = "";
             $alert      = array(
@@ -880,7 +880,7 @@ class PPG extends CI_Controller
             }
         } else {
             $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
-            $url_target = "PPG/";
+            $url_target = "PPG/mengelola_kegiatan";
             $name       = "";
             $value      = "";
             $alert      = array(
@@ -896,11 +896,11 @@ class PPG extends CI_Controller
 
     public function hapus_dokumentasi_kegiatan()
     {
-        $hapus = $this->input->post("hapus");
+        $hapus       = $this->input->post("hapus");
         $id_kegiatan = $this->input->post("id_kegiatan");
         if ($hapus != "") {
-            $where       = array('id_gambar_kegiatan' => $hapus);
-            $execute     = $this->PPG_model->delete_data('gambar_kegiatan', $where);
+            $where   = array('id_gambar_kegiatan' => $hapus);
+            $execute = $this->PPG_model->delete_data('gambar_kegiatan', $where);
             if ($execute >= 1) {
                 $dokumentasi = array('dokumentasi' => $id_kegiatan);
                 $this->session->set_flashdata('dokumentasi', $dokumentasi);
@@ -925,7 +925,7 @@ class PPG extends CI_Controller
             }
         } else {
             $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
-            $url_target = "PPG/";
+            $url_target = "PPG/mengelola_kegiatan";
             $name       = "";
             $value      = "";
             $alert      = array(
@@ -941,7 +941,7 @@ class PPG extends CI_Controller
 
     public function mengelola_feedback()
     {
-        $data_kegiatan = $this->PPG_model->get_kegiatan("where k.id_status_kegiatan = 3");
+        $data_kegiatan = $this->PPG_model->get_data_feedback_kegiatan("where k.id_status_kegiatan = 3");
         $this->load->view("ppg/v_mengelola_feedback", array('data_kegiatan' => $data_kegiatan));
         $this->load->view('footer');
     }
@@ -950,12 +950,13 @@ class PPG extends CI_Controller
     {
         $id_kegiatan = $this->input->post("id_kegiatan");
         if ($id_kegiatan != "") {
-            $feedback = $this->PPG_model->get_feedback_kegiatan("where k.id_kegiatan = $id_kegiatan");
-            $this->load->view("ppg/v_list_feedback", array('feedback' => $feedback));
+            $feedback_relawan = $this->PPG_model->get_feedback_kegiatan_relawan("where k.id_kegiatan = $id_kegiatan");
+            $feedback_donatur = $this->PPG_model->get_feedback_kegiatan_donatur("where k.id_kegiatan = $id_kegiatan");
+            $this->load->view("ppg/v_list_feedback", array('feedback_relawan' => $feedback_relawan, 'feedback_donatur' => $feedback_donatur, 'id_kegiatan' => $id_kegiatan));
             $this->load->view('footer');
         } else {
             $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
-            $url_target = "PPG/";
+            $url_target = "PPG/mengelola_feedback";
             $name       = "";
             $value      = "";
             $alert      = array(
@@ -969,32 +970,37 @@ class PPG extends CI_Controller
         }
     }
 
-    public function balas_feedback()
+    public function balas_feedback_relawan()
     {
         $balas                = $this->input->post("balas");
+        $id_kegiatan          = $this->input->post("id_kegiatan");
         $id_feedback_kegiatan = $this->input->post("id_feedback_kegiatan");
         $email                = $this->input->post("email");
         $nama                 = $this->input->post("nama");
         $komentar             = $this->input->post("komentar");
         if ($balas != "") {
-            $feedback       = $this->PPG_model->get_feedback_kegiatan("where id_feedback_kegiatan = $balas");
-            $balas_feedback = $this->PPG_model->get_balasan_feedback_kegiatan("where id_feedback_kegiatan = $balas");
+            $feedback       = $this->PPG_model->get_feedback_kegiatan_relawan("where id_feedback_kegiatan = $balas");
+            $balas_feedback = $this->PPG_model->get_balasan_feedback_kegiatan_relawan("where id_feedback_kegiatan = $balas");
             // for session
-            $email = "kuthu@gmail.com";
-            $nama  = "si kuthu";
-            $this->load->view("ppg/v_balas_feedback", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $balas, 'email' => $email, 'nama' => $nama));
+            $email_admin = $this->session->userdata('email'); //"kuthu@gmail.com";
+            $nama_admin  = $this->session->userdata('nama'); //"si kuthu";
+            $this->load->view("ppg/v_balas_feedback_relawan", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $balas, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
             $this->load->view('footer');
         } elseif ($id_feedback_kegiatan != "" && $email != "" && $nama != "" && $komentar != "") {
             $balas_komentar = array(
                 'email'                => $email,
                 'id_feedback_kegiatan' => $id_feedback_kegiatan,
                 'komentar'             => $komentar,
+                'tanggal'              => date("Y-m-d"),
             );
-            $execute = $this->PPG_model->insert_data('balas_feedback', $balas_komentar);
+            $execute = $this->PPG_model->insert_data('balas_feedback_relawan', $balas_komentar);
             if ($execute >= 1) {
-                $feedback       = $this->PPG_model->get_feedback_kegiatan("where id_feedback_kegiatan = $id_feedback_kegiatan");
-                $balas_feedback = $this->PPG_model->get_balasan_feedback_kegiatan("where id_feedback_kegiatan = $id_feedback_kegiatan");
-                $this->load->view("ppg/v_balas_feedback", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $id_feedback_kegiatan, 'email' => $email, 'nama' => $nama));
+                $feedback       = $this->PPG_model->get_feedback_kegiatan_relawan("where id_feedback_kegiatan = $id_feedback_kegiatan");
+                $balas_feedback = $this->PPG_model->get_balasan_feedback_kegiatan_relawan("where id_feedback_kegiatan = $id_feedback_kegiatan");
+                // for session
+                $email_admin = $this->session->userdata('email'); //"kuthu@gmail.com";
+                $nama_admin  = $this->session->userdata('nama'); //"si kuthu";
+                $this->load->view("ppg/v_balas_feedback_relawan", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $id_feedback_kegiatan, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
                 $this->load->view('footer');
             } else {
                 $pesan      = "Gagal Membalas Feedback. Silahkan Cek Kembali.";
@@ -1012,7 +1018,69 @@ class PPG extends CI_Controller
             }
         } else {
             $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
-            $url_target = "PPG/";
+            $url_target = "PPG/mengelola_feedback";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
+        }
+    }
+
+    public function balas_feedback_donatur()
+    {
+        $balas                = $this->input->post("balas");
+        $id_kegiatan          = $this->input->post("id_kegiatan");
+        $id_feedback_kegiatan = $this->input->post("id_feedback_kegiatan");
+        $email                = $this->input->post("email");
+        $nama                 = $this->input->post("nama");
+        $komentar             = $this->input->post("komentar");
+        if ($balas != "") {
+            $feedback       = $this->PPG_model->get_feedback_kegiatan_donatur("where id_feedback_kegiatan = $balas");
+            $balas_feedback = $this->PPG_model->get_balasan_feedback_kegiatan_donatur("where id_feedback_kegiatan = $balas");
+            // for session
+            $email_admin = $this->session->userdata('email'); //"kuthu@gmail.com";
+            $nama_admin  = $this->session->userdata('nama'); //"si kuthu";
+            $this->load->view("ppg/v_balas_feedback_donatur", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $balas, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
+            $this->load->view('footer');
+        } elseif ($id_feedback_kegiatan != "" && $email != "" && $nama != "" && $komentar != "") {
+            $balas_komentar = array(
+                'email'                => $email,
+                'id_feedback_kegiatan' => $id_feedback_kegiatan,
+                'komentar'             => $komentar,
+                'tanggal'              => date("Y-m-d"),
+            );
+            $execute = $this->PPG_model->insert_data('balas_feedback_donatur', $balas_komentar);
+            if ($execute >= 1) {
+                $feedback       = $this->PPG_model->get_feedback_kegiatan_donatur("where id_feedback_kegiatan = $id_feedback_kegiatan");
+                $balas_feedback = $this->PPG_model->get_balasan_feedback_kegiatan_donatur("where id_feedback_kegiatan = $id_feedback_kegiatan");
+                // for session
+                $email_admin = $this->session->userdata('email'); //"kuthu@gmail.com";
+                $nama_admin  = $this->session->userdata('nama'); //"si kuthu";
+                $this->load->view("ppg/v_balas_feedback_donatur", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $id_feedback_kegiatan, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
+                $this->load->view('footer');
+            } else {
+                $pesan      = "Gagal Membalas Feedback. Silahkan Cek Kembali.";
+                $url_target = "PPG/mengelola_feedback";
+                $name       = "";
+                $value      = "";
+                $alert      = array(
+                    'pesan'      => $pesan,
+                    'url_target' => $url_target,
+                    'name'       => $name,
+                    'value'      => $value,
+                );
+                $this->load->view("alert", array('alert' => $alert));
+                $this->load->view("footer");
+            }
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "PPG/mengelola_feedback";
             $name       = "";
             $value      = "";
             $alert      = array(
