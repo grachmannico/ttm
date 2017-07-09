@@ -44,6 +44,19 @@ class Kewirausahaan extends CI_Controller
             } else {
                 echo "gagal";
             }
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "Kewirausahaan/mengelola_donatur";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -65,16 +78,31 @@ class Kewirausahaan extends CI_Controller
 
     public function validasi_donasi()
     {
-        $id_donasi       = $this->input->post("id_donasi");
-        $validasi_donasi = array(
-            'id_status_donasi' => 3,
-        );
-        $where   = array('id_donasi' => $id_donasi);
-        $execute = $this->Kewirausahaan_model->update_data('donasi', $validasi_donasi, $where);
-        if ($execute >= 1) {
-            redirect("Kewirausahaan/mengelola_donasi");
+        $id_donasi = $this->input->post("id_donasi");
+        if ($id_donasi != "") {
+            $validasi_donasi = array(
+                'id_status_donasi' => 3,
+            );
+            $where   = array('id_donasi' => $id_donasi);
+            $execute = $this->Kewirausahaan_model->update_data('donasi', $validasi_donasi, $where);
+            if ($execute >= 1) {
+                redirect("Kewirausahaan/mengelola_donasi");
+            } else {
+                echo "gagal";
+            }
         } else {
-            echo "gagal";
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "Kewirausahaan/";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -134,7 +162,18 @@ class Kewirausahaan extends CI_Controller
                 }
             }
         } else {
-            echo "gagal";
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "Kewirausahaan/mengelola_garage_sale";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -189,18 +228,46 @@ class Kewirausahaan extends CI_Controller
                     echo "gagal";
                 }
             }
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "Kewirausahaan/mengelola_garage_sale";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
     public function hapus_barang_garage_sale()
     {
-        $hapus   = $this->input->post("hapus");
-        $where   = array('id_barang_garage_sale' => $hapus);
-        $execute = $this->Kewirausahaan_model->delete_data('barang_garage_sale', $where);
-        if ($execute >= 1) {
-            redirect("Kewirausahaan/mengelola_garage_sale");
+        $hapus = $this->input->post("hapus");
+        if ($hapus != "") {
+            $where   = array('id_barang_garage_sale' => $hapus);
+            $execute = $this->Kewirausahaan_model->delete_data('barang_garage_sale', $where);
+            if ($execute >= 1) {
+                redirect("Kewirausahaan/mengelola_garage_sale");
+            } else {
+                echo "gagal";
+            }
         } else {
-            echo "gagal";
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "Kewirausahaan/mengelola_garage_sale";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -243,6 +310,19 @@ class Kewirausahaan extends CI_Controller
             $tagihan   = $this->Kewirausahaan_model->get_total_tagihan("where kb.id_invoice = '$detail'");
             $this->load->view("kewirausahaan/v_detail_pembelian", array('invoice' => $invoice, 'pembelian' => $pembelian, 'tagihan' => $tagihan));
             $this->load->view('footer');
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "Kewirausahaan/mengelola_garage_sale";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -295,6 +375,19 @@ class Kewirausahaan extends CI_Controller
             } else {
                 echo "gagal";
             }
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "Kewirausahaan/mengelola_lpj";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -330,24 +423,52 @@ class Kewirausahaan extends CI_Controller
             } else {
                 echo "gagal";
             }
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "Kewirausahaan/mengelola_lpj";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
     public function hapus_data_pengeluaran()
     {
-        $hapus       = $this->input->post("hapus");
-        $id_kegiatan = $this->input->post("id_kegiatan");
-        $where       = array('id_monitor_dana_kegiatan' => $hapus);
-        $execute     = $this->PPG_model->delete_data('monitor_dana_kegiatan', $where);
-        if ($execute >= 1) {
-            $nama_kegiatan = $this->Kewirausahaan_model->get_kegiatan("where k.id_kegiatan = $id_kegiatan");
-            $dana_masuk    = $this->Kewirausahaan_model->get_data_donasi_donatur("where k.id_kegiatan = $id_kegiatan and dn.id_status_donasi = 3");
-            $total_dana    = $this->Kewirausahaan_model->get_total_donasi("where id_status_donasi = 3 and id_kegiatan = $id_kegiatan");
-            $dana_keluar   = $this->Kewirausahaan_model->get_laporan_pengeluaran("where id_kegiatan = $id_kegiatan");
-            $this->load->view("kewirausahaan/v_kelola_laporan", array('dana_masuk' => $dana_masuk, 'total_dana' => $total_dana, 'dana_keluar' => $dana_keluar, 'id_kegiatan' => $id_kegiatan, 'nama_kegiatan' => $nama_kegiatan));
-            $this->load->view('footer');
+        $hapus = $this->input->post("hapus");
+        if ($hapus != "") {
+            $id_kegiatan = $this->input->post("id_kegiatan");
+            $where       = array('id_monitor_dana_kegiatan' => $hapus);
+            $execute     = $this->PPG_model->delete_data('monitor_dana_kegiatan', $where);
+            if ($execute >= 1) {
+                $nama_kegiatan = $this->Kewirausahaan_model->get_kegiatan("where k.id_kegiatan = $id_kegiatan");
+                $dana_masuk    = $this->Kewirausahaan_model->get_data_donasi_donatur("where k.id_kegiatan = $id_kegiatan and dn.id_status_donasi = 3");
+                $total_dana    = $this->Kewirausahaan_model->get_total_donasi("where id_status_donasi = 3 and id_kegiatan = $id_kegiatan");
+                $dana_keluar   = $this->Kewirausahaan_model->get_laporan_pengeluaran("where id_kegiatan = $id_kegiatan");
+                $this->load->view("kewirausahaan/v_kelola_laporan", array('dana_masuk' => $dana_masuk, 'total_dana' => $total_dana, 'dana_keluar' => $dana_keluar, 'id_kegiatan' => $id_kegiatan, 'nama_kegiatan' => $nama_kegiatan));
+                $this->load->view('footer');
+            } else {
+                echo "gagal";
+            }
         } else {
-            echo "gagal";
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "Kewirausahaan/mengelola_lpj";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 }

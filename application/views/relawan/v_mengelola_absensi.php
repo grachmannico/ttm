@@ -18,24 +18,26 @@
             </div>
             <div class="box-body">
               <form action="<?php echo base_url() . "Relawan/list_relawan"; ?>" method="POST">
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <th>Nama Kegiatan</th>
-                    <th>Jumlah Relawan</th>
-                    <th>Action</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <?php foreach ($data_kegiatan as $dk): ?>
-                  <tr>
-                    <td><?php echo $dk['nama_kegiatan']; ?></td>
-                    <td><?php echo $dk['jumlah_relawan']; ?></td>
-                    <td><center><button type="submit" class="btn btn-primary btn-xs" name="id_kegiatan" value="<?php echo $dk['id_kegiatan']; ?>"><i class="fa fa-check-square"></i> Lakukan Absensi</button></center></td>
-                  </tr>
-                  <?php endforeach?>
-                  </tfoot>
-                </table>
+                <div class="table-responsive">
+                  <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                      <th><center>Nama Kegiatan</center></th>
+                      <th><center>Jumlah Relawan</center></th>
+                      <th><center>Action</center></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($data_kegiatan as $dk): ?>
+                    <tr>
+                      <td><?php echo $dk['nama_kegiatan']; ?></td>
+                      <td><?php echo $dk['jumlah_relawan']; ?></td>
+                      <td><center><button type="submit" class="btn btn-primary btn-xs" name="id_kegiatan" value="<?php echo $dk['id_kegiatan']; ?>"><i class="fa fa-check-square"></i> Lakukan Absensi</button></center></td>
+                    </tr>
+                    <?php endforeach?>
+                    </tfoot>
+                  </table>
+                </div>
               </form>
             </div>
           </div>

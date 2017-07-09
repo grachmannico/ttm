@@ -17,38 +17,91 @@
               <h3 class="box-title">Data Absensi Kegiatan "<?php echo $nama_kegiatan[0]['nama_kegiatan']; ?>"</h3>
             </div>
             <div class="box-body">
-              <form action="<?php echo base_url() . "Relawan/absensi"; ?>" method="POST">
-                <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <th>Nama</th>
-                    <th>Divisi</th>
-                    <th>Status Absensi Relawan</th>
-                    <th>Action</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <?php foreach ($list_relawan as $lr): ?>
-                  <tr>
-                    <td><?php echo $lr['nama']; ?></td>
-                    <td><?php echo $lr['divisi']; ?></td>
-                    <td><?php echo $lr['status_absensi_relawan']; ?></td>
-                    <td>
-                      <div class="col-md-12">
-                        <div class="col-md-6">
-                          <center><button type="submit" class="btn btn-primary btn-xs" name="hadir" value="<?php echo $lr['id_gabung_kegiatan']; ?>">Hadir</button></center>
-                        </div>
-                        <div class="col-md-6">
-                          <center><button type="submit" class="btn btn-danger btn-xs" name="tidak_hadir" value="<?php echo $lr['id_gabung_kegiatan']; ?>">Tidak Hadir</button></center>
-                        </div>
+              <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                  <li class="active"><a href="#tab_1" data-toggle="tab">Data Relawan Belum Diabsen</a></li>
+                  <li><a href="#tab_2" data-toggle="tab">Data Relawan Hadir</a></li>
+                  <li><a href="#tab_3" data-toggle="tab">Data Relawan Tidak Hadir</a></li>
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane active" id="tab_1">
+                    <form action="<?php echo base_url() . "Relawan/absensi"; ?>" method="POST">
+                      <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
+                      <div class="table-responsive">
+                        <table id="example1" class="table table-bordered table-striped">
+                          <thead>
+                          <tr>
+                            <th><center>Nama</center></th>
+                            <th><center>Divisi</center></th>
+                            <th><center>Status Absensi Relawan</center></th>
+                            <th><center>Action</center></th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <?php foreach ($list_relawan as $lr): ?>
+                          <tr>
+                            <td><?php echo $lr['nama']; ?></td>
+                            <td><?php echo $lr['divisi']; ?></td>
+                            <td><?php echo $lr['status_absensi_relawan']; ?></td>
+                            <td>
+                              <div class="col-md-12">
+                                <div class="col-md-6">
+                                  <center><button type="submit" class="btn btn-primary btn-xs" name="hadir" value="<?php echo $lr['id_gabung_kegiatan']; ?>">Hadir</button></center>
+                                </div>
+                                <div class="col-md-6">
+                                  <center><button type="submit" class="btn btn-danger btn-xs" name="tidak_hadir" value="<?php echo $lr['id_gabung_kegiatan']; ?>">Tidak Hadir</button></center>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                          <?php endforeach?>
+                          </tbody>
+                        </table>
                       </div>
-                    </td>
-                  </tr>
-                  <?php endforeach?>
-                  </tfoot>
-                </table>
-              </form>
+                    </form>
+                  </div>
+                  <div class="tab-pane" id="tab_2">
+                    <table id="example2" class="table table-bordered table-striped">
+                      <thead>
+                        <tr>
+                          <th><center>Nama</center></th>
+                          <th><center>Divisi</center></th>
+                          <th><center>Status Absensi Relawan</center></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($list_relawan_hadir as $lr): ?>
+                        <tr>
+                          <td><?php echo $lr['nama']; ?></td>
+                          <td><?php echo $lr['divisi']; ?></td>
+                          <td><?php echo $lr['status_absensi_relawan']; ?></td>
+                        </tr>
+                        <?php endforeach?>
+                        </tbody>
+                      </table>
+                  </div>
+                  <div class="tab-pane" id="tab_3">
+                    <table id="example3" class="table table-bordered table-striped">
+                      <thead>
+                        <tr>
+                          <th><center>Nama</center></th>
+                          <th><center>Divisi</center></th>
+                          <th><center>Status Absensi Relawan</center></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($list_relawan_tidak_hadir as $lr): ?>
+                        <tr>
+                          <td><?php echo $lr['nama']; ?></td>
+                          <td><?php echo $lr['divisi']; ?></td>
+                          <td><?php echo $lr['status_absensi_relawan']; ?></td>
+                        </tr>
+                      <?php endforeach?>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -11,133 +11,145 @@
     <section class="content">
       <div class="row">
         <div class="col-md-12">
-          <div class="box box-danger">
-            <div class="box-header with-border">
-              <h3 class="box-title">Tambah Data LPJ</h3>
-            </div>
-            <form role="form" action="<?php echo base_url()."Kewirausahaan/tambah_data_pengeluaran"; ?>" method="POST">
-              <div class="box-body">
-                <div class="form-group">
-                  <label for="exampleInputEmail1"><i class="fa fa-book"></i> Nama Dana Keluar</label>
-                  <input type="text" class="form-control" placeholder="Nama Dana Keluar" name="nama_dana_keluar" required>
-                </div>
-                <div class="form-group">
-                  <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal</label>
-                  <!-- <input type="text" class="form-control" placeholder="Tanggal" name="tanggal" required> -->
-                  <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" placeholder="Tanggal" name="tanggal" required>
-                </div>
-                <div class="form-group">
-                  <label for="exampleInputEmail1"><i class="fa fa-money"></i> Nominal Dana Keluar</label>
-                  <input type="text" class="form-control" placeholder="Nominal Dana Keluar" name="nominal_dana_keluar" required>
-                </div>
-                <div class="form-group">
-                  <label for="exampleInputEmail1"><i class="fa fa-file-text"></i> Keterangan</label>
-                  <textarea id="editor1" name="keterangan" rows="10" cols="80" required>
-                  
-                  </textarea>
+          <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#tab_1" data-toggle="tab">Data Laporan Pengeluaran Dana</a></li>
+              <li><a href="#tab_2" data-toggle="tab">Rekap Data Donasi Yang Masuk</a></li>
+              <li><a href="#tab_3" data-toggle="tab">Tambah Data LPJ</a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="tab_1">
+                <div class="box box-danger">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">Laporan Pengeluaran Dana</h3>
+                  </div>
+                  <div class="box-body">
+                    <div class="form-group">
+                      <!-- <label for="exampleInputEmail1">Detail Data Pembelian Barang <?php echo $detail_barang[0]['nama_barang']; ?>:</label> -->
+                      <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                          <th>Nama Dana Keluar</th>
+                          <th>Tanggal</th>
+                          <th>Nominal Dana Keluar</th>
+                          <th>Keterangan</th>
+                          <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($dana_keluar as $d): ?>
+                        <tr>
+                          <td><?php echo $d['nama_dana_keluar']; ?></td>
+                          <td><?php echo $d['tanggal']; ?></td>
+                          <td><?php echo $d['nominal_dana_keluar']; ?></td>
+                          <td><?php echo $d['keterangan']; ?></td>
+                          <td>
+                            <div class="col-md-12">
+                              <div class="col-md-6">
+                                <center><form action="<?php echo base_url()."Kewirausahaan/edit_data_pengeluaran"; ?>" method="POST">
+                                  <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
+                                  <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['id_monitor_dana_kegiatan']; ?>"><i class="fa fa-edit"></i> Edit</button>
+                                </form></center>
+                              </div>
+                              <div class="col-md-6">
+                                <center><form action="<?php echo base_url()."Kewirausahaan/hapus_data_pengeluaran"; ?>" method="POST">
+                                  <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
+                                  <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $d['id_monitor_dana_kegiatan']; ?>" onclick="return checkDelete()"><i class="fa fa-trash"></i> Hapus</button>
+                                </form></center>
+                              </div>
+                            </div>
+                            <!-- <form action="<?php echo base_url()."Kewirausahaan/edit_data_pengeluaran"; ?>" method="POST">
+                              <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
+                              <button type="submit" name="edit" value="<?php echo $d['id_monitor_dana_kegiatan']; ?>">Edit</button>
+                            </form> -->
+                          <!-- </td>
+                          <td> -->
+                            <!-- <form action="<?php echo base_url()."Kewirausahaan/hapus_data_pengeluaran"; ?>" method="POST">
+                              <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
+                              <button type="submit" name="hapus" value="<?php echo $d['id_monitor_dana_kegiatan']; ?>">Hapus</button>
+                            </form> -->
+                          </td>
+                        </tr>
+                        <?php endforeach?>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                  <!-- <div class="box-footer">
+                    <h4 class="pull-left">Total Tagihan: <?php echo $tagihan[0]['total_tagihan']; ?></h4>
+                    <form action="<?php echo base_url()."Kewirausahaan/validasi_pembelian"; ?>" method="POST">
+                      <button type="submit" class="btn btn-primary pull-right" name="validasi" value="<?php echo $invoice[0]['id_invoice']; ?>"><i class="fa fa-plus"></i> <span>Validasi Pembelian</span></button>
+                    </form>
+                  </div> -->
                 </div>
               </div>
-              <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>"><i class="fa fa-plus-square"></i> <span>Tambah Data</span></button>
+              <div class="tab-pane" id="tab_2">
+                <div class="box box-danger">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">Donasi yang Masuk</h3>
+                  </div>
+                  <div class="box-body">
+                    <div class="form-group">
+                      <!-- <label for="exampleInputEmail1">Detail Data Pembelian Barang <?php echo $detail_barang[0]['nama_barang']; ?>:</label> -->
+                      <table id="example2" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                          <th>nama</th>
+                          <th>nominal_donasi</th>
+                          <th>tanggal_donasi</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($dana_masuk as $d): ?>
+                        <tr>
+                          <td><?php echo $d['nama']; ?></td>
+                          <td><?php echo $d['nominal_donasi']; ?></td>
+                          <td><?php echo $d['tanggal_donasi']; ?></td>
+                        </tr>
+                        <?php endforeach?>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="box-footer">
+                    <h4 class="pull-left">Total Donasi: <?php echo $total_dana[0]['total_dana']; ?></h4>
+                  </div>
+                </div>
               </div>
-            </form>
-          </div>
-        </div>
-        <div class="col-md-12">
-          <div class="box box-danger">
-            <div class="box-header with-border">
-              <h3 class="box-title">Laporan Pengeluaran Dana</h3>
-            </div>
-            <div class="box-body">
-              <div class="form-group">
-                <!-- <label for="exampleInputEmail1">Detail Data Pembelian Barang <?php echo $detail_barang[0]['nama_barang']; ?>:</label> -->
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <th>Nama Dana Keluar</th>
-                    <th>Tanggal</th>
-                    <th>Nominal Dana Keluar</th>
-                    <th>Keterangan</th>
-                    <th>Action</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <?php foreach ($dana_keluar as $d): ?>
-                  <tr>
-                    <td><?php echo $d['nama_dana_keluar']; ?></td>
-                    <td><?php echo $d['tanggal']; ?></td>
-                    <td><?php echo $d['nominal_dana_keluar']; ?></td>
-                    <td><?php echo $d['keterangan']; ?></td>
-                    <td>
-                      <div class="col-md-12">
-                        <div class="col-md-6">
-                          <center><form action="<?php echo base_url()."Kewirausahaan/edit_data_pengeluaran"; ?>" method="POST">
-                            <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
-                            <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['id_monitor_dana_kegiatan']; ?>"><i class="fa fa-edit"></i> Edit</button>
-                          </form></center>
-                        </div>
-                        <div class="col-md-6">
-                          <center><form action="<?php echo base_url()."Kewirausahaan/hapus_data_pengeluaran"; ?>" method="POST">
-                            <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
-                            <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $d['id_monitor_dana_kegiatan']; ?>"><i class="fa fa-trash"></i> Hapus</button>
-                          </form></center>
-                        </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab_3">
+                <div class="box box-danger">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">Tambah Data LPJ</h3>
+                  </div>
+                  <form role="form" action="<?php echo base_url()."Kewirausahaan/tambah_data_pengeluaran"; ?>" method="POST">
+                    <div class="box-body">
+                      <div class="form-group">
+                        <label for="exampleInputEmail1"><i class="fa fa-book"></i> Nama Dana Keluar</label>
+                        <input type="text" class="form-control" placeholder="Nama Dana Keluar" name="nama_dana_keluar" required>
                       </div>
-                      <!-- <form action="<?php echo base_url()."Kewirausahaan/edit_data_pengeluaran"; ?>" method="POST">
-                        <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
-                        <button type="submit" name="edit" value="<?php echo $d['id_monitor_dana_kegiatan']; ?>">Edit</button>
-                      </form> -->
-                    <!-- </td>
-                    <td> -->
-                      <!-- <form action="<?php echo base_url()."Kewirausahaan/hapus_data_pengeluaran"; ?>" method="POST">
-                        <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
-                        <button type="submit" name="hapus" value="<?php echo $d['id_monitor_dana_kegiatan']; ?>">Hapus</button>
-                      </form> -->
-                    </td>
-                  </tr>
-                  <?php endforeach?>
-                  </tfoot>
-                </table>
+                      <div class="form-group">
+                        <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal</label>
+                        <!-- <input type="text" class="form-control" placeholder="Tanggal" name="tanggal" required> -->
+                        <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" placeholder="Tanggal" name="tanggal" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputEmail1"><i class="fa fa-money"></i> Nominal Dana Keluar</label>
+                        <input type="text" class="form-control" placeholder="Nominal Dana Keluar" name="nominal_dana_keluar" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputEmail1"><i class="fa fa-file-text"></i> Keterangan</label>
+                        <textarea id="editor1" name="keterangan" rows="10" cols="80" required>
+                        
+                        </textarea>
+                      </div>
+                    </div>
+                    <div class="box-footer">
+                      <button type="submit" class="btn btn-primary pull-right" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>"><i class="fa fa-plus-square"></i> <span>Tambah Data</span></button>
+                    </div>
+                  </form>
+                </div>
               </div>
-            </div>
-            <!-- <div class="box-footer">
-              <h4 class="pull-left">Total Tagihan: <?php echo $tagihan[0]['total_tagihan']; ?></h4>
-              <form action="<?php echo base_url()."Kewirausahaan/validasi_pembelian"; ?>" method="POST">
-                <button type="submit" class="btn btn-primary pull-right" name="validasi" value="<?php echo $invoice[0]['id_invoice']; ?>"><i class="fa fa-plus"></i> <span>Validasi Pembelian</span></button>
-              </form>
-            </div> -->
-          </div>
-        </div>
-        <div class="col-md-12">
-          <div class="box box-danger">
-            <div class="box-header with-border">
-              <h3 class="box-title">Donasi yang Masuk</h3>
-            </div>
-            <div class="box-body">
-              <div class="form-group">
-                <!-- <label for="exampleInputEmail1">Detail Data Pembelian Barang <?php echo $detail_barang[0]['nama_barang']; ?>:</label> -->
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <th>nama</th>
-                    <th>nominal_donasi</th>
-                    <th>tanggal_donasi</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <?php foreach ($dana_masuk as $d): ?>
-                  <tr>
-                    <td><?php echo $d['nama']; ?></td>
-                    <td><?php echo $d['nominal_donasi']; ?></td>
-                    <td><?php echo $d['tanggal_donasi']; ?></td>
-                  </tr>
-                  <?php endforeach?>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
-            <div class="box-footer">
-              <h4 class="pull-left">Total Donasi: <?php echo $total_dana[0]['total_dana']; ?></h4>
             </div>
           </div>
         </div>
