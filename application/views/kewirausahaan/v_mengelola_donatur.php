@@ -14,50 +14,52 @@
         <div class="col-md-12">
           <div class="box box-danger">
             <div class="box-header">
-              <!-- <h3 class="box-title">Data Table With Full Features</h3> -->
+              <h3 class="box-title">Data Seluruh Donatur</h3>
             </div>
             <div class="box-body">
-              <table id="example1" class="table table-bordered table-striped">
-                <thead>
-                <tr>
-                  <th>Email</th>
-                  <th>Nama</th>
-                  <th>Total Donasi</th>
-                  <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($donatur as $d): ?>
-                <tr>
-                  <td><?php echo $d['email']; ?></td>
-                  <td><?php echo $d['nama']; ?></td>
-                  <td><?php echo $d['total_donasi']; ?></td>
-                  <td>
-                    <div class="col-md-12">
-                      <div class="col-md-6">
-                        <center><form action="<?php echo base_url()."Kewirausahaan/edit_donatur"; ?>" method="POST">
-                          <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['email']; ?>"><i class="fa fa-edit"></i> Edit Donatur</button>
-                        </form></center>
+              <div class="table-responsive">
+                <table id="example1" class="table table-bordered table-striped">
+                  <thead>
+                  <tr>
+                    <th><center>Email</center></th>
+                    <th><center>Nama</center></th>
+                    <th><center>Total Transaksi Donasi</center></th>
+                    <th><center>Action</center></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <?php foreach ($donatur as $d): ?>
+                  <tr>
+                    <td><?php echo $d['email']; ?></td>
+                    <td><?php echo $d['nama']; ?></td>
+                    <td><?php echo $d['total_donasi']; ?></td>
+                    <td>
+                      <div class="col-md-12">
+                        <div class="col-md-6">
+                          <center><form action="<?php echo base_url()."Kewirausahaan/edit_donatur"; ?>" method="POST">
+                            <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['email']; ?>"><i class="fa fa-edit"></i> Edit Donatur</button>
+                          </form></center>
+                        </div>
+                        <div class="col-md-6">
+                          <center><form action="<?php echo base_url()."Kewirausahaan/detail_donatur"; ?>" method="POST">
+                            <button type="submit" class="btn btn-primary btn-xs" name="donatur" value="<?php echo $d['email']; ?>"><i class="fa fa-file-text"></i> Detail Donatur</button>
+                          </form></center>
+                        </div>
                       </div>
-                      <div class="col-md-6">
-                        <center><form action="<?php echo base_url()."Kewirausahaan/detail_donatur"; ?>" method="POST">
-                          <button type="submit" class="btn btn-primary btn-xs" name="donatur" value="<?php echo $d['email']; ?>"><i class="fa fa-file-text"></i> Detail Donatur</button>
-                        </form></center>
-                      </div>
-                    </div>
-                    <!-- <center><form action="<?php echo base_url()."Kewirausahaan/edit_donatur"; ?>" method="POST">
-                      <button type="submit"  class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['email']; ?>"><i class="fa fa-edit"></i> Edit Donatur</button>
-                    </form></center> -->
-                  <!-- </td>
-                  <td> -->
-                    <!-- <center><form action="<?php echo base_url()."Kewirausahaan/detail_donatur"; ?>" method="POST">
-                      <button type="submit" class="btn btn-primary btn-xs" name="donatur" value="<?php echo $d['email']; ?>"><i class="fa fa-file-text"> Detail Donatur</button>
-                    </form></center> -->
-                  </td>
-                </tr>
-                <?php endforeach?>
-                </tfoot>
-              </table>
+                      <!-- <center><form action="<?php echo base_url()."Kewirausahaan/edit_donatur"; ?>" method="POST">
+                        <button type="submit"  class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['email']; ?>"><i class="fa fa-edit"></i> Edit Donatur</button>
+                      </form></center> -->
+                    <!-- </td>
+                    <td> -->
+                      <!-- <center><form action="<?php echo base_url()."Kewirausahaan/detail_donatur"; ?>" method="POST">
+                        <button type="submit" class="btn btn-primary btn-xs" name="donatur" value="<?php echo $d['email']; ?>"><i class="fa fa-file-text"> Detail Donatur</button>
+                      </form></center> -->
+                    </td>
+                  </tr>
+                  <?php endforeach?>
+                  </tfoot>
+                </table>
+              </div>
             </div>
           </div>
         </div>

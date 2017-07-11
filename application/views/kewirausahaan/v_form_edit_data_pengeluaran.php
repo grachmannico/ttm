@@ -11,6 +11,10 @@
     <section class="content">
       <div class="row">
         <div class="col-md-8 col-md-push-2">
+          <form action="<?php echo base_url()."Kewirausahaan/kelola_laporan"; ?>" method="POST">
+          <button type="submit" class="btn btn-danger" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>"><i class="fa fa-arrow-left"></i> Kembali Ke Halaman Kelola Data LPJ</button>
+          </form>
+          <br>
           <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Form Edit Data LPJ</h3>

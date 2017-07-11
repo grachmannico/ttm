@@ -14,66 +14,66 @@
         <div class="col-md-12">
           <div class="box box-danger">
             <div class="box-header">
-              <!-- <h3 class="box-title">Data Table With Full Features</h3> -->
+              <h3 class="box-title">Data Semua Barang Garage Sale</h3>
             </div>
             <div class="box-body">
-              <table id="example1" class="table table-bordered table-striped">
-                <thead>
-                <tr>
-                  <th>Nama Barang</th>
-                  <th>Deskripsi</th>
-                  <th>Harga</th>
-                  <th>Stok Available</th>
-                  <th>Stok Terpesan</th>
-                  <!-- <th>Gambar Barang</th> -->
-                  <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($barang as $b): ?>
-                <tr>
-                  <td><?php echo $b['nama_barang']; ?></td>
-                  <td><?php echo $b['deskripsi']; ?></td>
-                  <td><?php echo $b['harga']; ?></td>
-                  <td><?php echo $b['stok_available']; ?></td>
-                  <td><?php echo $b['stok_terpesan']; ?></td>
-                  <!-- <td><?php echo $b['gambar_barang']; ?></td> -->
-                  <td>
-                    <div class="col-md-12">
-                      <div class="col-md-4">
-                        <center><form action="<?php echo base_url()."Kewirausahaan/edit_barang_garage_sale"; ?>" method="POST">
-                          <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $b['id_barang_garage_sale']; ?>"><i class="fa fa-edit"></i> Edit Barang</button>
-                        </form></center>
+              <div class="table-responsive">
+                <table id="example1" class="table table-bordered table-striped">
+                  <thead>
+                  <tr>
+                    <th><center>Nama Barang</center></th>
+                    <th><center>Deskripsi</center></th>
+                    <th><center>Harga</center></th>
+                    <th><center>Stok Available</center></th>
+                    <th><center>Stok Terpesan</center></th>
+                    <th><center>Action</center></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <?php foreach ($barang as $b): ?>
+                  <tr>
+                    <td><?php echo $b['nama_barang']; ?></td>
+                    <td><?php echo $b['deskripsi']; ?></td>
+                    <td><?php echo $b['harga']; ?></td>
+                    <td><?php echo $b['stok_available']; ?></td>
+                    <td><?php echo $b['stok_terpesan']; ?></td>
+                    <td>
+                      <div class="col-md-12">
+                        <div class="col-md-4">
+                          <center><form action="<?php echo base_url()."Kewirausahaan/edit_barang_garage_sale"; ?>" method="POST">
+                            <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $b['id_barang_garage_sale']; ?>"><i class="fa fa-edit"></i> Edit Barang</button>
+                          </form></center>
+                        </div>
+                        <div class="col-md-4">
+                          <center><form action="<?php echo base_url()."Kewirausahaan/hapus_barang_garage_sale"; ?>" method="POST">
+                            <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $b['id_barang_garage_sale']; ?>" onclick="return checkDelete()"><i class="fa fa-trash"></i> Hapus Barang</button>
+                          </form></center>
+                        </div>
+                        <div class="col-md-4">
+                          <center><form action="<?php echo base_url()."Kewirausahaan/detail_barang_garage_sale"; ?>" method="POST">
+                            <button type="submit" class="btn btn-primary btn-xs" name="barang" value="<?php echo $b['id_barang_garage_sale']; ?>"><i class="fa fa-file-text"></i> Lihat Detail Barang</button>
+                          </form></center>
+                        </div>
                       </div>
-                      <div class="col-md-4">
-                        <center><form action="<?php echo base_url()."Kewirausahaan/hapus_barang_garage_sale"; ?>" method="POST">
-                          <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $b['id_barang_garage_sale']; ?>"><i class="fa fa-trash"></i> Hapus Barang</button>
-                        </form></center>
-                      </div>
-                      <div class="col-md-4">
-                        <center><form action="<?php echo base_url()."Kewirausahaan/detail_barang_garage_sale"; ?>" method="POST">
-                          <button type="submit" class="btn btn-primary btn-xs" name="barang" value="<?php echo $b['id_barang_garage_sale']; ?>"><i class="fa fa-file-text"></i> Lihat Detail Barang</button>
-                        </form></center>
-                      </div>
-                    </div>
-                    <!-- <form action="<?php echo base_url()."Kewirausahaan/edit_barang_garage_sale"; ?>" method="POST">
-                      <button type="submit" name="edit" value="<?php echo $b['id_barang_garage_sale']; ?>">Edit Barang</button>
-                    </form> -->
-                  <!-- </td>
-                  <td> -->
-                    <!-- <form action="<?php echo base_url()."Kewirausahaan/hapus_barang_garage_sale"; ?>" method="POST">
-                      <button type="submit" name="hapus" value="<?php echo $b['id_barang_garage_sale']; ?>">Hapus Barang</button>
-                    </form> -->
-                  <!-- </td>
-                  <td> -->
-                    <!-- <form action="<?php echo base_url()."Kewirausahaan/detail_barang_garage_sale"; ?>" method="POST">
-                      <button type="submit" name="barang" value="<?php echo $b['id_barang_garage_sale']; ?>">Lihat Detail Barang</button>
-                    </form> -->
-                  </td>
-                </tr>
-                <?php endforeach?>
-                </tfoot>
-              </table>
+                      <!-- <form action="<?php echo base_url()."Kewirausahaan/edit_barang_garage_sale"; ?>" method="POST">
+                        <button type="submit" name="edit" value="<?php echo $b['id_barang_garage_sale']; ?>">Edit Barang</button>
+                      </form> -->
+                    <!-- </td>
+                    <td> -->
+                      <!-- <form action="<?php echo base_url()."Kewirausahaan/hapus_barang_garage_sale"; ?>" method="POST">
+                        <button type="submit" name="hapus" value="<?php echo $b['id_barang_garage_sale']; ?>">Hapus Barang</button>
+                      </form> -->
+                    <!-- </td>
+                    <td> -->
+                      <!-- <form action="<?php echo base_url()."Kewirausahaan/detail_barang_garage_sale"; ?>" method="POST">
+                        <button type="submit" name="barang" value="<?php echo $b['id_barang_garage_sale']; ?>">Lihat Detail Barang</button>
+                      </form> -->
+                    </td>
+                  </tr>
+                  <?php endforeach?>
+                  </tfoot>
+                </table>
+              </div>
             </div>
           </div>
         </div>

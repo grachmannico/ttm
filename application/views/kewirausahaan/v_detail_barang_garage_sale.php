@@ -54,26 +54,28 @@
             <div class="box-body">
               <div class="form-group">
                 <label for="exampleInputEmail1">Detail Data Pembelian Barang <?php echo $detail_barang[0]['nama_barang']; ?>:</label>
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <th>nama</th>
-                    <th>qty</th>
-                    <th>status_pembelian</th>
-                    <th>tanggal_pembelian</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <?php foreach ($data_pembelian as $d): ?>
-                  <tr>
-                    <td><?php echo $d['nama']; ?></td>
-                    <td><?php echo $d['qty']; ?></td>
-                    <td><?php echo $d['status_pembelian']; ?></td>
-                    <td><?php echo $d['tanggal_pembelian']; ?></td>
-                  </tr>
-                  <?php endforeach?>
-                  </tfoot>
-                </table>
+                <div class="table-responsive">
+                  <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                      <th>Nama</th>
+                      <th>Qty</th>
+                      <th>Status pembelian</th>
+                      <th>Tanggal Pembelian</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($data_pembelian as $d): ?>
+                    <tr>
+                      <td><?php echo $d['nama']; ?></td>
+                      <td><?php echo $d['qty']; ?></td>
+                      <td><?php echo $d['status_pembelian']; ?></td>
+                      <td><?php echo $d['tanggal_pembelian']; ?></td>
+                    </tr>
+                    <?php endforeach?>
+                    </tfoot>
+                  </table>
+                </div>
               </div>
             </div>
           </div>

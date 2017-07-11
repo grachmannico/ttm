@@ -42,32 +42,44 @@
             </div>
             <div class="box-body">
               <div class="form-group">
-                <!-- <label for="exampleInputEmail1">Detail Data Pembelian Barang <?php echo $detail_barang[0]['nama_barang']; ?>:</label> -->
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <th>Nama Barang</th>
-                    <th>Qty</th>
-                    <th>Harga (per-satuan)</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <?php foreach ($pembelian as $p): ?>
-                  <tr>
-                    <td><?php echo $p['nama_barang']; ?></td>
-                    <td><?php echo $p['qty']; ?></td>
-                    <td><?php echo $p['harga']; ?></td>
-                  </tr>
-                  <?php endforeach?>
-                  </tfoot>
-                </table>
+                <div class="table-responsive">
+                  <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                      <th><center>Nama Barang</center></th>
+                      <th><center>Qty</center></th>
+                      <th><center>Harga (per-satuan)</center></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($pembelian as $p): ?>
+                    <tr>
+                      <td><?php echo $p['nama_barang']; ?></td>
+                      <td><?php echo $p['qty']; ?></td>
+                      <td><?php echo $p['harga']; ?></td>
+                    </tr>
+                    <?php endforeach?>
+                    </tfoot>
+                  </table>
+                </div>
               </div>
             </div>
             <div class="box-footer">
               <h4 class="pull-left">Total Tagihan: <?php echo $tagihan[0]['total_tagihan']; ?></h4>
-              <form action="<?php echo base_url()."Kewirausahaan/validasi_pembelian"; ?>" method="POST">
-                <button type="submit" class="btn btn-primary pull-right" name="validasi" value="<?php echo $invoice[0]['id_invoice']; ?>"><i class="fa fa-check-square"></i> <span>Validasi Pembelian</span></button>
-              </form>
+              <br>
+              <hr>
+              <div class="col-md-6">
+                <form action="<?php echo base_url()."Kewirausahaan/validasi_pembelian"; ?>" method="POST">
+                  <input type="hidden" name="status" value="tidak valid">
+                  <button type="submit" class="btn btn-danger" name="validasi" value="<?php echo $invoice[0]['id_invoice']; ?>" onclick="return isNotValid()"><i class="fa fa-minus-square"></i> <span>Pembelian Tidak Valid</span></button>
+                </form>
+              </div>
+              <div class="col-md-6">
+                <form action="<?php echo base_url()."Kewirausahaan/validasi_pembelian"; ?>" method="POST">
+                  <input type="hidden" name="status" value="valid">
+                  <button type="submit" class="btn btn-primary pull-right" name="validasi" value="<?php echo $invoice[0]['id_invoice']; ?>" onclick="return isValid()"><i class="fa fa-check-square"></i> <span>Validasi Pembelian</span></button>
+                </form>
+              </div>
             </div>
           </div>
         </div>

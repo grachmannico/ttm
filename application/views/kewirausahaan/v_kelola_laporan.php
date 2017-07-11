@@ -26,14 +26,15 @@
                   <div class="box-body">
                     <div class="form-group">
                       <!-- <label for="exampleInputEmail1">Detail Data Pembelian Barang <?php echo $detail_barang[0]['nama_barang']; ?>:</label> -->
-                      <table id="example1" class="table table-bordered table-striped">
+                      <div class="table-responsive">
+                        <table id="example1" class="table table-bordered table-striped">
                         <thead>
                         <tr>
-                          <th>Nama Dana Keluar</th>
-                          <th>Tanggal</th>
-                          <th>Nominal Dana Keluar</th>
-                          <th>Keterangan</th>
-                          <th>Action</th>
+                          <th><center>Nama Dana Keluar</center></th>
+                          <th><center>Tanggal</center></th>
+                          <th><center>Nominal Dana Keluar</center></th>
+                          <th><center>Keterangan</center></th>
+                          <th><center>Action</center></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -73,6 +74,7 @@
                         <?php endforeach?>
                         </tfoot>
                       </table>
+                      </div>
                     </div>
                   </div>
                   <!-- <div class="box-footer">
@@ -84,6 +86,7 @@
                 </div>
               </div>
               <div class="tab-pane" id="tab_2">
+                <h4>Total Donasi: <?php echo $total_dana[0]['total_dana']; ?></h4>
                 <div class="box box-danger">
                   <div class="box-header with-border">
                     <h3 class="box-title">Donasi yang Masuk</h3>
@@ -91,29 +94,31 @@
                   <div class="box-body">
                     <div class="form-group">
                       <!-- <label for="exampleInputEmail1">Detail Data Pembelian Barang <?php echo $detail_barang[0]['nama_barang']; ?>:</label> -->
-                      <table id="example2" class="table table-bordered table-striped">
-                        <thead>
-                        <tr>
-                          <th>nama</th>
-                          <th>nominal_donasi</th>
-                          <th>tanggal_donasi</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($dana_masuk as $d): ?>
-                        <tr>
-                          <td><?php echo $d['nama']; ?></td>
-                          <td><?php echo $d['nominal_donasi']; ?></td>
-                          <td><?php echo $d['tanggal_donasi']; ?></td>
-                        </tr>
-                        <?php endforeach?>
-                        </tfoot>
-                      </table>
+                      <div class="table-responsive">
+                        <table id="example2" class="table table-bordered table-striped">
+                          <thead>
+                          <tr>
+                            <th><center>Nama</center></th>
+                            <th><center>Nominal Donasi</center></th>
+                            <th><center>Tanggal Donasi</center></th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <?php foreach ($dana_masuk as $d): ?>
+                          <tr>
+                            <td><?php echo $d['nama']; ?></td>
+                            <td><?php echo $d['nominal_donasi']; ?></td>
+                            <td><?php echo $d['tanggal_donasi']; ?></td>
+                          </tr>
+                          <?php endforeach?>
+                          </tfoot>
+                        </table>
+                      </div>
                     </div>
                   </div>
-                  <div class="box-footer">
+                  <!-- <div class="box-footer">
                     <h4 class="pull-left">Total Donasi: <?php echo $total_dana[0]['total_dana']; ?></h4>
-                  </div>
+                  </div> -->
                 </div>
               </div>
               <!-- /.tab-pane -->

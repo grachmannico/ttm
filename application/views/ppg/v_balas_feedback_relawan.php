@@ -66,7 +66,7 @@
                 <img class="img-responsive img-circle img-sm" src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" alt="Alt Text">
                 <!-- .img-push is used to add margin to elements next to floating images -->
                 <div class="img-push">
-                  <input type="text" class="form-control input-sm" name="komentar" placeholder="Press enter to post comment">
+                  <input type="text" class="form-control input-sm" name="komentar" placeholder="Press enter to post comment" required>
                 </div>
               </form>
             </div>

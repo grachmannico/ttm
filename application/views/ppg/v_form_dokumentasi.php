@@ -13,11 +13,54 @@
         <div class="col-md-10 col-md-push-1">
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab">Tambah Dokumentasi</a></li>
-              <li><a href="#tab_2" data-toggle="tab">Kelola Dokumentasi</a></li>
+              <li class="active"><a href="#tab_1" data-toggle="tab">Kelola Dokumentasi</a></li>
+              <li><a href="#tab_2" data-toggle="tab">Tambah Dokumentasi</a></li>
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="tab_1">
+                <div class="box box-danger">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">Dokumentasi</h3>
+                  </div>
+                  <div class="box-body">
+                    <div class="table-responsive">
+                      <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                          <th><center>Gambar Kegiatan</center></th>
+                          <th><center>Deskripsi</center></th>
+                          <th><center>Tanggal</th>
+                          <th><center>Action</center></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                          <?php foreach ($dokumentasi as $d): ?>
+                          <tr>
+                            <td><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_kegiatan']; ?>" alt="" width="300px"></td>
+                            <td><?php echo $d['deskripsi']; ?></td>
+                            <td><?php echo $d['tanggal']; ?></td>
+                            <td>
+                              <div class="col-md-6">
+                                <form action="<?php echo base_url()."PPG/edit_dokumentasi_kegiatan"; ?>" method="POST">
+                                  <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['id_gambar_kegiatan']; ?>"><i class="fa fa-edit"></i> Edit</button>
+                                </form>
+                              </div>
+                              <div class="col-md-6">
+                                <form action="<?php echo base_url()."PPG/hapus_dokumentasi_kegiatan"; ?>" method="POST">
+                                <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
+                                <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $d['id_gambar_kegiatan']; ?>" onclick="return checkDelete()"><i class="fa fa-trash"></i> Hapus</button>
+                              </form>
+                              </div>
+                            </td>
+                          </tr>
+                          <?php endforeach?>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane" id="tab_2">
                 <div class="box box-danger">
                   <div class="box-header with-border">
                     <h3 class="box-title">Form Tambah Dokumentasi Kegiatan</h3>
@@ -46,46 +89,7 @@
                   </form>
                 </div>
               </div>
-              <div class="tab-pane" id="tab_2">
-                <div class="box box-danger">
-                  <div class="box-header with-border">
-                    <h3 class="box-title">Dokumentasi</h3>
-                  </div>
-                  <div class="box-body">
-                    <table id="example1" class="table table-bordered table-striped">
-                      <thead>
-                      <tr>
-                        <th>gambar kegiatan</th>
-                        <th>deskripsi</th>
-                        <th>tanggal</th>
-                        <th>action</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                        <?php foreach ($dokumentasi as $d): ?>
-                        <tr>
-                          <td><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_kegiatan']; ?>" alt="" width="300px"></td>
-                          <td><?php echo $d['deskripsi']; ?></td>
-                          <td><?php echo $d['tanggal']; ?></td>
-                          <td>
-                            <form action="<?php echo base_url()."PPG/edit_dokumentasi_kegiatan"; ?>" method="POST">
-                              <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['id_gambar_kegiatan']; ?>"><i class="fa fa-edit"></i> Edit</button>
-                            </form>
-                            <form action="<?php echo base_url()."PPG/hapus_dokumentasi_kegiatan"; ?>" method="POST">
-                              <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
-                              <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $d['id_gambar_kegiatan']; ?>" onclick="return checkDelete()"><i class="fa fa-trash"></i> Hapus</button>
-                            </form>
-                          </td>
-                        </tr>
-                        <?php endforeach?>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              <!-- /.tab-pane -->
             </div>
-            <!-- /.tab-content -->
           </div>
         </div>
         <!-- <div class="col-md-8 col-md-push-2">

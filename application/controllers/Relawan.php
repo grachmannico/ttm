@@ -177,8 +177,8 @@ class Relawan extends CI_Controller
                 $this->load->view("footer");
             }
         } else {
-            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
-            $url_target = "Relawan/mengelola_data_relawan";
+            $pesan      = "Gagal Menambah Data Relawan. Isi Seluruh Form Yang Tersedia.";
+            $url_target = "Relawan/tambah_relawan";
             $name       = "";
             $value      = "";
             $alert      = array(
@@ -221,10 +221,13 @@ class Relawan extends CI_Controller
             $where   = array('email' => $email);
             $execute = $this->Relawan_model->update_data('relawan', $update_data_relawan, $where);
             if ($execute >= 1) {
+                $pesan  = "Sukses Meng-edit Data Relawan $nama";
+                $sukses = array('pesan' => $pesan);
+                $this->session->set_flashdata('success_msg', $sukses);
                 redirect("Relawan/mengelola_data_relawan");
             } else {
                 $pesan      = "Gagal Meng-edit Data Relawan. Silahkan Cek Kembali.";
-                $url_target = "PPG/mengelola_absensi";
+                $url_target = "PPG/edit_relawan";
                 $name       = "edit";
                 $value      = $email;
                 $alert      = array(
@@ -259,6 +262,9 @@ class Relawan extends CI_Controller
             $where   = array('email' => $hapus);
             $execute = $this->Relawan_model->delete_data('relawan', $where);
             if ($execute >= 1) {
+                $pesan  = "Sukses Menghapus Data Relawan";
+                $sukses = array('pesan' => $pesan);
+                $this->session->set_flashdata('success_msg', $sukses);
                 redirect("Relawan/mengelola_data_relawan");
             } else {
                 $pesan      = "Gagal Hapus Relawan. Silahkan Cek Kembali.";

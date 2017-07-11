@@ -79,7 +79,18 @@
 <!-- confirm deletion -->
 <script language="JavaScript" type="text/javascript">
 function checkDelete(){
-    return confirm('Are you sure?');
+    return confirm('Yakin Ingin Menghapus Data Ini?');
+}
+</script>
+<!-- confirm transaction -->
+<script language="JavaScript" type="text/javascript">
+function isValid(){
+    return confirm('Yakin Transaksi Ini Valid?');
+}
+</script>
+<script language="JavaScript" type="text/javascript">
+function isNotValid(){
+    return confirm('Yakin Transaksi Ini Tidak Valid?');
 }
 </script>
 

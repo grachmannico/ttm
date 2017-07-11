@@ -115,75 +115,66 @@ class PPG extends CI_Controller
                 );
                 $execute = $this->PPG_model->insert_data('kegiatan', $tambah_kegiatan);
                 if ($execute >= 1) {
-                    if ($id_status_kegiatan == 1) {
 
-                        //Start FCM Code
-                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
-                        $title           = "Kegiatan Baru: " . $nama_kegiatan;
-                        $body            = $pesan_ajakan;
-                        $message         = "null";
-                        $message_type    = "kegiatan";
-                        $intent          = "DetailKegiatanActivity";
-                        $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
-                        $date_rcv        = date("Y-m-d");
+                    //Start FCM Code
+                    $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
+                    $title           = "Kegiatan Baru: " . $nama_kegiatan;
+                    $body            = $pesan_ajakan;
+                    $message         = "null";
+                    $message_type    = "kegiatan";
+                    $intent          = "DetailKegiatanActivity";
+                    $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
+                    $date_rcv        = date("Y-m-d");
 
-                        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
-                        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
-                        $data        = $this->PPG_model->get_all_user();
-                        print_r($data);
+                    $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                    $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+                    $data        = $this->PPG_model->get_all_user();
+                    print_r($data);
 
-                        $ids = array();
-                        $i   = 0;
-                        foreach ($data as $d) {
-                            $ids[$i] = $d['fcm_token'];
-                            $i++;
-                        }
-
-                        $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
-                        $fields  = array(
-                            'registration_ids' => $ids,
-                            'data'             => array(
-                                'title'       => $title,
-                                'body'        => $body,
-                                'message'     => $message,
-                                'messagetype' => $message_type,
-                                'intent'      => $intent,
-                                'idtarget'    => $id_target,
-                                'datercv'     => $date_rcv,
-                            ),
-                        );
-
-                        $payload      = json_encode($fields);
-                        $curl_session = curl_init();
-                        curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
-                        curl_setopt($curl_session, CURLOPT_POST, true);
-                        curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
-                        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
-                        curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-                        curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
-
-                        $result = curl_exec($curl_session);
-                        curl_close($curl_session);
-                        // echo "<hr>";
-                        // print_r($result);
-                        //End FCM Code
-
-                        $pesan  = "Sukses Menambah Kegiatan $nama_kegiatan";
-                        $sukses = array('pesan' => $pesan);
-                        $this->session->set_flashdata('success_msg', $sukses);
-                        redirect("PPG/mengelola_kegiatan");
-                    } elseif ($id_status_kegiatan == 2) {
-                        $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                        $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
-                        $this->load->view('footer');
-                    } elseif ($id_status_kegiatan == 3) {
-                        $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                        $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi));
-                        $this->load->view('footer');
+                    $ids = array();
+                    $i   = 0;
+                    foreach ($data as $d) {
+                        $ids[$i] = $d['fcm_token'];
+                        $i++;
                     }
+
+                    $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                    $fields  = array(
+                        'registration_ids' => $ids,
+                        'data'             => array(
+                            'title'       => $title,
+                            'body'        => $body,
+                            'message'     => $message,
+                            'messagetype' => $message_type,
+                            'intent'      => $intent,
+                            'idtarget'    => $id_target,
+                            'datercv'     => $date_rcv,
+                        ),
+                    );
+
+                    $payload      = json_encode($fields);
+                    $curl_session = curl_init();
+                    curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                    curl_setopt($curl_session, CURLOPT_POST, true);
+                    curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                    curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                    $result = curl_exec($curl_session);
+                    curl_close($curl_session);
+                    // echo "<hr>";
+                    // print_r($result);
+                    //End FCM Code
+
+                    $pesan  = "Sukses Menambah Kegiatan $nama_kegiatan";
+                    $sukses = array('pesan' => $pesan);
+                    $this->session->set_flashdata('success_msg', $sukses);
+                    redirect("PPG/mengelola_kegiatan");
+
                 } else {
-                    $pesan      = "Gagal Menambah Kegiatan. Isi Seluruh Form Yang Tersedia.";
+                    $pesan      = "Gagal Menambah Kegiatan. Silahkan Cek Kembali.";
                     $url_target = "PPG/tambah_kegiatan";
                     $name       = "";
                     $value      = "";
@@ -214,78 +205,92 @@ class PPG extends CI_Controller
                 );
                 $execute = $this->PPG_model->insert_data('kegiatan', $tambah_kegiatan);
                 if ($execute >= 1) {
-                    if ($id_status_kegiatan == 1) {
 
-                        //Start FCM Code
-                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
-                        $title           = "Kegiatan Baru: " . $nama_kegiatan;
-                        $body            = $pesan_ajakan;
-                        $message         = "null";
-                        $message_type    = "kegiatan";
-                        $intent          = "DetailKegiatanActivity";
-                        $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
-                        $date_rcv        = date("Y-m-d");
+                    //Start FCM Code
+                    $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
+                    $title           = "Kegiatan Baru: " . $nama_kegiatan;
+                    $body            = $pesan_ajakan;
+                    $message         = "null";
+                    $message_type    = "kegiatan";
+                    $intent          = "DetailKegiatanActivity";
+                    $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
+                    $date_rcv        = date("Y-m-d");
 
-                        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
-                        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
-                        $data        = $this->PPG_model->get_all_user();
-                        print_r($data);
+                    $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                    $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+                    $data        = $this->PPG_model->get_all_user();
+                    print_r($data);
 
-                        $ids = array();
-                        $i   = 0;
-                        foreach ($data as $d) {
-                            $ids[$i] = $d['fcm_token'];
-                            $i++;
-                        }
-
-                        $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
-                        $fields  = array(
-                            'registration_ids' => $ids,
-                            'data'             => array(
-                                'title'       => $title,
-                                'body'        => $body,
-                                'message'     => $message,
-                                'messagetype' => $message_type,
-                                'intent'      => $intent,
-                                'idtarget'    => $id_target,
-                                'datercv'     => $date_rcv,
-                            ),
-                        );
-
-                        $payload      = json_encode($fields);
-                        $curl_session = curl_init();
-                        curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
-                        curl_setopt($curl_session, CURLOPT_POST, true);
-                        curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
-                        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
-                        curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-                        curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
-
-                        $result = curl_exec($curl_session);
-                        curl_close($curl_session);
-                        // echo "<hr>";
-                        // print_r($result);
-                        //End FCM Code
-
-                        $pesan  = "Sukses Menambah Kegiatan $nama_kegiatan";
-                        $sukses = array('pesan' => $pesan);
-                        $this->session->set_flashdata('success_msg', $sukses);
-
-                        redirect("PPG/mengelola_kegiatan");
-                    } elseif ($id_status_kegiatan == 2) {
-                        $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                        $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
-                        $this->load->view('footer');
-                    } elseif ($id_status_kegiatan == 3) {
-                        $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                        $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi));
-                        $this->load->view('footer');
+                    $ids = array();
+                    $i   = 0;
+                    foreach ($data as $d) {
+                        $ids[$i] = $d['fcm_token'];
+                        $i++;
                     }
+
+                    $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                    $fields  = array(
+                        'registration_ids' => $ids,
+                        'data'             => array(
+                            'title'       => $title,
+                            'body'        => $body,
+                            'message'     => $message,
+                            'messagetype' => $message_type,
+                            'intent'      => $intent,
+                            'idtarget'    => $id_target,
+                            'datercv'     => $date_rcv,
+                        ),
+                    );
+
+                    $payload      = json_encode($fields);
+                    $curl_session = curl_init();
+                    curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                    curl_setopt($curl_session, CURLOPT_POST, true);
+                    curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                    curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                    $result = curl_exec($curl_session);
+                    curl_close($curl_session);
+                    // echo "<hr>";
+                    // print_r($result);
+                    //End FCM Code
+
+                    $pesan  = "Sukses Menambah Kegiatan $nama_kegiatan";
+                    $sukses = array('pesan' => $pesan);
+                    $this->session->set_flashdata('success_msg', $sukses);
+
+                    redirect("PPG/mengelola_kegiatan");
                 } else {
-                    echo "gagal";
+                    $pesan      = "Gagal Menambah Kegiatan. Silahkan Cek Kembali.";
+                    $url_target = "PPG/tambah_kegiatan";
+                    $name       = "";
+                    $value      = "";
+                    $alert      = array(
+                        'pesan'      => $pesan,
+                        'url_target' => $url_target,
+                        'name'       => $name,
+                        'value'      => $value,
+                    );
+                    $this->load->view("alert", array('alert' => $alert));
+                    $this->load->view("footer");
                 }
             }
+        } else {
+            $pesan      = "Gagal Menambah Kegiatan. Isi Seluruh Form Yang Tersedia.";
+            $url_target = "PPG/tambah_kegiatan";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
         }
     }
 
@@ -367,73 +372,63 @@ class PPG extends CI_Controller
                 $where   = array('id_kegiatan' => $id_kegiatan);
                 $execute = $this->PPG_model->update_data('kegiatan', $update_kegiatan, $where);
                 if ($execute >= 1) {
-                    if ($id_status_kegiatan == 1) {
 
-                        //Start FCM Code
-                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
-                        $title           = "Kegiatan " . $nama_kegiatan . " Diperbarui";
-                        $body            = "Kegiatan telah diperbarui, lihat sekarang.";
-                        $message         = "null";
-                        $message_type    = "kegiatan";
-                        $intent          = "DetailKegiatanActivity";
-                        $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
-                        $date_rcv        = date("Y-m-d");
+                    //Start FCM Code
+                    $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
+                    $title           = "Kegiatan " . $nama_kegiatan . " Diperbarui";
+                    $body            = "Kegiatan telah diperbarui, lihat sekarang.";
+                    $message         = "null";
+                    $message_type    = "kegiatan";
+                    $intent          = "DetailKegiatanActivity";
+                    $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
+                    $date_rcv        = date("Y-m-d");
 
-                        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
-                        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
-                        $data        = $this->PPG_model->get_all_user();
-                        print_r($data);
+                    $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                    $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+                    $data        = $this->PPG_model->get_all_user();
+                    print_r($data);
 
-                        $ids = array();
-                        $i   = 0;
-                        foreach ($data as $d) {
-                            $ids[$i] = $d['fcm_token'];
-                            $i++;
-                        }
-
-                        $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
-                        $fields  = array(
-                            'registration_ids' => $ids,
-                            'data'             => array(
-                                'title'       => $title,
-                                'body'        => $body,
-                                'message'     => $message,
-                                'messagetype' => $message_type,
-                                'intent'      => $intent,
-                                'idtarget'    => $id_target,
-                                'datercv'     => $date_rcv,
-                            ),
-                        );
-
-                        $payload      = json_encode($fields);
-                        $curl_session = curl_init();
-                        curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
-                        curl_setopt($curl_session, CURLOPT_POST, true);
-                        curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
-                        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
-                        curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-                        curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
-
-                        $result = curl_exec($curl_session);
-                        curl_close($curl_session);
-                        // echo "<hr>";
-                        // print_r($result);
-                        //End FCM Code
-
-                        $pesan  = "Sukses Meng-edit Kegiatan $nama_kegiatan";
-                        $sukses = array('pesan' => $pesan);
-                        $this->session->set_flashdata('success_msg', $sukses);
-                        redirect("PPG/mengelola_kegiatan");
-                    } elseif ($id_status_kegiatan == 2) {
-                        $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                        $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
-                        $this->load->view('footer');
-                    } elseif ($id_status_kegiatan == 3) {
-                        $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                        $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi));
-                        $this->load->view('footer');
+                    $ids = array();
+                    $i   = 0;
+                    foreach ($data as $d) {
+                        $ids[$i] = $d['fcm_token'];
+                        $i++;
                     }
+
+                    $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                    $fields  = array(
+                        'registration_ids' => $ids,
+                        'data'             => array(
+                            'title'       => $title,
+                            'body'        => $body,
+                            'message'     => $message,
+                            'messagetype' => $message_type,
+                            'intent'      => $intent,
+                            'idtarget'    => $id_target,
+                            'datercv'     => $date_rcv,
+                        ),
+                    );
+
+                    $payload      = json_encode($fields);
+                    $curl_session = curl_init();
+                    curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                    curl_setopt($curl_session, CURLOPT_POST, true);
+                    curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                    curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                    $result = curl_exec($curl_session);
+                    curl_close($curl_session);
+                    // echo "<hr>";
+                    // print_r($result);
+                    //End FCM Code
+
+                    $pesan  = "Sukses Meng-edit Kegiatan $nama_kegiatan";
+                    $sukses = array('pesan' => $pesan);
+                    $this->session->set_flashdata('success_msg', $sukses);
+                    redirect("PPG/mengelola_kegiatan");
                 } else {
                     $pesan      = "Gagal Edit Kegiatan. Silahkan Cek Kembali.";
                     $url_target = "PPG/edit_kegiatan";
@@ -467,74 +462,64 @@ class PPG extends CI_Controller
                 $where   = array('id_kegiatan' => $id_kegiatan);
                 $execute = $this->PPG_model->update_data('kegiatan', $update_kegiatan, $where);
                 if ($execute >= 1) {
-                    if ($id_status_kegiatan == 1) {
 
-                        //Start FCM Code
-                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
-                        $title           = "Kegiatan " . $nama_kegiatan . " Diperbarui";
-                        $body            = "Kegiatan telah diperbarui, lihat sekarang.";
-                        $message         = "null";
-                        $message_type    = "kegiatan";
-                        $intent          = "DetailKegiatanActivity";
-                        $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
-                        $date_rcv        = date("Y-m-d");
+                    //Start FCM Code
+                    $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
+                    $title           = "Kegiatan " . $nama_kegiatan . " Diperbarui";
+                    $body            = "Kegiatan telah diperbarui, lihat sekarang.";
+                    $message         = "null";
+                    $message_type    = "kegiatan";
+                    $intent          = "DetailKegiatanActivity";
+                    $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
+                    $date_rcv        = date("Y-m-d");
 
-                        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
-                        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
-                        $data        = $this->PPG_model->get_all_user();
-                        print_r($data);
+                    $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                    $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+                    $data        = $this->PPG_model->get_all_user();
+                    print_r($data);
 
-                        $ids = array();
-                        $i   = 0;
-                        foreach ($data as $d) {
-                            $ids[$i] = $d['fcm_token'];
-                            $i++;
-                        }
-
-                        $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
-                        $fields  = array(
-                            'registration_ids' => $ids,
-                            'data'             => array(
-                                'title'       => $title,
-                                'body'        => $body,
-                                'message'     => $message,
-                                'messagetype' => $message_type,
-                                'intent'      => $intent,
-                                'idtarget'    => $id_target,
-                                'datercv'     => $date_rcv,
-                            ),
-                        );
-
-                        $payload      = json_encode($fields);
-                        $curl_session = curl_init();
-                        curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
-                        curl_setopt($curl_session, CURLOPT_POST, true);
-                        curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
-                        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
-                        curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-                        curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
-
-                        $result = curl_exec($curl_session);
-                        curl_close($curl_session);
-                        // echo "<hr>";
-                        // print_r($result);
-                        //End FCM Code
-
-                        $pesan  = "Sukses Meng-edit Kegiatan $nama_kegiatan";
-                        $sukses = array('pesan' => $pesan);
-                        $this->session->set_flashdata('success_msg', $sukses);
-
-                        redirect("PPG/mengelola_kegiatan");
-                    } elseif ($id_status_kegiatan == 2) {
-                        $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                        $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
-                        $this->load->view('footer');
-                    } elseif ($id_status_kegiatan == 3) {
-                        $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
-                        $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi));
-                        $this->load->view('footer');
+                    $ids = array();
+                    $i   = 0;
+                    foreach ($data as $d) {
+                        $ids[$i] = $d['fcm_token'];
+                        $i++;
                     }
+
+                    $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                    $fields  = array(
+                        'registration_ids' => $ids,
+                        'data'             => array(
+                            'title'       => $title,
+                            'body'        => $body,
+                            'message'     => $message,
+                            'messagetype' => $message_type,
+                            'intent'      => $intent,
+                            'idtarget'    => $id_target,
+                            'datercv'     => $date_rcv,
+                        ),
+                    );
+
+                    $payload      = json_encode($fields);
+                    $curl_session = curl_init();
+                    curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                    curl_setopt($curl_session, CURLOPT_POST, true);
+                    curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                    curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                    $result = curl_exec($curl_session);
+                    curl_close($curl_session);
+                    // echo "<hr>";
+                    // print_r($result);
+                    //End FCM Code
+
+                    $pesan  = "Sukses Meng-edit Kegiatan $nama_kegiatan";
+                    $sukses = array('pesan' => $pesan);
+                    $this->session->set_flashdata('success_msg', $sukses);
+
+                    redirect("PPG/mengelola_kegiatan");
                 } else {
                     $pesan      = "Gagal Edit Kegiatan. Silahkan Cek Kembali.";
                     $url_target = "PPG/edit_kegiatan";
@@ -551,10 +536,10 @@ class PPG extends CI_Controller
                 }
             }
         } else {
-            $pesan      = "Gagal Edit Kegiatan. Silahkan Cek Kembali.";
-            $url_target = "PPG/edit_kegiatan";
-            $name       = "edit";
-            $value      = $id_kegiatan;
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "PPG/mengelola_kegiatan";
+            $name       = "";
+            $value      = "";
             $alert      = array(
                 'pesan'      => $pesan,
                 'url_target' => $url_target,
@@ -679,6 +664,9 @@ class PPG extends CI_Controller
         // echo $tanggal."<br>";
 
         if ($dokumen != "") {
+            if ($this->session->flashdata('success_msg')) {
+                $this->load->view("success", array('success' => $this->session->flashdata('success_msg')));
+            }
             $check_status_kegiatan = $this->PPG_model->get_kegiatan("where k.id_kegiatan = $dokumen");
             if ($check_status_kegiatan[0]['id_status_kegiatan'] > 1) {
                 $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $dokumen");
@@ -699,6 +687,9 @@ class PPG extends CI_Controller
                 $this->load->view("footer");
             }
         } else if ($this->session->flashdata('dokumentasi')) {
+            if ($this->session->flashdata('success_msg')) {
+                $this->load->view("success", array('success' => $this->session->flashdata('success_msg')));
+            }
             $doc                   = $this->session->flashdata('dokumentasi');
             $check_status_kegiatan = $this->PPG_model->get_kegiatan("where k.id_kegiatan = $doc[dokumentasi]");
             if ($check_status_kegiatan[0]['id_status_kegiatan'] > 1) {
@@ -756,8 +747,15 @@ class PPG extends CI_Controller
                     //Start FCM Code
                     //End FCM Code
 
-                    $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
-                    $this->load->view('footer');
+                    $pesan  = "Sukses Menambah Dokumentasi Kegiatan";
+                    $sukses = array('pesan' => $pesan);
+                    $this->session->set_flashdata('success_msg', $sukses);
+                    $dokumentasi = array('dokumentasi' => $id_kegiatan);
+                    $this->session->set_flashdata('dokumentasi', $dokumentasi);
+                    redirect("PPG/tambah_dokumentasi_kegiatan");
+
+                    // $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $id_kegiatan));
+                    // $this->load->view('footer');
                 } else {
                     $pesan      = "Gagal Menambah Dokumentasi. Silahkan Cek Kembali.";
                     $url_target = "PPG/mengelola_kegiatan";
@@ -822,6 +820,9 @@ class PPG extends CI_Controller
                     //Start FCM Code
                     //End FCM Code
 
+                    $pesan  = "Sukses Meng-edit Dokumentasi Kegiatan";
+                    $sukses = array('pesan' => $pesan);
+                    $this->session->set_flashdata('success_msg', $sukses);
                     $dokumentasi = array('dokumentasi' => $id_kegiatan);
                     $this->session->set_flashdata('dokumentasi', $dokumentasi);
                     redirect("PPG/tambah_dokumentasi_kegiatan");
@@ -857,6 +858,9 @@ class PPG extends CI_Controller
                     //Start FCM Code
                     //End FCM Code
 
+                    $pesan  = "Sukses Menambah Dokumentasi Kegiatan";
+                    $sukses = array('pesan' => $pesan);
+                    $this->session->set_flashdata('success_msg', $sukses);
                     $dokumentasi = array('dokumentasi' => $id_kegiatan);
                     $this->session->set_flashdata('dokumentasi', $dokumentasi);
                     redirect("PPG/tambah_dokumentasi_kegiatan");
@@ -902,6 +906,9 @@ class PPG extends CI_Controller
             $where   = array('id_gambar_kegiatan' => $hapus);
             $execute = $this->PPG_model->delete_data('gambar_kegiatan', $where);
             if ($execute >= 1) {
+                $pesan  = "Sukses Menghapus Dokumentasi Kegiatan";
+                $sukses = array('pesan' => $pesan);
+                $this->session->set_flashdata('success_msg', $sukses);
                 $dokumentasi = array('dokumentasi' => $id_kegiatan);
                 $this->session->set_flashdata('dokumentasi', $dokumentasi);
                 redirect("PPG/tambah_dokumentasi_kegiatan");

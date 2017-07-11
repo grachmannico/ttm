@@ -10,8 +10,33 @@
     </section>
     <section class="content">
       <div class="row">
-        <div class="col-md-4">
-          <div class="box box-danger">
+        <div class="col-md-8 col-md-push-2">
+          <div class="box box-widget widget-user">
+            <div class="widget-user-header bg-black" style="background: url('<?php echo base_url() . "uploads/dokumentasi/"; ?>Untitled.png') center center;">
+              <h3 class="widget-user-username"><?php echo $data_donatur[0]['nama']; ?></h3>
+              <h5 class="widget-user-desc"><?php echo $data_donatur[0]['email']; ?></h5>
+            </div>
+            <div class="widget-user-image">
+              <img class="img-circle" src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" alt="User Avatar">
+            </div>
+            <div class="box-footer">
+              <div class="row">
+                <div class="col-sm-6 border-right">
+                  <div class="description-block">
+                    <h5 class="description-header">10</h5>
+                    <span class="description-text">Jumlah Transaksi Donasi</span>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="description-block">
+                    <h5 class="description-header">Rp. 100000</h5>
+                    <span class="description-text">Jumlah Nominal Donasi</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Detail Data Donatur</h3>
             </div>
@@ -25,9 +50,9 @@
                 <input type="text" class="form-control" value="<?php echo $data_donatur[0]['nama']; ?>" readonly>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
-        <div class="col-md-8">
+        <div class="col-md-8 col-md-push-2">
           <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Data Donasi yang dilakukan Donatur</h3>
@@ -35,28 +60,30 @@
             <div class="box-body">
               <div class="form-group">
                 <!-- <label for="exampleInputEmail1">Detail Data Pembelian Barang <?php echo $detail_barang[0]['nama_barang']; ?>:</label> -->
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <td>Nama kegiatan</td>
-                    <td>Status Donasi</td>
-                    <td>Nominal Donasi</td>
-                    <td>Struk Donasi</td>
-                    <td>Tanggal Donasi</td>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <?php foreach ($data_donasi_donatur as $d): ?>
-                  <tr>
-                    <td><?php echo $d['nama_kegiatan']; ?></td>
-                    <td><?php echo $d['status_donasi']; ?></td>
-                    <td><?php echo $d['nominal_donasi']; ?></td>
-                    <td><a href="<?php echo base_url()."uploads/konfirmasi_donasi/" ?><?php echo $d['struk_donasi']; ?>" target="blank"><img src="<?php echo base_url()."uploads/konfirmasi_donasi/" ?><?php echo $d['struk_donasi']; ?>" alt="" width="150px"></a></td>
-                    <td><?php echo $d['tanggal_donasi']; ?></td>
-                  </tr>
-                  <?php endforeach?>
-                  </tfoot>
-                </table>
+                <div class="table-responsive">
+                  <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                      <th>Nama kegiatan</th>
+                      <th>Status Donasi</th>
+                      <th>Nominal Donasi</th>
+                      <th>Struk Donasi</th>
+                      <th>Tanggal Donasi</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($data_donasi_donatur as $d): ?>
+                    <tr>
+                      <td><?php echo $d['nama_kegiatan']; ?></td>
+                      <td><?php echo $d['status_donasi']; ?></td>
+                      <td><?php echo $d['nominal_donasi']; ?></td>
+                      <td><a href="<?php echo base_url()."uploads/konfirmasi_donasi/" ?><?php echo $d['struk_donasi']; ?>" target="blank"><img src="<?php echo base_url()."uploads/konfirmasi_donasi/" ?><?php echo $d['struk_donasi']; ?>" alt="" width="150px"></a></td>
+                      <td><?php echo $d['tanggal_donasi']; ?></td>
+                    </tr>
+                    <?php endforeach?>
+                    </tfoot>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
