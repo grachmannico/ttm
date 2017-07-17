@@ -65,7 +65,7 @@ class PPG_model extends CI_Model
 
     public function get_dokumentasi_kegiatan($where = "")
     {
-        $data = $this->db->query('select * from gambar_kegiatan ' . $where);
+        $data = $this->db->query('select * from dokumentasi ' . $where);
         return $data->result_array();
     }
 

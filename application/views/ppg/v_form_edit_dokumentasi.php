@@ -23,8 +23,12 @@
               <input type="hidden" name="id_kegiatan" value="<?php echo $dokumentasi[0]['id_kegiatan']; ?>">
               <div class="box-body">
                 <div class="form-group">
+                  <label for="exampleInputEmail1"><i class="fa fa-file-text"></i> Nama Dokumentasi</label>
+                  <input type="text" class="form-control" name="nama_dokumentasi" value="<?php echo $dokumentasi[0]['nama_dokumentasi']; ?>" required>
+                </div>
+                <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-image"></i> Gambar Kegitan</label><br>
-                  <img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $dokumentasi[0]['gambar_kegiatan']; ?>" alt="" width="300px"><br>
+                  <img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $dokumentasi[0]['gambar_dokumentasi']; ?>" alt="" width="300px"><br>
                   <!-- <input type="email" class="form-control" placeholder="Email Relawan" name="email" required> -->
                   <input name="gambar" size="20" type="file">
                 </div>
@@ -40,7 +44,7 @@
                 </div>
               </div>
               <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right" name="id_gambar_kegiatan" value="<?php echo $dokumentasi[0]['id_gambar_kegiatan']; ?>"><i class="fa fa-edit"></i> <span>Edit Dokumentasi</span></button>
+                <button type="submit" class="btn btn-primary pull-right" name="id_dokumentasi" value="<?php echo $dokumentasi[0]['id_dokumentasi']; ?>"><i class="fa fa-edit"></i> <span>Edit Dokumentasi</span></button>
               </div>
             </form>
           </div>

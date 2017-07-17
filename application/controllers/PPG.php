@@ -653,10 +653,11 @@ class PPG extends CI_Controller
 
     public function tambah_dokumentasi_kegiatan()
     {
-        $dokumen     = $this->input->post("dokumentasi");
-        $id_kegiatan = $this->input->post("id_kegiatan");
-        $deskripsi   = $this->input->post("deskripsi");
-        $tanggal     = $this->input->post("tanggal");
+        $dokumen          = $this->input->post("dokumentasi");
+        $id_kegiatan      = $this->input->post("id_kegiatan");
+        $nama_dokumentasi = $this->input->post("nama_dokumentasi");
+        $deskripsi        = $this->input->post("deskripsi");
+        $tanggal          = $this->input->post("tanggal");
 
         // echo $dokumen."<br>";
         // echo $id_kegiatan."<br>";
@@ -670,7 +671,7 @@ class PPG extends CI_Controller
             $check_status_kegiatan = $this->PPG_model->get_kegiatan("where k.id_kegiatan = $dokumen");
             if ($check_status_kegiatan[0]['id_status_kegiatan'] > 1) {
                 $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $dokumen");
-                $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $dokumen));
+                $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $dokumen, 'kegiatan' => $check_status_kegiatan));
                 $this->load->view('footer');
             } else {
                 $pesan      = "Tidak Bisa Menambah Dokumentasi Karena Kegiatan Masih Dalam Promosi Kegiatan.";
@@ -694,7 +695,7 @@ class PPG extends CI_Controller
             $check_status_kegiatan = $this->PPG_model->get_kegiatan("where k.id_kegiatan = $doc[dokumentasi]");
             if ($check_status_kegiatan[0]['id_status_kegiatan'] > 1) {
                 $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $doc[dokumentasi]");
-                $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $doc['dokumentasi']));
+                $this->load->view("ppg/v_form_dokumentasi", array('dokumentasi' => $dokumentasi, 'id_kegiatan' => $doc['dokumentasi'], 'kegiatan' => $check_status_kegiatan));
                 $this->load->view('footer');
             } else {
                 $pesan      = "Tidak Bisa Menambah Dokumentasi Karena Kegiatan Masih Dalam Promosi Kegiatan.";
@@ -710,7 +711,7 @@ class PPG extends CI_Controller
                 $this->load->view("alert", array('alert' => $alert));
                 $this->load->view("footer");
             }
-        } else if ($id_kegiatan != "" && $deskripsi != "" && $tanggal != "") {
+        } else if ($id_kegiatan != "" && $deskripsi != "" && $tanggal != "" && $nama_dokumentasi != "") {
             $config['upload_path']   = './uploads/dokumentasi/';
             $config['allowed_types'] = 'gif|jpg|png';
             $config['max_size']      = 2048;
@@ -735,12 +736,13 @@ class PPG extends CI_Controller
             } else {
                 $data               = array('upload_data' => $this->upload->data());
                 $tambah_dokumentasi = array(
-                    'deskripsi'       => $deskripsi,
-                    'tanggal'         => $tanggal,
-                    'id_kegiatan'     => $id_kegiatan,
-                    'gambar_kegiatan' => $this->upload->data('file_name'),
+                    'nama_dokumentasi'   => $nama_dokumentasi,
+                    'deskripsi'          => $deskripsi,
+                    'tanggal'            => $tanggal,
+                    'id_kegiatan'        => $id_kegiatan,
+                    'gambar_dokumentasi' => $this->upload->data('file_name'),
                 );
-                $execute = $this->PPG_model->insert_data('gambar_kegiatan', $tambah_dokumentasi);
+                $execute = $this->PPG_model->insert_data('dokumentasi', $tambah_dokumentasi);
                 if ($execute >= 1) {
                     $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
 
@@ -789,16 +791,17 @@ class PPG extends CI_Controller
 
     public function edit_dokumentasi_kegiatan()
     {
-        $edit               = $this->input->post("edit");
-        $id_gambar_kegiatan = $this->input->post("id_gambar_kegiatan");
-        $id_kegiatan        = $this->input->post("id_kegiatan");
-        $deskripsi          = $this->input->post("deskripsi");
-        $tanggal            = $this->input->post("tanggal");
+        $edit             = $this->input->post("edit");
+        $id_dokumentasi   = $this->input->post("id_dokumentasi");
+        $nama_dokumentasi = $this->input->post("nama_dokumentasi");
+        $id_kegiatan      = $this->input->post("id_kegiatan");
+        $deskripsi        = $this->input->post("deskripsi");
+        $tanggal          = $this->input->post("tanggal");
         if ($edit != "") {
-            $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_gambar_kegiatan = $edit");
+            $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_dokumentasi = $edit");
             $this->load->view("ppg/v_form_edit_dokumentasi", array('dokumentasi' => $dokumentasi));
             $this->load->view('footer');
-        } elseif ($id_gambar_kegiatan != "" && $id_kegiatan != "" && $deskripsi != "" && $tanggal != "") {
+        } elseif ($id_dokumentasi != "" && $id_kegiatan != "" && $deskripsi != "" && $tanggal != "" && $nama_dokumentasi != "") {
             $config['upload_path']   = './uploads/dokumentasi/';
             $config['allowed_types'] = 'gif|jpg|png';
             $config['max_size']      = 2048;
@@ -808,12 +811,13 @@ class PPG extends CI_Controller
                 // $error = array('error' => $this->upload->display_errors());
                 // echo "error";
                 $update_dokumentasi = array(
-                    'deskripsi'   => $deskripsi,
-                    'tanggal'     => $tanggal,
-                    'id_kegiatan' => $id_kegiatan,
+                    'nama_dokumentasi' => $nama_dokumentasi,
+                    'deskripsi'        => $deskripsi,
+                    'tanggal'          => $tanggal,
+                    'id_kegiatan'      => $id_kegiatan,
                 );
-                $where   = array('id_gambar_kegiatan' => $id_gambar_kegiatan);
-                $execute = $this->PPG_model->update_data('gambar_kegiatan', $update_dokumentasi, $where);
+                $where   = array('id_dokumentasi' => $id_dokumentasi);
+                $execute = $this->PPG_model->update_data('dokumentasi', $update_dokumentasi, $where);
                 if ($execute >= 1) {
                     $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
 
@@ -833,7 +837,7 @@ class PPG extends CI_Controller
                     $pesan      = "Gagal Meng-edit Dokumentasi. Silahkan Cek Kembali.";
                     $url_target = "PPG/edit_dokumentasi_kegiatan";
                     $name       = "edit";
-                    $value      = $id_gambar_kegiatan;
+                    $value      = $id_dokumentasi;
                     $alert      = array(
                         'pesan'      => $pesan,
                         'url_target' => $url_target,
@@ -845,13 +849,14 @@ class PPG extends CI_Controller
                 }
             } else {
                 $update_dokumentasi = array(
-                    'deskripsi'       => $deskripsi,
-                    'tanggal'         => $tanggal,
-                    'id_kegiatan'     => $id_kegiatan,
-                    'gambar_kegiatan' => $this->upload->data('file_name'),
+                    'nama_dokumentasi'   => $nama_dokumentasi,
+                    'deskripsi'          => $deskripsi,
+                    'tanggal'            => $tanggal,
+                    'id_kegiatan'        => $id_kegiatan,
+                    'gambar_dokumentasi' => $this->upload->data('file_name'),
                 );
-                $where   = array('id_gambar_kegiatan' => $id_gambar_kegiatan);
-                $execute = $this->PPG_model->update_data('gambar_kegiatan', $update_dokumentasi, $where);
+                $where   = array('id_dokumentasi' => $id_dokumentasi);
+                $execute = $this->PPG_model->update_data('dokumentasi', $update_dokumentasi, $where);
                 if ($execute >= 1) {
                     $dokumentasi = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
 
@@ -871,7 +876,7 @@ class PPG extends CI_Controller
                     $pesan      = "Gagal Meng-edit Dokumentasi. Silahkan Cek Kembali.";
                     $url_target = "PPG/edit_dokumentasi_kegiatan";
                     $name       = "edit";
-                    $value      = $id_gambar_kegiatan;
+                    $value      = $id_dokumentasi;
                     $alert      = array(
                         'pesan'      => $pesan,
                         'url_target' => $url_target,
@@ -903,8 +908,8 @@ class PPG extends CI_Controller
         $hapus       = $this->input->post("hapus");
         $id_kegiatan = $this->input->post("id_kegiatan");
         if ($hapus != "") {
-            $where   = array('id_gambar_kegiatan' => $hapus);
-            $execute = $this->PPG_model->delete_data('gambar_kegiatan', $where);
+            $where   = array('id_dokumentasi' => $hapus);
+            $execute = $this->PPG_model->delete_data('dokumentasi', $where);
             if ($execute >= 1) {
                 $pesan  = "Sukses Menghapus Dokumentasi Kegiatan";
                 $sukses = array('pesan' => $pesan);

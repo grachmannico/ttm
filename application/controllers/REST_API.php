@@ -227,13 +227,13 @@ class REST_API extends CI_Controller
         // $this->load->view("rest_api/v_list_konfirmasi_donasi", array('list_konfirmasi_donasi' => $list_konfirmasi_donasi));
     }
 
-    public function form_konfirmasi_donasi()
-    {
-        $id_donasi         = $this->input->post("id_donasi");
-        $konfirmasi_donasi = $this->REST_API_model->get_list_konfirmasi_donasi("and id_donasi = $id_donasi");
-        // $this->load->view("rest_api/v_konfirmasi_donasi", array('konfirmasi_donasi' => $konfirmasi_donasi));
-        echo json_encode($konfirmasi_donasi);
-    }
+    // public function form_konfirmasi_donasi()
+    // {
+    //     $id_donasi         = $this->input->post("id_donasi");
+    //     $konfirmasi_donasi = $this->REST_API_model->get_list_konfirmasi_donasi("and id_donasi = $id_donasi");
+    //     // $this->load->view("rest_api/v_konfirmasi_donasi", array('konfirmasi_donasi' => $konfirmasi_donasi));
+    //     echo json_encode($konfirmasi_donasi);
+    // }
 
     public function konfirmasi_donasi()
     {
@@ -288,39 +288,63 @@ class REST_API extends CI_Controller
         // $this->load->view("rest_api/v_list_kegiatan_diikuti", array('subscribe' => $subscribe));
     }
 
-    public function form_feedback()
-    {
-        $id_kegiatan = $this->input->post("id_kegiatan");
-        $email       = $this->input->post("email");
-        // $this->load->view("rest_api/v_form_feedback", array('id_kegiatan' => $id_kegiatan, 'email' => $email));
-    }
+    // public function form_feedback()
+    // {
+    //     $id_kegiatan = $this->input->post("id_kegiatan");
+    //     $email       = $this->input->post("email");
+    //     // $this->load->view("rest_api/v_form_feedback", array('id_kegiatan' => $id_kegiatan, 'email' => $email));
+    // }
 
     public function kirim_feedback()
     {
-        $email             = $this->input->post("email");
-        $id_kegiatan       = $this->input->post("id_kegiatan");
-        $komentar          = $this->input->post("komentar");
-        $rating            = $this->input->post("rating");
-        $feedback_kegiatan = array(
-            'email'       => $email,
-            'id_kegiatan' => $id_kegiatan,
-            'rating'      => $rating,
-            'komentar'    => $komentar,
-        );
-        $execute = $this->REST_API_model->insert_data('feedback_kegiatan', $feedback_kegiatan);
-        if ($execute >= 1) {
-            $json_data['status'] = "sukses";
-            echo json_encode($json_data);
-        } else {
-            $json_data['status'] = "gagal";
-            echo json_encode($json_data);
+        $email         = $this->input->post("email");
+        $id_kegiatan   = $this->input->post("id_kegiatan");
+        $komentar      = $this->input->post("komentar");
+        $rating        = $this->input->post("rating");
+        $tipe_pengguna = $this->input->post("tipe_pengguna");
+        if ($tipe_pengguna == "relawan") {
+            $feedback_kegiatan = array(
+                'email'       => $email,
+                'id_kegiatan' => $id_kegiatan,
+                'rating'      => $rating,
+                'komentar'    => $komentar,
+            );
+            $execute = $this->REST_API_model->insert_data('feedback_kegiatan_relawan', $feedback_kegiatan);
+            if ($execute >= 1) {
+                $json_data['status'] = "sukses";
+                echo json_encode($json_data);
+            } else {
+                $json_data['status'] = "gagal";
+                echo json_encode($json_data);
+            }
+        } elseif ($tipe_pengguna == "donatur") {
+            $feedback_kegiatan = array(
+                'email'       => $email,
+                'id_kegiatan' => $id_kegiatan,
+                'rating'      => $rating,
+                'komentar'    => $komentar,
+            );
+            $execute = $this->REST_API_model->insert_data('feedback_kegiatan_donatur', $feedback_kegiatan);
+            if ($execute >= 1) {
+                $json_data['status'] = "sukses";
+                echo json_encode($json_data);
+            } else {
+                $json_data['status'] = "gagal";
+                echo json_encode($json_data);
+            }
         }
     }
 
     public function lihat_feedback()
     {
-        $id_kegiatan = $this->input->post("id_kegiatan");
-        $feedback    = $this->REST_API_model->get_feedback_kegiatan("where id_kegiatan = $id_kegiatan");
+        $id_kegiatan   = $this->input->post("id_kegiatan");
+        $tipe_pengguna = $this->input->post("tipe_pengguna");
+        if ($tipe_pengguna == "relawan") {
+            $feedback = $this->REST_API_model->get_feedback_kegiatan_relawan("where id_kegiatan = $id_kegiatan");
+        } elseif ($tipe_pengguna == "donatur") {
+            $feedback = $this->REST_API_model->get_feedback_kegiatan_donatur("where id_kegiatan = $id_kegiatan");
+        }
+        // $feedback      = $this->REST_API_model->get_feedback_kegiatan("where id_kegiatan = $id_kegiatan");
         // $this->load->view("rest_api/v_lihat_feedback", array('feedback' => $feedback));
         echo json_encode($feedback);
     }
@@ -328,7 +352,13 @@ class REST_API extends CI_Controller
     public function lihat_balasan_feedback()
     {
         $id_feedback_kegiatan = $this->input->post("id_feedback_kegiatan");
-        $balasan              = $this->REST_API_model->get_balasan_feedback("where id_feedback_kegiatan = $id_feedback_kegiatan");
+        $tipe_pengguna        = $this->input->post("tipe_pengguna");
+        if ($tipe_pengguna == "relawan") {
+            $balasan = $this->REST_API_model->get_balasan_feedback_relawan("where id_feedback_kegiatan = $id_feedback_kegiatan");
+        } elseif ($tipe_pengguna == "donatur") {
+            $balasan = $this->REST_API_model->get_balasan_feedback_donatur("where id_feedback_kegiatan = $id_feedback_kegiatan");
+        }
+        // $balasan              = $this->REST_API_model->get_balasan_feedback_relawan("where id_feedback_kegiatan = $id_feedback_kegiatan");
         // if (empty($balasan)) {
 
         // } else {
@@ -342,20 +372,39 @@ class REST_API extends CI_Controller
         $id_feedback_kegiatan = $this->input->post("id_feedback_kegiatan");
         $email                = $this->input->post("email");
         $komentar             = $this->input->post("komentar");
-        $balasan_feedback     = array(
-            'id_feedback_kegiatan' => $id_feedback_kegiatan,
-            'email'                => $email,
-            'komentar'             => $komentar,
-        );
-        $execute = $this->REST_API_model->insert_data('balas_feedback', $balasan_feedback);
-        if ($execute >= 1) {
-            $balasan = $this->REST_API_model->get_balasan_feedback("where id_feedback_kegiatan = $id_feedback_kegiatan");
-            // $this->load->view("rest_api/v_list_balasan_feedback", array('balasan' => $balasan));
-            $json_data['status'] = "sukses";
-            echo json_encode($json_data);
-        } else {
-            $json_data['status'] = "gagal";
-            echo json_encode($json_data);
+        $tipe_pengguna        = $this->input->post("tipe_pengguna");
+        if ($tipe_pengguna == "relawan") {
+            $balasan_feedback = array(
+                'id_feedback_kegiatan' => $id_feedback_kegiatan,
+                'email'                => $email,
+                'komentar'             => $komentar,
+            );
+            $execute = $this->REST_API_model->insert_data('balas_feedback_relawan', $balasan_feedback);
+            if ($execute >= 1) {
+                $balasan = $this->REST_API_model->get_balasan_feedback_relawan("where id_feedback_kegiatan = $id_feedback_kegiatan");
+                // $this->load->view("rest_api/v_list_balasan_feedback", array('balasan' => $balasan));
+                $json_data['status'] = "sukses";
+                echo json_encode($json_data);
+            } else {
+                $json_data['status'] = "gagal";
+                echo json_encode($json_data);
+            }
+        } elseif ($tipe_pengguna == "donatur") {
+            $balasan_feedback = array(
+                'id_feedback_kegiatan' => $id_feedback_kegiatan,
+                'email'                => $email,
+                'komentar'             => $komentar,
+            );
+            $execute = $this->REST_API_model->insert_data('balas_feedback_donatur', $balasan_feedback);
+            if ($execute >= 1) {
+                $balasan = $this->REST_API_model->get_balasan_feedback_donatur("where id_feedback_kegiatan = $id_feedback_kegiatan");
+                // $this->load->view("rest_api/v_list_balasan_feedback", array('balasan' => $balasan));
+                $json_data['status'] = "sukses";
+                echo json_encode($json_data);
+            } else {
+                $json_data['status'] = "gagal";
+                echo json_encode($json_data);
+            }
         }
     }
 
@@ -562,13 +611,13 @@ class REST_API extends CI_Controller
         }
     }
 
-    public function form_konfirmasi_pembelian()
-    {
-        $invoice       = $this->input->post("invoice");
-        $total_tagihan = $this->REST_API_model->get_total_tagihan("and id_invoice = '$invoice'");
-        // $this->load->view("rest_api/v_form_konfirmasi_pembelian", array('total_tagihan' => $total_tagihan, 'invoice' => $invoice));
-        echo json_encode($total_tagihan);
-    }
+    // public function form_konfirmasi_pembelian()
+    // {
+    //     $invoice       = $this->input->post("invoice");
+    //     $total_tagihan = $this->REST_API_model->get_total_tagihan("and id_invoice = '$invoice'");
+    //     // $this->load->view("rest_api/v_form_konfirmasi_pembelian", array('total_tagihan' => $total_tagihan, 'invoice' => $invoice));
+    //     echo json_encode($total_tagihan);
+    // }
 
     public function konfirmasi_pembelian()
     {
@@ -616,6 +665,13 @@ class REST_API extends CI_Controller
         $this->load->view("rest_api/v_detail_monitor_dana", array('lpj' => $lpj));
         echo json_encode($lpj);
         // }
+    }
+
+    public function dokumentasi()
+    {
+        $id_kegiatan = $this->input->post("id_kegiatan");
+        $dokumentasi = $this->REST_API_model->get_dokumentasi("where d.id_kegiatan = $id_kegiatan");
+        echo json_encode($dokumentasi);
     }
 
     public function send_notification()

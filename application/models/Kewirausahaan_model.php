@@ -52,6 +52,17 @@ class Kewirausahaan_model extends CI_Model
         return $data->result_array();
     }
 
+    public function get_jumlah_nominal_donasi_donatur($where = "")
+    {
+        $data = $this->db->query('select dr.email, sum(dn.nominal_donasi) as jumlah_nominal_donasi
+            from donatur dr
+            join donasi dn
+            on dr.email=dn.email '
+            . $where .
+            ' group by dr.email');
+        return $data->result_array();
+    }
+
     public function get_transaksi_donasi($where = "")
     {
         $data = $this->db->query('select d.id_donasi, dn.nama, k.nama_kegiatan, d.nominal_donasi, d.tanggal_donasi, d.struk_donasi

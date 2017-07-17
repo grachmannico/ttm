@@ -24,7 +24,7 @@ class Kewirausahaan extends CI_Controller
         if ($this->session->flashdata('success_msg')) {
             $this->load->view("success", array('success' => $this->session->flashdata('success_msg')));
         }
-        $donatur = $this->Kewirausahaan_model->get_donatur();
+        $donatur = $this->Kewirausahaan_model->get_donatur("where not dr.email = 'oyii@gmail.com'");
         $this->load->view("kewirausahaan/v_mengelola_donatur", array('donatur' => $donatur));
         $this->load->view('footer');
     }
@@ -83,10 +83,11 @@ class Kewirausahaan extends CI_Controller
 
     public function detail_donatur()
     {
-        $donatur             = $this->input->post("donatur");
-        $data_donatur        = $this->Kewirausahaan_model->get_donatur("where dr.email = '$donatur'");
-        $data_donasi_donatur = $this->Kewirausahaan_model->get_data_donasi_donatur("where dr.email = '$donatur'");
-        $this->load->view("kewirausahaan/v_detail_donatur", array('data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur));
+        $donatur                            = $this->input->post("donatur");
+        $data_donatur                       = $this->Kewirausahaan_model->get_donatur("where dr.email = '$donatur'");
+        $data_donasi_donatur                = $this->Kewirausahaan_model->get_data_donasi_donatur("where dr.email = '$donatur'");
+        $data_jumlah_nominal_donasi_donatur = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
+        $this->load->view("kewirausahaan/v_detail_donatur", array('data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur));
         $this->load->view('footer');
     }
 
@@ -415,7 +416,7 @@ class Kewirausahaan extends CI_Controller
         $barang = $this->input->post("barang");
         if ($barang != "") {
             $detail_barang  = $this->Kewirausahaan_model->get_barang("where id_barang_garage_sale = $barang");
-            $data_pembelian = $this->Kewirausahaan_model->get_data_pembelian_barang("where b.id_barang_garage_sale = $barang");
+            $data_pembelian = $this->Kewirausahaan_model->get_data_pembelian_barang("where b.id_barang_garage_sale = $barang and p.id_status_pembelian = 3");
             $this->load->view("kewirausahaan/v_detail_barang_garage_sale", array('detail_barang' => $detail_barang, 'data_pembelian' => $data_pembelian));
             $this->load->view('footer');
         } else {
@@ -454,13 +455,13 @@ class Kewirausahaan extends CI_Controller
             if ($execute >= 1) {
                 $pembelian = $this->Kewirausahaan_model->get_data_pembelian_barang("where p.id_invoice = '$validasi'");
                 foreach ($pembelian as $p) {
-                    $barang               = $this->Kewirausahaan_model->get_barang("where id_barang_garage_sale = $p[id_barang_garage_sale]");
-                    $qty_sebelum          = $barang[0]['stok_available'];
-                    $update_stok_terpesan = array(
+                    $barang                = $this->Kewirausahaan_model->get_barang("where id_barang_garage_sale = $p[id_barang_garage_sale]");
+                    $qty_sebelum           = $barang[0]['stok_available'];
+                    $update_stok_available = array(
                         'stok_available' => $qty_sebelum - $p['qty'],
                     );
                     $where   = array('id_barang_garage_sale' => $p['id_barang_garage_sale']);
-                    $execute = $this->REST_API_model->update_data('barang_garage_sale', $update_stok_terpesan, $where);
+                    $execute = $this->REST_API_model->update_data('barang_garage_sale', $update_stok_available, $where);
                 }
                 $pesan  = "Sukses Memvalidasi Pembelian Barang Garage Sale";
                 $sukses = array('pesan' => $pesan);
@@ -487,6 +488,16 @@ class Kewirausahaan extends CI_Controller
             $where   = array('id_invoice' => $validasi);
             $execute = $this->Kewirausahaan_model->update_data('pembelian', $validasi_pembelian, $where);
             if ($execute >= 1) {
+                $pembelian = $this->Kewirausahaan_model->get_data_pembelian_barang("where p.id_invoice = '$validasi'");
+                foreach ($pembelian as $p) {
+                    $barang               = $this->Kewirausahaan_model->get_barang("where id_barang_garage_sale = $p[id_barang_garage_sale]");
+                    $qty_sebelum          = $barang[0]['stok_terpesan'];
+                    $update_stok_terpesan = array(
+                        'stok_terpesan' => $qty_sebelum + $p['qty'],
+                    );
+                    $where   = array('id_barang_garage_sale' => $p['id_barang_garage_sale']);
+                    $execute = $this->REST_API_model->update_data('barang_garage_sale', $update_stok_terpesan, $where);
+                }
                 $pesan  = "Sukses Membatalkan Pembelian Barang Garage Sale Karena Struk Transfer Tidak Valid";
                 $sukses = array('pesan' => $pesan);
                 $this->session->set_flashdata('success_msg', $sukses);

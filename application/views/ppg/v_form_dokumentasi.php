@@ -1,7 +1,7 @@
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
-        <i class="fa fa-book"></i> Dokumentasi Kegiatan
+        <i class="fa fa-book"></i> Dokumentasi Kegiatan "<?php echo $kegiatan[0]['nama_kegiatan']; ?>"
       </h1>
       <!-- <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -28,6 +28,7 @@
                         <thead>
                         <tr>
                           <th><center>Gambar Kegiatan</center></th>
+                          <th><center>Nama Dokumentasi</center></th>
                           <th><center>Deskripsi</center></th>
                           <th><center>Tanggal</th>
                           <th><center>Action</center></th>
@@ -36,19 +37,20 @@
                         <tbody>
                           <?php foreach ($dokumentasi as $d): ?>
                           <tr>
-                            <td><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_kegiatan']; ?>" alt="" width="300px"></td>
+                            <td><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" alt="" width="300px"></td>
+                            <td><?php echo $d['nama_dokumentasi']; ?></td>
                             <td><?php echo $d['deskripsi']; ?></td>
                             <td><?php echo $d['tanggal']; ?></td>
                             <td>
                               <div class="col-md-6">
                                 <form action="<?php echo base_url()."PPG/edit_dokumentasi_kegiatan"; ?>" method="POST">
-                                  <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['id_gambar_kegiatan']; ?>"><i class="fa fa-edit"></i> Edit</button>
+                                  <button type="submit" class="btn btn-warning btn-xs" name="edit" value="<?php echo $d['id_dokumentasi']; ?>"><i class="fa fa-edit"></i> Edit</button>
                                 </form>
                               </div>
                               <div class="col-md-6">
                                 <form action="<?php echo base_url()."PPG/hapus_dokumentasi_kegiatan"; ?>" method="POST">
                                 <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
-                                <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $d['id_gambar_kegiatan']; ?>" onclick="return checkDelete()"><i class="fa fa-trash"></i> Hapus</button>
+                                <button type="submit" class="btn btn-danger btn-xs" name="hapus" value="<?php echo $d['id_dokumentasi']; ?>" onclick="return checkDelete()"><i class="fa fa-trash"></i> Hapus</button>
                               </form>
                               </div>
                             </td>
@@ -68,6 +70,10 @@
                   <form role="form" action="<?php echo base_url()."PPG/tambah_dokumentasi_kegiatan"; ?>" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
                     <div class="box-body">
+                      <div class="form-group">
+                        <label for="exampleInputEmail1"><i class="fa fa-file-text"></i> Nama Dokumentasi</label>
+                        <input type="text" class="form-control" placeholder="Nama Dokumentasi" name="nama_dokumentasi" required>
+                      </div>
                       <div class="form-group">
                         <label for="exampleInputEmail1"><i class="fa fa-image"></i> Gambar Kegitan</label>
                         <input name="gambar" size="20" type="file" required>

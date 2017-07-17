@@ -23,13 +23,18 @@
               <div class="row">
                 <div class="col-sm-6 border-right">
                   <div class="description-block">
-                    <h5 class="description-header">10</h5>
+                    <h5 class="description-header"><?php echo $data_donatur[0]['total_donasi']; ?></h5>
                     <span class="description-text">Jumlah Transaksi Donasi</span>
                   </div>
                 </div>
                 <div class="col-sm-6">
                   <div class="description-block">
-                    <h5 class="description-header">Rp. 100000</h5>
+                    <?php if (empty($data_jumlah_nominal_donasi_donatur)): ?>
+                      <h5 class="description-header">0</h5>
+                    <?php endif ?>
+                    <?php if (!empty($data_jumlah_nominal_donasi_donatur)): ?>
+                      <h5 class="description-header"><?php echo $data_jumlah_nominal_donasi_donatur[0]['jumlah_nominal_donasi']; ?></h5>
+                    <?php endif ?>
                     <span class="description-text">Jumlah Nominal Donasi</span>
                   </div>
                 </div>

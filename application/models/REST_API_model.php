@@ -66,7 +66,7 @@ class REST_API_model extends CI_Model
         return $data->result_array();
     }
 
-    public function get_jumlah_donasi($where)
+    public function get_jumlah_donasi($where = "")
     {
         $data = $this->db->query('select k.id_kegiatan, coalesce(sum(d.nominal_donasi), 0) as jumlah_donasi
             from kegiatan k
@@ -78,13 +78,13 @@ class REST_API_model extends CI_Model
         return $data->result_array();
     }
 
-    public function get_relawan_bergabung($where)
+    public function get_relawan_bergabung($where = "")
     {
         $data = $this->db->query('select * from gabung_kegiatan ' . $where);
         return $data->result_array();
     }
 
-    public function get_list_konfirmasi_donasi($where)
+    public function get_list_konfirmasi_donasi($where = "")
     {
         $data = $this->db->query('select d.id_donasi, k.nama_kegiatan, d.nominal_donasi, d.tanggal_donasi
             from donasi d
@@ -94,7 +94,7 @@ class REST_API_model extends CI_Model
         return $data->result_array();
     }
 
-    public function get_subscribe_relawan($where)
+    public function get_subscribe_relawan($where = "")
     {
         $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, k.banner, gk.email, s.status_kegiatan
             from kegiatan k
@@ -105,7 +105,7 @@ class REST_API_model extends CI_Model
         return $data->result_array();
     }
 
-    public function get_subscribe_donatur($where)
+    public function get_subscribe_donatur($where = "")
     {
         $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, k.banner, d.email, s.status_kegiatan
             from kegiatan k
@@ -118,11 +118,11 @@ class REST_API_model extends CI_Model
         return $data->result_array();
     }
 
-    public function get_feedback_kegiatan($where)
+    public function get_feedback_kegiatan_relawan($where = "")
     {
         $data = $this->db->query('select fk.id_feedback_kegiatan, r.nama, fk.komentar, fk.rating, count(b.id_feedback_kegiatan) as jml_balasan
-            from feedback_kegiatan fk
-            left join balas_feedback b
+            from feedback_kegiatan_relawan fk
+            left join balas_feedback_relawan b
             on fk.id_feedback_kegiatan=b.id_feedback_kegiatan
             join relawan r
             on fk.email=r.email '
@@ -131,11 +131,33 @@ class REST_API_model extends CI_Model
         return $data->result_array();
     }
 
-    public function get_balasan_feedback($where)
+    public function get_feedback_kegiatan_donatur($where = "")
+    {
+        $data = $this->db->query('select fk.id_feedback_kegiatan, r.nama, fk.komentar, fk.rating, count(b.id_feedback_kegiatan) as jml_balasan
+            from feedback_kegiatan_donatur fk
+            left join balas_feedback_donatur b
+            on fk.id_feedback_kegiatan=b.id_feedback_kegiatan
+            join donatur r
+            on fk.email=r.email '
+            . $where .
+            ' group by fk.id_feedback_kegiatan');
+        return $data->result_array();
+    }
+
+    public function get_balasan_feedback_relawan($where = "")
     {
         $data = $this->db->query('select b.id_balas_feedback, b.email, b.id_feedback_kegiatan, b.komentar, r.nama
-            from balas_feedback b
+            from balas_feedback_relawan b
             join relawan r
+            on b.email=r.email ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_balasan_feedback_donatur($where = "")
+    {
+        $data = $this->db->query('select b.id_balas_feedback, b.email, b.id_feedback_kegiatan, b.komentar, r.nama
+            from balas_feedback_donatur b
+            join donatur r
             on b.email=r.email ' . $where);
         return $data->result_array();
     }
@@ -186,6 +208,15 @@ class REST_API_model extends CI_Model
             from monitor_dana_kegiatan m
             join kegiatan k
             on m.id_kegiatan=k.id_kegiatan ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_dokumentasi($where = "")
+    {
+        $data = $this->db->query('select d.id_dokumentasi, d.id_kegiatan, d.nama_dokumentasi, d.gambar_dokumentasi, d.deskripsi, d.tanggal, k.nama_kegiatan
+            from dokumentasi d
+            join kegiatan k
+            on d.id_kegiatan = k.id_kegiatan ' . $where);
         return $data->result_array();
     }
 }
