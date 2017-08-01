@@ -15,7 +15,7 @@
             <div class="box-header with-border">
               <h3 class="box-title">Form Edit Barang</h3>
             </div>
-            <form role="form" action="<?php echo base_url()."Kewirausahaan/edit_barang_garage_sale"; ?>" method="POST" enctype="multipart/form-data">
+            <form role="form" action="<?php echo base_url()."Kewirausahaan/edit_barang_garage_sale"; ?>" method="POST" enctype="multipart/form-data" onsubmit="return (Validate(this) && check_form());">
               <div class="box-body">
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-cube"></i> Nama Barang</label>
@@ -29,7 +29,7 @@
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-money"></i> Harga</label>
-                  <input type="text" class="form-control" value="<?php echo $barang[0]['harga']; ?>" name="harga" required>
+                  <input type="text" class="form-control" value="<?php echo $barang[0]['harga']; ?>" name="harga" id="money" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-cubes"></i> Stok</label>

@@ -42,7 +42,7 @@
                           <tr>
                             <td><?php echo $t['nama']; ?></td>
                             <td><?php echo $t['nama_kegiatan']; ?></td>
-                            <td><?php echo $t['nominal_donasi']; ?></td>
+                            <td><?php echo "Rp. " . number_format($t['nominal_donasi'], 2, ",", "."); ?></td>
                             <td><?php echo $t['tanggal_donasi']; ?></td>
                             <td><a href="<?php echo base_url()."uploads/konfirmasi_donasi/"; ?><?php echo $t['struk_donasi']; ?>" target="blank"><img src="<?php echo base_url()."uploads/konfirmasi_donasi/"; ?><?php echo $t['struk_donasi']; ?>" alt="" width="150px"></a></td>
                             <td>
@@ -84,11 +84,11 @@
                         </tr>
                       </thead>
                       <tbody>
-                      <?php foreach ($transaksi_donasi_masuk as $t): ?>
+                      <?php foreach ($transaksi_donasi_akan_masuk as $t): ?>
                         <tr>
                           <td><?php echo $t['nama']; ?></td>
                           <td><?php echo $t['nama_kegiatan']; ?></td>
-                          <td><?php echo $t['nominal_donasi']; ?></td>
+                          <td><?php echo "Rp. " . number_format($t['nominal_donasi'], 2, ",", "."); ?></td>
                           <td><?php echo $t['tanggal_donasi']; ?></td>
                         </tr>
                         <?php endforeach?>

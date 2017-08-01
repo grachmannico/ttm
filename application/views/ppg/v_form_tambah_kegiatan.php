@@ -80,7 +80,7 @@ function update_address(lat,lng)
             <div class="box-header with-border">
               <h3 class="box-title">Form Tambah Kegiatan</h3>
             </div>
-            <form role="form" action="<?php echo base_url()."PPG/tambah_kegiatan"; ?>" method="POST" enctype="multipart/form-data">
+            <form role="form" action="<?php echo base_url()."PPG/tambah_kegiatan"; ?>" method="POST" enctype="multipart/form-data" onsubmit="return (Validate(this) && check_form());">
               <div class="box-body">
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-list-alt"></i> Nama Kegiatan</label>
@@ -106,11 +106,11 @@ function update_address(lat,lng)
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-users"></i> Minimal Relawan</label>
-                  <input type="number" class="form-control" placeholder="Minimal Relawan" name="minimal_relawan" required>
+                  <input type="text" class="form-control" placeholder="Minimal Relawan" name="minimal_relawan" id="qty" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-heart"></i> Minimal Donasi</label>
-                  <input type="number" class="form-control" placeholder="Minimal Donasi" name="minimal_donasi" required>
+                  <input type="text" class="form-control" placeholder="Minimal Donasi" name="minimal_donasi" id="money" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal kegiatan</label>
@@ -145,7 +145,7 @@ function update_address(lat,lng)
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-image"></i> Banner Kegiatan</label><br>
-                  <input name="banner" size="20" type="file">
+                  <input name="banner" size="20" type="file" required>
                 </div>
               </div>
               <div class="box-footer">

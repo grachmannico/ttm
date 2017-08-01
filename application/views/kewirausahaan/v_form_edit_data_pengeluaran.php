@@ -19,7 +19,7 @@
             <div class="box-header with-border">
               <h3 class="box-title">Form Edit Data LPJ</h3>
             </div>
-            <form role="form" action="<?php echo base_url()."Kewirausahaan/edit_data_pengeluaran"; ?>" method="POST">
+            <form role="form" action="<?php echo base_url()."Kewirausahaan/edit_data_pengeluaran"; ?>" method="POST" onsubmit="return check_form();">
               <input type="hidden" name="id_kegiatan" value="<?php echo $id_kegiatan; ?>">
               <div class="box-body">
                 <div class="form-group">
@@ -33,7 +33,7 @@
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-money"></i> Nominal Dana Keluar</label>
-                  <input type="text" class="form-control" value="<?php echo $data_dana_keluar[0]['nominal_dana_keluar']; ?>" name="nominal_dana_keluar" required>
+                  <input type="text" class="form-control" value="<?php echo $data_dana_keluar[0]['nominal_dana_keluar']; ?>" name="nominal_dana_keluar" id="money" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-file-text"></i> Keterangan</label>

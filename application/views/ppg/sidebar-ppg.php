@@ -25,14 +25,24 @@
             <!-- Menu Toggle Button -->
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <!-- The user image in the navbar-->
-              <img src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+              <?php if ($this->session->userdata('foto_profil') == ""): ?>
+                <img src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+              <?php endif ?>
+              <?php if ($this->session->userdata('foto_profil') != ""): ?>
+                <img src="<?php echo base_url() . "uploads/foto_profil/"; ?><?php echo $this->session->userdata('foto_profil'); ?>" class="user-image" alt="User Image">
+              <?php endif ?>
               <!-- hidden-xs hides the username on small devices so only the image appears. -->
               <span class="hidden-xs"><?php echo $this->session->userdata('nama'); ?></span>
             </a>
             <ul class="dropdown-menu">
               <!-- The user image in the menu -->
               <li class="user-header">
-                <img src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                <?php if ($this->session->userdata('foto_profil') == ""): ?>
+                  <img src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                <?php endif ?>
+                <?php if ($this->session->userdata('foto_profil') != ""): ?>
+                  <img src="<?php echo base_url() . "uploads/foto_profil/"; ?><?php echo $this->session->userdata('foto_profil'); ?>" class="img-circle" alt="User Image">
+                <?php endif ?>
 
                 <p>
                   <?php echo $this->session->userdata('nama'); ?>
@@ -65,8 +75,18 @@
 
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel">
-        <div class="pull-left image">
-          <img src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+        <?php if ($this->session->userdata('foto_profil') == ""): ?>
+          <div class="pull-left image">
+        <?php endif ?>
+        <?php if ($this->session->userdata('foto_profil') != ""): ?>
+          <div class="pull-left">
+        <?php endif ?>
+          <?php if ($this->session->userdata('foto_profil') == ""): ?>
+            <img src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+          <?php endif ?>
+          <?php if ($this->session->userdata('foto_profil') != ""): ?>
+            <img src="<?php echo base_url() . "uploads/foto_profil/"; ?><?php echo $this->session->userdata('foto_profil'); ?>" class="img-circle" alt="User Image" height="50px" width="50px">
+          <?php endif ?>
         </div>
         <div class="pull-left info">
           <p><?php echo $this->session->userdata('nama'); ?></p>
@@ -92,6 +112,16 @@
           </ul>
         </li>
         <li class="active"><a href="<?php echo base_url()."PPG/mengelola_feedback"; ?>"><i class="fa fa-comments"></i> <span>Kelola Feedback</span></a></li>
+        <li class="treeview">
+          <a href="#"><i class="fa fa-book"></i> <span>Arsip</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="<?php echo base_url()."PPG/mengelola_arsip_kegiatan"; ?>"><i class="fa fa-list-alt"></i> Arsip Data Kegiatan</a></li>
+          </ul>
+        </li>
       </ul>
       <!-- /.sidebar-menu -->
     </section>

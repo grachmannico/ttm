@@ -27,7 +27,7 @@
               </div>
               <div class="form-group">
                 <label for="exampleInputEmail1"><i class="fa fa-money"></i> Harga</label>
-                <input type="text" class="form-control" value="Rp. <?php echo $detail_barang[0]['harga']; ?>" readonly>
+                <input type="text" class="form-control" value="<?php echo "Rp. " . number_format($detail_barang[0]['harga'], 2, ",", "."); ?>" readonly>
               </div>
               <div class="form-group">
                 <label for="exampleInputEmail1"><i class="fa fa-cubes"></i> Stok yang Tersedia</label>

@@ -37,6 +37,7 @@ class Auth extends CI_Controller
                             'nama'           => $data_login[0]['nama'],
                             'pangkat_divisi' => $data_login[0]['pangkat_divisi'],
                             'divisi'         => $data_login[0]['divisi'],
+                            'foto_profil'    => $data_login[0]['foto_profil'],
                         );
                         $this->session->set_userdata($usersess);
                         // $this->load->view("v_logout", array('pangkat_divisi' => $this->session->userdata('pangkat_divisi'), 'divisi' => $this->session->userdata('divisi')));
@@ -48,6 +49,7 @@ class Auth extends CI_Controller
                             'nama'           => $data_login[0]['nama'],
                             'pangkat_divisi' => $data_login[0]['pangkat_divisi'],
                             'divisi'         => $data_login[0]['divisi'],
+                            'foto_profil'    => $data_login[0]['foto_profil'],
                         );
                         $this->session->set_userdata($usersess);
                         // echo $this->session->userdata('pangkat_divisi');
@@ -60,6 +62,7 @@ class Auth extends CI_Controller
                             'nama'           => $data_login[0]['nama'],
                             'pangkat_divisi' => $data_login[0]['pangkat_divisi'],
                             'divisi'         => $data_login[0]['divisi'],
+                            'foto_profil'    => $data_login[0]['foto_profil'],
                         );
                         $this->session->set_userdata($usersess);
                         // echo $this->session->userdata('pangkat_divisi');

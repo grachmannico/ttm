@@ -19,7 +19,7 @@
             <div class="box-header with-border">
               <h3 class="box-title">Form Edit Dokumentasi Kegiatan</h3>
             </div>
-            <form role="form" action="<?php echo base_url()."PPG/edit_dokumentasi_kegiatan"; ?>" method="POST" enctype="multipart/form-data">
+            <form role="form" action="<?php echo base_url()."PPG/edit_dokumentasi_kegiatan"; ?>" method="POST" enctype="multipart/form-data" onsubmit="return (Validate(this) && check_form());">
               <input type="hidden" name="id_kegiatan" value="<?php echo $dokumentasi[0]['id_kegiatan']; ?>">
               <div class="box-body">
                 <div class="form-group">

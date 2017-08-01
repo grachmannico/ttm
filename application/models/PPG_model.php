@@ -126,13 +126,79 @@ class PPG_model extends CI_Model
         return $data->result_array();
     }
 
+    // public function get_all_user($where = "")
+    // {
+    //     $data = $this->db->query('select email, fcm_token
+    //         from relawan
+    //         union all
+    //         select email, fcm_token
+    //         from donatur ' . $where);
+    //     return $data->result_array();
+    // }
+
+    //FCM FUNCTION
+
     public function get_all_user($where = "")
     {
-        $data = $this->db->query('select email, fcm_token
+        $data = $this->db->query("select email, fcm_token
             from relawan
+            where fcm_token != ''
             union all
             select email, fcm_token
-            from donatur ' . $where);
+            from donatur d
+            where fcm_token != ''");
+        return $data->result_array();
+    }
+
+    public function get_subs_all_user($where = "")
+    {
+        $data = $this->db->query("select r.email, r.fcm_token, k.id_kegiatan
+            from relawan r
+            join gabung_kegiatan g
+            on r.email=g.email
+            join kegiatan k
+            on g.id_kegiatan=k.id_kegiatan
+            where fcm_token != '' and " . $where .
+            " union all
+            select d.email, d.fcm_token, k.id_kegiatan
+            from donatur d
+            join donasi dn
+            on d.email=dn.email
+            join kegiatan k
+            on dn.id_kegiatan=k.id_kegiatan
+            where fcm_token != '' and " . $where .
+            " group by k.id_kegiatan");
+        return $data->result_array();
+    }
+
+    //ON DELETE KEGIATAN & ARSIP
+    public function get_cek_gabung_relawan($where = "")
+    {
+        $data = $this->db->query('select * from gabung_kegiatan ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_cek_donasi($where = "")
+    {
+        $data = $this->db->query('select * from donasi ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_cek_dokumentasi($where = "")
+    {
+        $data = $this->db->query('select * from dokumentasi ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_cek_feeback_relawan($where = "")
+    {
+        $data = $this->db->query('select * from feedback_kegiatan_relawan ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_cek_feeback_donatur($where = "")
+    {
+        $data = $this->db->query('select * from feedback_kegiatan_donatur ' . $where);
         return $data->result_array();
     }
 }

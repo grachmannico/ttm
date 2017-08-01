@@ -172,7 +172,7 @@ function update_address(lat,lng)
                         <tbody>
                         <?php foreach ($dokumentasi as $d): ?>
                         <tr>
-                          <td><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_kegiatan']; ?>" alt="" width="150px"></td>
+                          <td><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" alt="" width="150px"></td>
                           <td><?php echo $d['deskripsi']; ?></td>
                           <td><?php echo $d['tanggal']; ?></td>
                         </tr>

@@ -17,7 +17,12 @@
               <h5 class="widget-user-desc"><?php echo $data_relawan[0]['email']; ?></h5>
             </div>
             <div class="widget-user-image">
-              <img class="img-circle" src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" alt="User Avatar">
+              <?php if ($data_relawan[0]['foto_profil'] == ""): ?>
+                <img class="img-circle" src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" alt="User Avatar">
+              <?php endif ?>
+              <?php if ($data_relawan[0]['foto_profil'] != ""): ?>
+                <img src="<?php echo base_url() . "uploads/foto_profil/"; ?><?php echo $data_relawan[0]['foto_profil']; ?>" alt="User Avatar" style="border-radius: 50%; height: 90px; width: 90px;">
+              <?php endif ?>
             </div>
             <div class="box-footer">
               <div class="row">

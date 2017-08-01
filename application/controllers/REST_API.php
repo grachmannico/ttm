@@ -33,6 +33,7 @@ class REST_API extends CI_Controller
                             $json_data['tipe_pengguna'] = "donatur";
                             $json_data['email']         = $donatur[0]['email'];
                             $json_data['nama']          = $donatur[0]['nama'];
+                            $json_data['foto_profil']   = $donatur[0]['foto_profil'];
                             echo json_encode($json_data);
                         } else {
                             $json_data['status'] = "gagal";
@@ -58,6 +59,7 @@ class REST_API extends CI_Controller
                         $json_data['nama']           = $relawan[0]['nama'];
                         $json_data['pangkat_divisi'] = $relawan[0]['pangkat_divisi'];
                         $json_data['divisi']         = $relawan[0]['divisi'];
+                        $json_data['foto_profil']    = $relawan[0]['foto_profil'];
                         echo json_encode($json_data);
                     } else {
                         $json_data['status'] = "gagal";
@@ -176,18 +178,26 @@ class REST_API extends CI_Controller
             $json_data['status'] = "exist";
             echo json_encode($json_data);
         } else {
-            $gabung_kegiatan = array(
-                'id_status_absensi_relawan' => 1,
-                'id_kegiatan'               => $id_kegiatan,
-                'email'                     => $email,
-            );
-            $execute = $this->REST_API_model->insert_data('gabung_kegiatan', $gabung_kegiatan);
-            if ($execute >= 1) {
-                $json_data['status'] = "sukses";
+            $kegiatan     = $this->REST_API_model->get_detail_kegiatan("where id_kegiatan = $id_kegiatan");
+            $today        = date('Y-m-d');
+            $exp_kegiatan = date('Y-m-d', strtotime($kegiatan[0]['batas_akhir_pendaftaran']));
+            if ($today > $exp_kegiatan) {
+                $json_data['status'] = "exp";
                 echo json_encode($json_data);
             } else {
-                $json_data['status'] = "gagal";
-                echo json_encode($json_data);
+                $gabung_kegiatan = array(
+                    'id_status_absensi_relawan' => 1,
+                    'id_kegiatan'               => $id_kegiatan,
+                    'email'                     => $email,
+                );
+                $execute = $this->REST_API_model->insert_data('gabung_kegiatan', $gabung_kegiatan);
+                if ($execute >= 1) {
+                    $json_data['status'] = "sukses";
+                    echo json_encode($json_data);
+                } else {
+                    $json_data['status'] = "gagal";
+                    echo json_encode($json_data);
+                }
             }
         }
     }
@@ -221,7 +231,8 @@ class REST_API extends CI_Controller
 
     public function list_konfirmasi_donasi()
     {
-        $email                  = $this->input->post("email");
+        $email = $this->input->post("email");
+        $this->exp_donasi($email);
         $list_konfirmasi_donasi = $this->REST_API_model->get_list_konfirmasi_donasi("and email = '$email'");
         echo json_encode($list_konfirmasi_donasi);
         // $this->load->view("rest_api/v_list_konfirmasi_donasi", array('list_konfirmasi_donasi' => $list_konfirmasi_donasi));
@@ -279,7 +290,7 @@ class REST_API extends CI_Controller
             echo json_encode($subscribe);
         } else if (!empty($donatur)) {
             // $subscribe = $this->REST_API_model->get_subscribe_donatur("where email = '$email' and id_status_kegiatan >= 2");
-            $subscribe = $this->REST_API_model->get_subscribe_donatur("where email = '$email'");
+            $subscribe = $this->REST_API_model->get_subscribe_donatur("where email = '$email' and id_status_donasi = 3");
             echo json_encode($subscribe);
         } else {
             $subscribe = array();
@@ -308,6 +319,7 @@ class REST_API extends CI_Controller
                 'id_kegiatan' => $id_kegiatan,
                 'rating'      => $rating,
                 'komentar'    => $komentar,
+                'tanggal'     => date("Y-m-d"),
             );
             $execute = $this->REST_API_model->insert_data('feedback_kegiatan_relawan', $feedback_kegiatan);
             if ($execute >= 1) {
@@ -323,6 +335,7 @@ class REST_API extends CI_Controller
                 'id_kegiatan' => $id_kegiatan,
                 'rating'      => $rating,
                 'komentar'    => $komentar,
+                'tanggal'     => date("Y-m-d"),
             );
             $execute = $this->REST_API_model->insert_data('feedback_kegiatan_donatur', $feedback_kegiatan);
             if ($execute >= 1) {
@@ -378,6 +391,7 @@ class REST_API extends CI_Controller
                 'id_feedback_kegiatan' => $id_feedback_kegiatan,
                 'email'                => $email,
                 'komentar'             => $komentar,
+                'tanggal'              => date("Y-m-d"),
             );
             $execute = $this->REST_API_model->insert_data('balas_feedback_relawan', $balasan_feedback);
             if ($execute >= 1) {
@@ -394,6 +408,7 @@ class REST_API extends CI_Controller
                 'id_feedback_kegiatan' => $id_feedback_kegiatan,
                 'email'                => $email,
                 'komentar'             => $komentar,
+                'tanggal'              => date("Y-m-d"),
             );
             $execute = $this->REST_API_model->insert_data('balas_feedback_donatur', $balasan_feedback);
             if ($execute >= 1) {
@@ -522,6 +537,55 @@ class REST_API extends CI_Controller
         }
     }
 
+    public function batal_beli()
+    {
+        $invoice       = $this->input->post("invoice");
+        $cek_data_cart = $this->REST_API_model->get_keranjang_barang("where kb.id_invoice = '$invoice'");
+        if (empty($cek_data_cart)) {
+            echo "0";
+        } elseif (!empty($cek_data_cart)) {
+            // print_r($cek_data_cart);
+            $i = 0;
+            foreach ($cek_data_cart as $c) {
+                $barang_di_keranjang   = $this->REST_API_model->get_keranjang_barang("where id_keranjang_belanja = $c[id_keranjang_belanja]");
+                $qty                   = $barang_di_keranjang[0]['qty'];
+                $id_barang_garage_sale = $barang_di_keranjang[0]['id_barang_garage_sale'];
+                $barang                = $this->REST_API_model->get_barang("where id_barang_garage_sale = $id_barang_garage_sale");
+                $qty_sebelum           = $barang[0]['stok_terpesan'];
+                $update_stok_terpesan  = array(
+                    'stok_terpesan' => $qty_sebelum + $qty,
+                );
+                $where   = array('id_barang_garage_sale' => $id_barang_garage_sale);
+                $execute = $this->REST_API_model->update_data('barang_garage_sale', $update_stok_terpesan, $where);
+                if ($execute >= 1) {
+                    $where   = array('id_keranjang_belanja' => $c['id_keranjang_belanja']);
+                    $execute = $this->REST_API_model->delete_data('keranjang_belanja', $where);
+                    if ($execute >= 1) {
+                        $current_stat = "sukses";
+                        $i++;
+                    } else {
+                        $json_data['status'] = "gagal";
+                        echo json_encode($json_data);
+                    }
+                } else {
+                    $json_data['status'] = "gagal";
+                    echo json_encode($json_data);
+                }
+            }
+            if ($current_stat == "sukses") {
+                $where   = array('id_invoice' => $invoice);
+                $execute = $this->REST_API_model->delete_data('pembelian', $where);
+                if ($execute >= 1) {
+                    $json_data['status'] = "sukses";
+                    echo json_encode($json_data);
+                } else {
+                    $json_data['status'] = "gagal";
+                    echo json_encode($json_data);
+                }
+            }
+        }
+    }
+
     public function keranjang_belanja()
     {
         $email             = $this->input->post("email");
@@ -592,7 +656,8 @@ class REST_API extends CI_Controller
 
     public function list_konfirmasi_pembayaran()
     {
-        $email          = $this->input->post("email");
+        $email = $this->input->post("email");
+        $this->exp_pembelian($email);
         $list_pembelian = $this->REST_API_model->get_list_pembelian("where email = '$email' and id_status_pembelian = 1");
         // $this->load->view("rest_api/v_list_pembelian", array('list_pembelian' => $list_pembelian));
         echo json_encode($list_pembelian);
@@ -661,7 +726,7 @@ class REST_API extends CI_Controller
         //     $this->load->view("rest_api/v_list_monitor_dana", array('subs_kegiatan' => $subs_kegiatan));
         //     echo json_encode($subs_kegiatan);
         // } elseif ($id_kegiatan != "") {
-        $lpj = $this->REST_API_model->get_laporan_pengeluaran("where m.id_kegiatan = $id_kegiatan");
+        $lpj = $this->REST_API_model->get_laporan_pengeluaran("where m.id_kegiatan = $id_kegiatan order by m.id_monitor_dana_kegiatan desc");
         $this->load->view("rest_api/v_detail_monitor_dana", array('lpj' => $lpj));
         echo json_encode($lpj);
         // }
@@ -715,5 +780,143 @@ class REST_API extends CI_Controller
         curl_close($curl_session);
         echo "<hr>";
         print_r($result);
+    }
+
+    public function exp_donasi($email)
+    {
+        $today      = date('Y-m-d');
+        $donasi_exp = $this->REST_API_model->get_transaksi_donasi("where d.id_status_donasi = 1 and dn.email = '$email'");
+        foreach ($donasi_exp as $d) {
+            $payday   = date('Y-m-d', strtotime($d['tanggal_donasi']));
+            $exp_date = date('Y-m-d', strtotime($payday . ' + 2 days'));
+            if (($today >= $payday) && ($today <= $exp_date)) {
+                // OK
+            } else {
+                // T E R C Y D U Q
+                $update_status_donasi = array(
+                    'id_status_donasi' => 4,
+                );
+                $where   = array('id_donasi' => $d['id_donasi']);
+                $execute = $this->Kewirausahaan_model->update_data('donasi', $update_status_donasi, $where);
+                if ($execute >= 1) {
+                    // ok, fcm start here
+                    //Start FCM Code
+                    $title        = "Donasi Anda Dibatalkan";
+                    $body         = "Donasi Pada Kegiatan $d[nama_kegiatan] Telah Melewati Batas Waktu";
+                    $message      = "null";
+                    $message_type = "konfirmasi donasi";
+                    $intent       = "NotificationFragment";
+                    $id_target    = "null";
+                    $date_rcv     = date("Y-m-d");
+
+                    $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                    $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+
+                    $ids    = array();
+                    $ids[0] = $d['fcm_token'];
+
+                    $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                    $fields  = array(
+                        'registration_ids' => $ids,
+                        'data'             => array(
+                            'title'       => $title,
+                            'body'        => $body,
+                            'message'     => $message,
+                            'messagetype' => $message_type,
+                            'intent'      => $intent,
+                            'idtarget'    => $id_target,
+                            'datercv'     => $date_rcv,
+                        ),
+                    );
+
+                    $payload      = json_encode($fields);
+                    $curl_session = curl_init();
+                    curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                    curl_setopt($curl_session, CURLOPT_POST, true);
+                    curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                    curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                    $result = curl_exec($curl_session);
+                    curl_close($curl_session);
+                    // echo "<hr>";
+                    // print_r($result);
+                    //End FCM Code
+                } else {
+                    // database error
+                }
+            }
+        }
+    }
+
+    public function exp_pembelian($email)
+    {
+        $today         = date('Y-m-d');
+        $pembelian_exp = $this->REST_API_model->get_invoice("where p.id_status_pembelian = 1 and d.email = '$email'");
+        foreach ($pembelian_exp as $d) {
+            $payday   = date('Y-m-d', strtotime($d['tanggal_pembelian']));
+            $exp_date = date('Y-m-d', strtotime($payday . ' + 2 days'));
+            if (($today >= $payday) && ($today <= $exp_date)) {
+                // OK
+            } else {
+                // T E R C Y D U Q
+                $update_status_pembelian = array(
+                    'id_status_pembelian' => 4,
+                );
+                $where   = array('id_invoice' => $d['id_invoice']);
+                $execute = $this->REST_API_model->update_data('pembelian', $update_status_pembelian, $where);
+                if ($execute >= 1) {
+                    // ok, fcm start here
+                    //Start FCM Code
+                    $title        = "Pembelian Barang Garage Sale Anda Dibatalkan";
+                    $body         = "Konfirmasi Pembelian Telah Melewati Batas Waktu. Invoice: $d[id_invoice]";
+                    $message      = "null";
+                    $message_type = "konfirmasi pembayaran";
+                    $intent       = "NotificationFragment";
+                    $id_target    = "null";
+                    $date_rcv     = date("Y-m-d");
+
+                    $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                    $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+
+                    $ids    = array();
+                    $ids[0] = $d['fcm_token'];
+
+                    $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                    $fields  = array(
+                        'registration_ids' => $ids,
+                        'data'             => array(
+                            'title'       => $title,
+                            'body'        => $body,
+                            'message'     => $message,
+                            'messagetype' => $message_type,
+                            'intent'      => $intent,
+                            'idtarget'    => $id_target,
+                            'datercv'     => $date_rcv,
+                        ),
+                    );
+
+                    $payload      = json_encode($fields);
+                    $curl_session = curl_init();
+                    curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                    curl_setopt($curl_session, CURLOPT_POST, true);
+                    curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                    curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                    $result = curl_exec($curl_session);
+                    curl_close($curl_session);
+                    // echo "<hr>";
+                    // print_r($result);
+                    //End FCM Code
+                } else {
+                    // database error
+                }
+            }
+        }
     }
 }

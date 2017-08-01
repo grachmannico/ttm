@@ -34,7 +34,7 @@
                   <tr>
                     <td><?php echo $b['nama_barang']; ?></td>
                     <td><?php echo $b['deskripsi']; ?></td>
-                    <td><?php echo $b['harga']; ?></td>
+                    <td><?php echo "Rp. " . number_format($b['harga'], 2, ",", "."); ?></td>
                     <td><?php echo $b['stok_available']; ?></td>
                     <td><?php echo $b['stok_terpesan']; ?></td>
                     <td>

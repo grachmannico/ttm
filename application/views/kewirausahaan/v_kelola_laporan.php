@@ -15,7 +15,9 @@
             <ul class="nav nav-tabs">
               <li class="active"><a href="#tab_1" data-toggle="tab">Data Laporan Pengeluaran Dana</a></li>
               <li><a href="#tab_2" data-toggle="tab">Rekap Data Donasi Yang Masuk</a></li>
-              <li><a href="#tab_3" data-toggle="tab">Tambah Data LPJ</a></li>
+              <?php if ($total_dana[0]['total_dana'] != 0): ?>
+                <li><a href="#tab_3" data-toggle="tab">Tambah Data LPJ</a></li>
+              <?php endif ?>
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="tab_1">
@@ -23,6 +25,27 @@
                   <div class="box-header with-border">
                     <h3 class="box-title">Laporan Pengeluaran Dana</h3>
                   </div>
+                  <?php if ($total_dana[0]['total_dana'] == 0): ?>
+                    <div class="box-header with-border">
+                      <h5>Belum Ada Dana Yang Masuk</h5>
+                    </div>
+                  <?php endif ?>
+                  <?php if ($total_dana[0]['total_dana'] != 0): ?>
+                    <?php 
+                      $jml_keluar = $jml_dana_keluar[0]['jml_dana_keluar'];
+                      $jml_masuk = $total_dana[0]['total_dana'];
+                      $progress_b = (($jml_masuk - $jml_keluar) / $jml_masuk) * 100;
+                    ?>
+                    <div class="box-header with-border">
+                      <h5>Dana Yang Dikeluarkan Sejumlah <u><?php echo "Rp. " . number_format($jml_keluar, 2, ",", "."); ?></u> dari Total <u><?php echo "Rp. " . number_format($jml_masuk, 2, ",", "."); ?></u> Dana Yang Masuk</h5>
+                      <div class="progress">
+                        <div class="progress-bar progress-bar-green" role="progressbar" aria-valuenow="<?php echo $progress_b; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $progress_b."%"; ?>">
+                          <span class="sr-only"><?php echo $progress_b."%"; ?> Complete (success)</span>
+                          <?php echo "Sisa Dana: " . $progress_b."%"; ?>
+                        </div>
+                      </div>
+                    </div>
+                  <?php endif ?>
                   <div class="box-body">
                     <div class="form-group">
                       <!-- <label for="exampleInputEmail1">Detail Data Pembelian Barang <?php echo $detail_barang[0]['nama_barang']; ?>:</label> -->
@@ -42,8 +65,15 @@
                         <tr>
                           <td><?php echo $d['nama_dana_keluar']; ?></td>
                           <td><?php echo $d['tanggal']; ?></td>
-                          <td><?php echo $d['nominal_dana_keluar']; ?></td>
-                          <td><?php echo $d['keterangan']; ?></td>
+                          <td><?php echo "Rp. " . number_format($d['nominal_dana_keluar'], 2, ",", "."); ?></td>
+                          <td>
+                            <?php if (strlen($d['keterangan']) > 50): ?>
+                              <?php echo substr($d['keterangan'], 0, 50). " ..."; ?>
+                            <?php endif ?>
+                            <?php if (strlen($d['keterangan']) <= 50): ?>
+                              <?php echo $d['keterangan']; ?>
+                            <?php endif ?>
+                          </td>
                           <td>
                             <div class="col-md-12">
                               <div class="col-md-6">
@@ -86,10 +116,12 @@
                 </div>
               </div>
               <div class="tab-pane" id="tab_2">
-                <h4>Total Donasi: <?php echo $total_dana[0]['total_dana']; ?></h4>
                 <div class="box box-danger">
                   <div class="box-header with-border">
                     <h3 class="box-title">Donasi yang Masuk</h3>
+                  </div>
+                  <div class="box-header with-border">
+                    <h5>Total Donasi Yang Masuk Sebesar <?php echo "Rp. " . number_format($total_dana[0]['total_dana'], 2, ",", "."); ?></h5>
                   </div>
                   <div class="box-body">
                     <div class="form-group">
@@ -107,7 +139,7 @@
                           <?php foreach ($dana_masuk as $d): ?>
                           <tr>
                             <td><?php echo $d['nama']; ?></td>
-                            <td><?php echo $d['nominal_donasi']; ?></td>
+                            <td><?php echo "Rp. " . number_format($d['nominal_donasi'], 2, ",", "."); ?></td>
                             <td><?php echo $d['tanggal_donasi']; ?></td>
                           </tr>
                           <?php endforeach?>
@@ -127,7 +159,7 @@
                   <div class="box-header with-border">
                     <h3 class="box-title">Tambah Data LPJ</h3>
                   </div>
-                  <form role="form" action="<?php echo base_url()."Kewirausahaan/tambah_data_pengeluaran"; ?>" method="POST">
+                  <form role="form" action="<?php echo base_url()."Kewirausahaan/tambah_data_pengeluaran"; ?>" method="POST" onsubmit="return check_form();">
                     <div class="box-body">
                       <div class="form-group">
                         <label for="exampleInputEmail1"><i class="fa fa-book"></i> Nama Dana Keluar</label>
@@ -140,7 +172,7 @@
                       </div>
                       <div class="form-group">
                         <label for="exampleInputEmail1"><i class="fa fa-money"></i> Nominal Dana Keluar</label>
-                        <input type="text" class="form-control" placeholder="Nominal Dana Keluar" name="nominal_dana_keluar" required>
+                        <input type="text" class="form-control" placeholder="Nominal Dana Keluar" name="nominal_dana_keluar" id="money" required>
                       </div>
                       <div class="form-group">
                         <label for="exampleInputEmail1"><i class="fa fa-file-text"></i> Keterangan</label>

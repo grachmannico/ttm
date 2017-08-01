@@ -24,7 +24,7 @@ class Auth_model extends CI_Model
 
     public function get_relawan($where = "")
     {
-        $data = $this->db->query('select r.email, r.nama, r.pass, dp.pangkat_divisi, d.divisi
+        $data = $this->db->query('select r.email, r.nama, r.pass, dp.pangkat_divisi, d.divisi, r.foto_profil
             from relawan r
             join divisi d
             on r.id_divisi=d.id_divisi

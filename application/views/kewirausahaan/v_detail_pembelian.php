@@ -56,7 +56,7 @@
                     <tr>
                       <td><?php echo $p['nama_barang']; ?></td>
                       <td><?php echo $p['qty']; ?></td>
-                      <td><?php echo $p['harga']; ?></td>
+                      <td><?php echo "Rp. " . number_format($p['harga'], 2, ",", "."); ?></td>
                     </tr>
                     <?php endforeach?>
                     </tfoot>
@@ -65,7 +65,7 @@
               </div>
             </div>
             <div class="box-footer">
-              <h4 class="pull-left">Total Tagihan: <?php echo $tagihan[0]['total_tagihan']; ?></h4>
+              <h4 class="pull-left">Total Tagihan: <?php echo "Rp. " . number_format($tagihan[0]['total_tagihan'], 2, ",", "."); ?></h4>
               <br>
               <hr>
               <div class="col-md-6">

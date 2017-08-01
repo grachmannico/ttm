@@ -24,7 +24,7 @@ class REST_API_model extends CI_Model
 
     public function get_relawan($where = "")
     {
-        $data = $this->db->query('select r.email, r.nama, r.pass, dp.pangkat_divisi, d.divisi, r.fcm_token
+        $data = $this->db->query('select r.email, r.nama, r.pass, dp.pangkat_divisi, d.divisi, r.fcm_token, r.foto_profil
             from relawan r
             join divisi d
             on r.id_divisi=d.id_divisi
@@ -217,6 +217,28 @@ class REST_API_model extends CI_Model
             from dokumentasi d
             join kegiatan k
             on d.id_kegiatan = k.id_kegiatan ' . $where);
+        return $data->result_array();
+    }
+
+    //FCM FUNCTION
+
+    public function get_transaksi_donasi($where = "")
+    {
+        $data = $this->db->query('select d.id_donasi, dn.nama, k.nama_kegiatan, d.nominal_donasi, d.tanggal_donasi, d.struk_donasi, dn.fcm_token
+            from donasi d
+            join kegiatan k
+            on d.id_kegiatan=k.id_kegiatan
+            join donatur dn
+            on d.email=dn.email ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_invoice($where = "")
+    {
+        $data = $this->db->query('select p.id_invoice, d.nama, d.email, p.tanggal_pembelian, p.struk_pembelian, d.fcm_token
+            from pembelian p
+            join donatur d
+            on p.email=d.email ' . $where);
         return $data->result_array();
     }
 }

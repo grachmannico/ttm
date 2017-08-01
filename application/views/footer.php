@@ -30,8 +30,10 @@
 <!-- bootstrap datepicker -->
 <script src="<?php echo base_url() . "assets/"; ?>plugins/datepicker/bootstrap-datepicker.js"></script>
 <!-- CK Editor -->
-<script src="https://cdn.ckeditor.com/4.5.7/standard/ckeditor.js"></script>
+<!-- <script src="https://cdn.ckeditor.com/4.7.1/standard/ckeditor.js"></script> -->
+<script src="<?php echo base_url() . "assets/"; ?>ckeditor/ckeditor.js"></script>
 <!-- InputMask -->
+<!-- <script src="<?php echo base_url() . "assets/"; ?>mask/src/jquery.mask.js"></script> -->
 <script src="<?php echo base_url() . "assets/"; ?>plugins/input-mask/jquery.inputmask.js"></script>
 <script src="<?php echo base_url() . "assets/"; ?>plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
 <script src="<?php echo base_url() . "assets/"; ?>plugins/input-mask/jquery.inputmask.extensions.js"></script>
@@ -55,6 +57,11 @@
     });
     $("#datemask").inputmask("yyyy-mm-dd", {"placeholder": "yyyy-mm-dd"});
     $("#datemask2").inputmask("yyyy-mm-dd", {"placeholder": "yyyy-mm-dd"});
+    $("#money").inputmask("999.999.999", { numericInput: true });
+    $("#qty").inputmask("999.999.999", { numericInput: true });
+    $("[data-mask]").inputmask();
+    CKEDITOR.config.enterMode = CKEDITOR.ENTER_BR;
+    CKEDITOR.config.autoParagraph = false;
     CKEDITOR.replace('editor1');
   });
 </script>
@@ -82,6 +89,7 @@ function checkDelete(){
     return confirm('Yakin Ingin Menghapus Data Ini?');
 }
 </script>
+
 <!-- confirm transaction -->
 <script language="JavaScript" type="text/javascript">
 function isValid(){
@@ -93,6 +101,58 @@ function isNotValid(){
     return confirm('Yakin Transaksi Ini Tidak Valid?');
 }
 </script>
+
+<!-- image upload validation -->
+<script type="text/javascript">
+  var _validFileExtensions = [".jpg", ".gif", ".png"];    
+  function Validate(oForm) {
+      var arrInputs = oForm.getElementsByTagName("input");
+
+      for (var i = 0; i < arrInputs.length; i++) {
+          var oInput = arrInputs[i];
+          if (oInput.type == "file") {
+              var sFileName = oInput.value;
+              if (sFileName.length > 0) {
+                  var blnValid = false;
+                  for (var j = 0; j < _validFileExtensions.length; j++) {
+                      var sCurExtension = _validFileExtensions[j];
+                      if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                          blnValid = true;
+                          break;
+                      }
+                  }
+                  
+                  if (!blnValid) {
+                      // alert("Sorry, " + sFileName + " is invalid, allowed extensions are: " + _validFileExtensions.join(", "));
+                      alert("Sorry, your file is invalid, allowed extensions are: " + _validFileExtensions.join(", "));
+                      return false;
+                  }
+              }
+          }
+      }    
+      return true;
+  }
+</script>
+
+<!-- CKEditor -->
+<script type="text/javascript">
+  function check_form() {
+    var editor_val = CKEDITOR.instances.editor1.document.getBody().getChild(0).getText() ;
+      
+    if (editor_val == '') {
+      alert('Please fill out Editor field.') ;
+      return false ;
+    }
+      
+    return true ;
+  }
+</script>
+
+<!-- <script type="text/javascript">
+  $(document).ready(function(){
+    $('#money').mask('000.000.000.000.000', {reverse: true});
+  });
+</script> -->
 
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
      Both of these plugins are recommended to enhance the
