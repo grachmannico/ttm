@@ -22,9 +22,20 @@ class REST_API_model extends CI_Model
         return $res;
     }
 
+    // public function get_relawan($where = "")
+    // {
+    //     $data = $this->db->query('select r.email, r.nama, r.pass, dp.pangkat_divisi, d.divisi, r.fcm_token, r.foto_profil
+    //         from relawan r
+    //         join divisi d
+    //         on r.id_divisi=d.id_divisi
+    //         join pangkat_divisi dp
+    //         on r.id_pangkat_divisi=dp.id_pangkat_divisi ' . $where);
+    //     return $data->result_array();
+    // }
+
     public function get_relawan($where = "")
     {
-        $data = $this->db->query('select r.email, r.nama, r.pass, dp.pangkat_divisi, d.divisi, r.fcm_token, r.foto_profil
+        $data = $this->db->query('select r.email, r.*, dp.pangkat_divisi, d.divisi
             from relawan r
             join divisi d
             on r.id_divisi=d.id_divisi
@@ -114,39 +125,42 @@ class REST_API_model extends CI_Model
             join status_kegiatan s
             on k.id_status_kegiatan=s.id_status_kegiatan '
             . $where .
-            ' group by k.id_kegiatan');
+            ' group by k.id_kegiatan
+             order by k.id_kegiatan desc');
         return $data->result_array();
     }
 
     public function get_feedback_kegiatan_relawan($where = "")
     {
-        $data = $this->db->query('select fk.id_feedback_kegiatan, r.nama, fk.komentar, fk.rating, count(b.id_feedback_kegiatan) as jml_balasan
+        $data = $this->db->query('select fk.id_feedback_kegiatan, r.nama, fk.komentar, fk.rating, fk.tanggal, count(b.id_feedback_kegiatan) as jml_balasan
             from feedback_kegiatan_relawan fk
             left join balas_feedback_relawan b
             on fk.id_feedback_kegiatan=b.id_feedback_kegiatan
             join relawan r
             on fk.email=r.email '
             . $where .
-            ' group by fk.id_feedback_kegiatan');
+            ' group by fk.id_feedback_kegiatan
+            order by fk.id_feedback_kegiatan desc');
         return $data->result_array();
     }
 
     public function get_feedback_kegiatan_donatur($where = "")
     {
-        $data = $this->db->query('select fk.id_feedback_kegiatan, r.nama, fk.komentar, fk.rating, count(b.id_feedback_kegiatan) as jml_balasan
+        $data = $this->db->query('select fk.id_feedback_kegiatan, r.nama, fk.komentar, fk.rating, fk.tanggal, count(b.id_feedback_kegiatan) as jml_balasan
             from feedback_kegiatan_donatur fk
             left join balas_feedback_donatur b
             on fk.id_feedback_kegiatan=b.id_feedback_kegiatan
             join donatur r
             on fk.email=r.email '
             . $where .
-            ' group by fk.id_feedback_kegiatan');
+            ' group by fk.id_feedback_kegiatan
+            order by fk.id_feedback_kegiatan desc');
         return $data->result_array();
     }
 
     public function get_balasan_feedback_relawan($where = "")
     {
-        $data = $this->db->query('select b.id_balas_feedback, b.email, b.id_feedback_kegiatan, b.komentar, r.nama
+        $data = $this->db->query('select b.id_balas_feedback, b.email, b.id_feedback_kegiatan, b.komentar, r.nama, b.tanggal
             from balas_feedback_relawan b
             join relawan r
             on b.email=r.email ' . $where);
@@ -155,7 +169,7 @@ class REST_API_model extends CI_Model
 
     public function get_balasan_feedback_donatur($where = "")
     {
-        $data = $this->db->query('select b.id_balas_feedback, b.email, b.id_feedback_kegiatan, b.komentar, r.nama
+        $data = $this->db->query('select b.id_balas_feedback, b.email, b.id_feedback_kegiatan, b.komentar, r.nama, b.tanggal
             from balas_feedback_donatur b
             join donatur r
             on b.email=r.email ' . $where);

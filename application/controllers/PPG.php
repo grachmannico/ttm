@@ -837,7 +837,8 @@ class PPG extends CI_Controller
                     $body            = $nama_dokumentasi;
                     $message         = "null";
                     $message_type    = "dokumentasi";
-                    $intent          = "DetailKegiatanDiikutiActivity";
+                    // $intent          = "DetailKegiatanDiikutiActivity";
+                    $intent          = "DokumentasiActivity";
                     $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
                     $date_rcv        = date("Y-m-d");
 

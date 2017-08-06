@@ -114,7 +114,7 @@
             <li><a href="<?php echo base_url()."Kewirausahaan/validasi_pembelian"; ?>"><i class="fa fa-cart-arrow-down"></i> Validasi Pembayaran</a></li>
           </ul>
         </li>
-        <li class="active"><a href="<?php echo base_url()."Kewirausahaan/mengelola_lpj"; ?>"><i class="fa fa-book"></i> <span>Kelola LPJ</span></a></li>
+        <li class="active"><a href="<?php echo base_url()."Kewirausahaan/mengelola_lpj"; ?>"><i class="fa fa-book"></i> <span>Kelola LPJ Kegiatan</span></a></li>
         <li class="treeview">
           <a href="#"><i class="fa fa-book"></i> <span>Arsip</span>
             <span class="pull-right-container">
@@ -123,6 +123,7 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="<?php echo base_url()."Kewirausahaan/mengelola_arsip_garage_sale"; ?>"><i class="fa fa-cubes"></i> Arsip Data Barang</a></li>
+            <li><a href="<?php echo base_url()."Kewirausahaan/mengelola_arsip_lpj"; ?>"><i class="fa fa-book"></i> Arsip LPJ Kegiatan</a></li>
           </ul>
         </li>
       </ul>

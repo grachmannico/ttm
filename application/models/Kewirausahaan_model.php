@@ -148,24 +148,16 @@ class Kewirausahaan_model extends CI_Model
 
     //FCM FUNCTION
 
-    public function get_subs_all_user($where = "")
+    public function get_subs_donatur($where = "")
     {
-        $data = $this->db->query("select r.email, r.fcm_token, k.id_kegiatan
-            from relawan r
-            join gabung_kegiatan g
-            on r.email=g.email
-            join kegiatan k
-            on g.id_kegiatan=k.id_kegiatan
-            where fcm_token != '' and " . $where . " 
-            union all
-            select d.email, d.fcm_token, k.id_kegiatan
+        $data = $this->db->query("select d.email, d.fcm_token, k.id_kegiatan
             from donatur d
             join donasi dn
             on d.email=dn.email
             join kegiatan k
             on dn.id_kegiatan=k.id_kegiatan
-            where fcm_token != '' and " . $where . " 
-            group by k.id_kegiatan");
+            where fcm_token != '' and " . $where .
+            " group by k.id_kegiatan");
         return $data->result_array();
     }
 

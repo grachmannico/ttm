@@ -275,7 +275,7 @@ class Relawan extends CI_Controller
         $tgl_lahir         = $this->input->post("tgl_lahir");
         $id_divisi         = $this->input->post("id_divisi");
         $id_pangkat_divisi = $this->input->post("id_pangkat_divisi");
-        $no_hp             = $this->input->post("no_hp");
+        $no_hp             = str_replace(str_split('-.'), "", $this->input->post("no_hp"));;
         $alamat            = $this->input->post("alamat");
         $jenis_kelamin     = $this->input->post("jenis_kelamin");
         if ($email == "" && $nama == "" && $pass == "" && $id_divisi == "" && $id_pangkat_divisi == "") {
@@ -338,7 +338,7 @@ class Relawan extends CI_Controller
         $tgl_lahir         = $this->input->post("tgl_lahir");
         $id_divisi         = $this->input->post("id_divisi");
         $id_pangkat_divisi = $this->input->post("id_pangkat_divisi");
-        $no_hp             = $this->input->post("no_hp");
+        $no_hp             = str_replace(str_split('-.'), "", $this->input->post("no_hp"));;
         $alamat            = $this->input->post("alamat");
         $jenis_kelamin     = $this->input->post("jenis_kelamin");
         if ($edit != "") {

@@ -38,7 +38,7 @@ class Kewirausahaan extends CI_Controller
         $nama          = $this->input->post("nama");
         $pass          = $this->input->post("pass");
         $tgl_lahir     = $this->input->post("tgl_lahir");
-        $no_hp         = $this->input->post("no_hp");
+        $no_hp         = str_replace(str_split('-.'), "", $this->input->post("no_hp"));
         $alamat        = $this->input->post("alamat");
         $jenis_kelamin = $this->input->post("jenis_kelamin");
         if ($edit != "") {
@@ -818,7 +818,7 @@ class Kewirausahaan extends CI_Controller
 
     public function mengelola_lpj()
     {
-        $data_kegiatan = $this->Kewirausahaan_model->get_kegiatan();
+        $data_kegiatan = $this->Kewirausahaan_model->get_kegiatan("where k.id_status_kegiatan != 0");
         $this->load->view("kewirausahaan/v_mengelola_lpj", array('data_kegiatan' => $data_kegiatan));
         $this->load->view('footer');
     }
@@ -893,13 +893,14 @@ class Kewirausahaan extends CI_Controller
                 $body            = "Pengeluaran Dana Pada Kegiatan $get_kegiatan[0][nama_kegiatan]";
                 $message         = "null";
                 $message_type    = "monitor dana";
-                $intent          = "DetailKegiatanDiikutiActivity";
+                // $intent          = "DetailKegiatanDiikutiActivity";
+                $intent          = "MonitorDanaActivity";
                 $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
                 $date_rcv        = date("Y-m-d");
 
                 $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
                 $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
-                $data        = $this->PPG_model->get_subs_all_user("k.id_kegiatan = $id_kegiatan");
+                $data        = $this->Kewirausahaan_model->get_subs_donatur("k.id_kegiatan = $id_kegiatan");
                 print_r($data);
 
                 $ids = array();
@@ -1286,6 +1287,43 @@ class Kewirausahaan extends CI_Controller
         } else {
             $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
             $url_target = "Kewirausahaan/mengelola_arsip_garage_sale";
+            $name       = "";
+            $value      = "";
+            $alert      = array(
+                'pesan'      => $pesan,
+                'url_target' => $url_target,
+                'name'       => $name,
+                'value'      => $value,
+            );
+            $this->load->view("alert", array('alert' => $alert));
+            $this->load->view("footer");
+        }
+    }
+
+    public function mengelola_arsip_lpj()
+    {
+        $data_kegiatan = $this->Kewirausahaan_model->get_kegiatan("where k.id_status_kegiatan = 0");
+        $this->load->view("kewirausahaan/v_mengelola_arsip_lpj", array('data_kegiatan' => $data_kegiatan));
+        $this->load->view('footer');
+    }
+
+    public function lihat_arsip_lpj()
+    {
+        $id_kegiatan = $this->input->post("id_kegiatan");
+        if ($id_kegiatan != "") {
+            if ($this->session->flashdata('success_msg')) {
+                $this->load->view("success", array('success' => $this->session->flashdata('success_msg')));
+            }
+            $nama_kegiatan   = $this->Kewirausahaan_model->get_kegiatan("where k.id_kegiatan = $id_kegiatan");
+            $dana_masuk      = $this->Kewirausahaan_model->get_data_donasi_donatur("where k.id_kegiatan = $id_kegiatan and dn.id_status_donasi = 3");
+            $total_dana      = $this->Kewirausahaan_model->get_total_donasi("where id_status_donasi = 3 and id_kegiatan = $id_kegiatan");
+            $dana_keluar     = $this->Kewirausahaan_model->get_laporan_pengeluaran("where id_kegiatan = $id_kegiatan");
+            $jml_dana_keluar = $this->Kewirausahaan_model->get_jml_dana_keluar("where k.id_kegiatan = $id_kegiatan");
+            $this->load->view("kewirausahaan/v_detail_arsip_lpj", array('dana_masuk' => $dana_masuk, 'total_dana' => $total_dana, 'dana_keluar' => $dana_keluar, 'jml_dana_keluar' => $jml_dana_keluar, 'id_kegiatan' => $id_kegiatan, 'nama_kegiatan' => $nama_kegiatan));
+            $this->load->view('footer');
+        } else {
+            $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
+            $url_target = "Kewirausahaan/mengelola_lpj";
             $name       = "";
             $value      = "";
             $alert      = array(
