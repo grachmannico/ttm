@@ -2,6 +2,18 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 class Kewirausahaan extends CI_Controller
 {
+    private $status_donatur;
+    private $persentase_transfer_valid;
+    private $persentase_transfer_per_kegiatan;
+    private $rata_rata_donasi;
+    private $persentase_hasil;
+    private $hasil;
+    private $jumlah_transfer_valid;
+    private $jumlah_transfer;
+    private $jumlah_kegiatan;
+    private $rank;
+    private $rank_result;
+
     public function __construct()
     {
         parent::__construct();
@@ -17,17 +29,22 @@ class Kewirausahaan extends CI_Controller
 
     public function index()
     {
-        $this->load->view("kewirausahaan/dashboard_kewirausahaan");
+        $jumlah_donatur         = $this->Kewirausahaan_model->get_jml_donatur("where d.email != 'admin@ttm.com'");
+        $jumlah_donasi_masuk    = $this->Kewirausahaan_model->get_donatur("and dn.id_status_donasi = 2");
+        $jumlah_pembayaran      = $this->Kewirausahaan_model->get_jml_konfirmasi_pembayaran("where p.id_status_pembelian = 2");
+        $transaksi_donasi_masuk = $this->Kewirausahaan_model->get_transaksi_donasi("where id_status_donasi = 2 order by tanggal_donasi asc"); //where id_status_donasi = 2
+        $this->load->view("kewirausahaan/dashboard_kewirausahaan", array('jumlah_donatur' => $jumlah_donatur, 'jumlah_donasi_masuk' => $jumlah_donasi_masuk, 'jumlah_pembayaran' => $jumlah_pembayaran, 'transaksi_donasi_masuk' => $transaksi_donasi_masuk));
         $this->load->view('footer');
     }
 
     public function mengelola_donatur()
     {
+        $this->ranking_donatur();
         if ($this->session->flashdata('success_msg')) {
             $this->load->view("success", array('success' => $this->session->flashdata('success_msg')));
         }
-        $donatur = $this->Kewirausahaan_model->get_donatur("where not dr.email = 'oyii@gmail.com'");
-        $this->load->view("kewirausahaan/v_mengelola_donatur", array('donatur' => $donatur));
+        $donatur = $this->Kewirausahaan_model->get_donatur("and dn.id_status_donasi = 3 where not dr.email = 'admin@ttm.com'");
+        $this->load->view("kewirausahaan/v_mengelola_donatur", array('donatur' => $donatur, 'rank' => $this->rank));
         $this->load->view('footer');
     }
 
@@ -100,15 +117,41 @@ class Kewirausahaan extends CI_Controller
             $data_donatur                       = $this->Kewirausahaan_model->get_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
             $data_donasi_donatur                = $this->Kewirausahaan_model->get_data_donasi_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
             $data_jumlah_nominal_donasi_donatur = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
-            $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur));
+            if (empty($data_donatur[0]['total_donasi'])) {
+                $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur));
+            } elseif (!empty($data_donatur[0]['total_donasi'])) {
+                $this->hasil_analisis_donatur($donatur);
+                $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur, 'status_donatur' => $this->status_donatur, 'persentase_hasil' => $this->persentase_hasil, 'hasil' => $this->hasil, 'persentase_transfer_valid' => $this->persentase_transfer_valid, 'jumlah_transfer_valid' => $this->jumlah_transfer_valid, 'jumlah_transfer' => $this->jumlah_transfer, 'persentase_transfer_per_kegiatan' => $this->persentase_transfer_per_kegiatan, 'jumlah_kegiatan' => $this->jumlah_kegiatan, 'rata_rata_donasi' => $this->rata_rata_donasi));
+            }
             $this->load->view('footer');
         } else if ($id_status_donasi != "" && $donatur != "") {
-            $profil_donatur                     = $this->Kewirausahaan_model->get_data_donatur("where email = '$donatur'");
-            $data_donatur                       = $this->Kewirausahaan_model->get_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
-            $data_donasi_donatur                = $this->Kewirausahaan_model->get_data_donasi_donatur("where dr.email = '$donatur' and dn.id_status_donasi = $id_status_donasi");
-            $data_jumlah_nominal_donasi_donatur = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
-            $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur));
-            $this->load->view('footer');
+            if ($id_status_donasi == 0) {
+                $profil_donatur                     = $this->Kewirausahaan_model->get_data_donatur("where email = '$donatur'");
+                $data_donatur                       = $this->Kewirausahaan_model->get_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
+                $data_donasi_donatur                = $this->Kewirausahaan_model->get_data_donasi_donatur("where dr.email = '$donatur'");
+                $data_jumlah_nominal_donasi_donatur = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
+                // $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur));
+                if (empty($data_donatur[0]['total_donasi'])) {
+                    $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur));
+                } elseif (!empty($data_donatur[0]['total_donasi'])) {
+                    $this->hasil_analisis_donatur($donatur);
+                    $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur, 'status_donatur' => $this->status_donatur, 'persentase_hasil' => $this->persentase_hasil, 'hasil' => $this->hasil, 'persentase_transfer_valid' => $this->persentase_transfer_valid, 'jumlah_transfer_valid' => $this->jumlah_transfer_valid, 'jumlah_transfer' => $this->jumlah_transfer, 'persentase_transfer_per_kegiatan' => $this->persentase_transfer_per_kegiatan, 'jumlah_kegiatan' => $this->jumlah_kegiatan, 'rata_rata_donasi' => $this->rata_rata_donasi));
+                }
+                $this->load->view('footer');
+            } elseif ($id_status_donasi > 0) {
+                $profil_donatur                     = $this->Kewirausahaan_model->get_data_donatur("where email = '$donatur'");
+                $data_donatur                       = $this->Kewirausahaan_model->get_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
+                $data_donasi_donatur                = $this->Kewirausahaan_model->get_data_donasi_donatur("where dr.email = '$donatur' and dn.id_status_donasi = $id_status_donasi");
+                $data_jumlah_nominal_donasi_donatur = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
+                // $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur));
+                if (empty($data_donatur[0]['total_donasi'])) {
+                    $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur));
+                } elseif (!empty($data_donatur[0]['total_donasi'])) {
+                    $this->hasil_analisis_donatur($donatur);
+                    $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur, 'status_donatur' => $this->status_donatur, 'persentase_hasil' => $this->persentase_hasil, 'hasil' => $this->hasil, 'persentase_transfer_valid' => $this->persentase_transfer_valid, 'jumlah_transfer_valid' => $this->jumlah_transfer_valid, 'jumlah_transfer' => $this->jumlah_transfer, 'persentase_transfer_per_kegiatan' => $this->persentase_transfer_per_kegiatan, 'jumlah_kegiatan' => $this->jumlah_kegiatan, 'rata_rata_donasi' => $this->rata_rata_donasi));
+                }
+                $this->load->view('footer');
+            }
         } else {
             $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
             $url_target = "Kewirausahaan/";
@@ -339,11 +382,12 @@ class Kewirausahaan extends CI_Controller
                 // $error = array('error' => $this->upload->display_errors());
                 // echo "error";
                 $tambah_barang = array(
-                    'nama_barang'    => $nama_barang,
-                    'deskripsi'      => $deskripsi,
-                    'harga'          => $harga,
-                    'stok_available' => $stok_available,
-                    'stok_terpesan'  => $stok_available,
+                    'nama_barang'      => $nama_barang,
+                    'deskripsi'        => $deskripsi,
+                    'harga'            => $harga,
+                    'stok_available'   => $stok_available,
+                    'stok_terpesan'    => $stok_available,
+                    'id_status_barang' => 1,
                 );
                 $execute = $this->Kewirausahaan_model->insert_data('barang_garage_sale', $tambah_barang);
                 if ($execute >= 1) {
@@ -368,12 +412,13 @@ class Kewirausahaan extends CI_Controller
             } else {
                 $data          = array('upload_data' => $this->upload->data());
                 $tambah_barang = array(
-                    'nama_barang'    => $nama_barang,
-                    'deskripsi'      => $deskripsi,
-                    'harga'          => $harga,
-                    'stok_available' => $stok_available,
-                    'stok_terpesan'  => $stok_available,
-                    'gambar_barang'  => $this->upload->data('file_name'),
+                    'nama_barang'      => $nama_barang,
+                    'deskripsi'        => $deskripsi,
+                    'harga'            => $harga,
+                    'stok_available'   => $stok_available,
+                    'stok_terpesan'    => $stok_available,
+                    'gambar_barang'    => $this->upload->data('file_name'),
+                    'id_status_barang' => 1,
                 );
                 $execute = $this->Kewirausahaan_model->insert_data('barang_garage_sale', $tambah_barang);
                 if ($execute >= 1) {
@@ -433,11 +478,20 @@ class Kewirausahaan extends CI_Controller
             if (!$this->upload->do_upload('gambar_barang')) {
                 // $error = array('error' => $this->upload->display_errors());
                 // echo "error";
+                $stok_lama = $this->Kewirausahaan_model->get_barang("where id_barang_garage_sale = $id_barang_garage_sale");
+                if ($stok_available == $stok_lama[0]['stok_available']) {
+                    $stok_terpesan = $stok_lama[0]['stok_terpesan'];
+                } elseif ($stok_available > $stok_lama[0]['stok_available']) {
+                    $stok_terpesan = $stok_available - $stok_lama[0]['stok_available'];
+                } elseif ($stok_available < $stok_lama[0]['stok_available']) {
+                    $stok_terpesan = $stok_lama[0]['stok_terpesan'];
+                }
                 $update_barang = array(
                     'nama_barang'    => $nama_barang,
                     'deskripsi'      => $deskripsi,
                     'harga'          => $harga,
                     'stok_available' => $stok_available,
+                    'stok_terpesan'  => $stok_terpesan,
                 );
                 $where   = array('id_barang_garage_sale' => $id_barang_garage_sale);
                 $execute = $this->Kewirausahaan_model->update_data('barang_garage_sale', $update_barang, $where);
@@ -461,12 +515,21 @@ class Kewirausahaan extends CI_Controller
                     $this->load->view("footer");
                 }
             } else {
-                $data          = array('upload_data' => $this->upload->data());
+                $data      = array('upload_data' => $this->upload->data());
+                $stok_lama = $this->Kewirausahaan_model->get_barang("where id_barang_garage_sale = $id_barang_garage_sale");
+                if ($stok_available == $stok_lama[0]['stok_available']) {
+                    $stok_terpesan = $stok_lama[0]['stok_terpesan'];
+                } elseif ($stok_available > $stok_lama[0]['stok_available']) {
+                    $stok_terpesan = $stok_available - $stok_lama[0]['stok_available'];
+                } elseif ($stok_available < $stok_lama[0]['stok_available']) {
+                    $stok_terpesan = $stok_lama[0]['stok_terpesan'];
+                }
                 $update_barang = array(
                     'nama_barang'    => $nama_barang,
                     'deskripsi'      => $deskripsi,
                     'harga'          => $harga,
                     'stok_available' => $stok_available,
+                    'stok_terpesan'  => $stok_terpesan,
                     'gambar_barang'  => $this->upload->data('file_name'),
                 );
                 $where   = array('id_barang_garage_sale' => $id_barang_garage_sale);
@@ -894,9 +957,9 @@ class Kewirausahaan extends CI_Controller
                 $message         = "null";
                 $message_type    = "monitor dana";
                 // $intent          = "DetailKegiatanDiikutiActivity";
-                $intent          = "MonitorDanaActivity";
-                $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
-                $date_rcv        = date("Y-m-d");
+                $intent    = "MonitorDanaActivity";
+                $id_target = $get_id_kegiatan[0]['id_kegiatan'];
+                $date_rcv  = date("Y-m-d");
 
                 $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
                 $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
@@ -1335,5 +1398,99 @@ class Kewirausahaan extends CI_Controller
             $this->load->view("alert", array('alert' => $alert));
             $this->load->view("footer");
         }
+    }
+
+    // Hitung-hitung
+    public function hasil_analisis_donatur($email = "")
+    {
+        $point = 0;
+
+        $jml_nominal_donasi              = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$email' and dn.id_status_donasi = 3");
+        $jml_transaksi_donasi            = $this->Kewirausahaan_model->get_donatur("where dr.email = '$email' and dn.id_status_donasi > 2");
+        $jml_transaksi_donasi_valid      = $this->Kewirausahaan_model->get_donatur("where dr.email = '$email' and dn.id_status_donasi = 3");
+        $jml_kegiatan                    = $this->Kewirausahaan_model->get_jml_kegiatan();
+        $this->persentase_transfer_valid = ($jml_transaksi_donasi_valid[0]['total_donasi'] / $jml_transaksi_donasi[0]['total_donasi']) * 100;
+        if ($this->persentase_transfer_valid >= 80) {
+            $point = $point + 3;
+        } elseif ($this->persentase_transfer_valid >= 50 && $this->persentase_transfer_valid < 80) {
+            $point = $point + 2;
+        } elseif ($this->persentase_transfer_valid < 50) {
+            $point = $point + 1;
+        }
+
+        $this->persentase_transfer_per_kegiatan = ($jml_transaksi_donasi_valid[0]['total_donasi'] / $jml_kegiatan[0]['jml_kegiatan']) * 100;
+        if ($this->persentase_transfer_per_kegiatan >= 50) {
+            $point = $point + 3;
+        } elseif ($this->persentase_transfer_per_kegiatan >= 20 && $this->persentase_transfer_per_kegiatan < 50) {
+            $point = $point + 2;
+        } elseif ($this->persentase_transfer_per_kegiatan < 20) {
+            $point = $point + 1;
+        }
+
+        $this->hasil = $point / 2;
+        if ($this->hasil > 2.5) {
+            $this->status_donatur = "Donatur Aktif";
+        } elseif ($this->hasil > 2.0 && $this->hasil <= 2.5) {
+            $this->status_donatur = "Donatur Potensial";
+        } elseif ($this->hasil <= 2.0) {
+            $this->status_donatur = "Donatur";
+        }
+
+        $this->persentase_hasil = ($this->hasil / 3) * 100;
+
+        $this->rata_rata_donasi = $jml_nominal_donasi[0]['jumlah_nominal_donasi'] / $jml_transaksi_donasi_valid[0]['total_donasi'];
+
+        $this->jumlah_transfer_valid = $jml_transaksi_donasi_valid[0]['total_donasi'];
+        $this->jumlah_transfer       = $jml_transaksi_donasi[0]['total_donasi'];
+        $this->jumlah_kegiatan       = $jml_kegiatan[0]['jml_kegiatan'];
+
+        // echo "jml_nominal_donasi: " . $jml_nominal_donasi[0]['jumlah_nominal_donasi'] . "<br>";
+        // echo "jml_transaksi_donasi: " . $jml_transaksi_donasi[0]['total_donasi'] . "<br>";
+        // echo "jml_transaksi_donasi_valid: " . $jml_transaksi_donasi_valid[0]['total_donasi'] . "<br>";
+        // echo "jml_kegiatan: " . $jml_kegiatan[0]['jml_kegiatan'];
+        // echo "<hr>";
+        // echo "jml_nominal_donasi: " . $jml_nominal_donasi[0]['jumlah_nominal_donasi'] . "<br>";
+        // echo "persentase_transfer_valid: " . $this->persentase_transfer_valid . "<br>";
+        // echo "persentase_transfer_per_kegiatan: " . $this->persentase_transfer_per_kegiatan . "<br>";
+        // echo "rata_rata_donasi: " . $this->rata_rata_donasi . "<br>";
+        // echo "status_donatur: " . $this->status_donatur . "<br>";
+        // echo "hasil: " . $hasil;
+    }
+
+    public function ranking_donatur()
+    {
+        $i       = 0;
+        $this->rank    = array();
+        $donatur = $this->Kewirausahaan_model->get_donatur("and dn.id_status_donasi = 3 where not dr.email = 'admin@ttm.com'");
+
+        foreach ($donatur as $d) {
+            $jml_nominal_donasi         = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$d[email]' and dn.id_status_donasi = 3");
+            $jml_transaksi_donasi       = $this->Kewirausahaan_model->get_donatur("where dr.email = '$d[email]' and dn.id_status_donasi > 2");
+            $jml_transaksi_donasi_valid = $this->Kewirausahaan_model->get_donatur("where dr.email = '$d[email]' and dn.id_status_donasi = 3");
+            $jml_kegiatan               = $this->Kewirausahaan_model->get_jml_kegiatan();
+
+            // $nilai = ($this->persentase_transfer_valid + $this->persentase_transfer_per_kegiatan) / 2;
+
+            if (!empty($jml_nominal_donasi) && !empty($jml_transaksi_donasi) && !empty($jml_transaksi_donasi_valid) && !empty($jml_kegiatan)) {
+                // $this->rank[$i]['persentase_hasil'] = $this->persentase_hasil;
+                $this->hasil_analisis_donatur($d['email']);
+                $this->rank[$i]['email']            = $d['email'];
+                $this->rank[$i]['nama']             = $d['nama'];
+                $this->rank[$i]['persentase_hasil'] = ($this->persentase_transfer_valid + $this->persentase_transfer_per_kegiatan) / 2;
+                $i++;
+            } else {
+                $this->rank[$i]['email']            = $d['email'];
+                $this->rank[$i]['nama']             = $d['nama'];
+                $this->rank[$i]['persentase_hasil'] = 0;
+                $i++;
+            }
+        }
+
+        $this->rank_result = array();
+        foreach ($this->rank as $r) {
+            $this->rank_result[] = $r['persentase_hasil'];
+        }
+        array_multisort($this->rank_result, SORT_DESC, $this->rank);
+        // print_r($this->rank);
     }
 }

@@ -1,3 +1,24 @@
+<?php
+function tanggal_indo($tanggal)
+{
+    $bulan = array(1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    );
+    $split = explode('-', $tanggal);
+    return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+}
+?>
+
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
@@ -26,11 +47,19 @@
               </div>
               <div class="form-group">
                 <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal Pembelian</label>
-                <input type="text" class="form-control" value="<?php echo $invoice[0]['tanggal_pembelian']; ?>" readonly>
+                <input type="text" class="form-control" value="<?php echo tanggal_indo($invoice[0]['tanggal_pembelian']); ?>" readonly>
               </div>
               <div class="form-group">
                 <label for="exampleInputEmail1"><i class="fa fa-sticky-note"></i> Struk Pembelian</label><br>
                 <a href="<?php echo base_url()."uploads/konfirmasi_pembayaran/"; ?><?php echo $invoice[0]['struk_pembelian']; ?>" target="blank"><img src="<?php echo base_url()."uploads/konfirmasi_pembayaran/"; ?><?php echo $invoice[0]['struk_pembelian']; ?>" alt="" width="150px" target="blank"></a>
+              </div>
+              <div class="form-group">
+                <label for="exampleInputEmail1"><i class="fa fa-send"></i> Alamat Pengiriman Barang</label><br>
+                <input type="text" class="form-control" value="<?php echo $pembelian[0]['alamat_pembeli']; ?>" readonly>
+              </div>
+              <div class="form-group">
+                <label for="exampleInputEmail1"><i class="fa fa-mobile-phone"></i> Nomor Handphone Yang Bisa Dihubungi</label><br>
+                <input type="text" class="form-control" value="<?php echo $pembelian[0]['no_hp']; ?>" data-inputmask="'mask': ['9999-9999-9999', '+99-999-9999-9999']" data-mask readonly>
               </div>
             </div>
           </div>

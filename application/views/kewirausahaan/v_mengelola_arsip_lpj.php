@@ -1,3 +1,24 @@
+<?php
+function tanggal_indo($tanggal)
+{
+    $bulan = array(1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    );
+    $split = explode('-', $tanggal);
+    return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+}
+?>
+
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
@@ -33,7 +54,13 @@
                   <tr>
                     <td><?php echo $dk['nama_kegiatan']; ?></td>
                     <td><?php echo $dk['status_kegiatan']; ?></td>
-                    <td><?php echo $dk['tanggal_kegiatan']; ?></td>
+                    <!-- <td><?php echo $dk['tanggal_kegiatan']; ?></td> -->
+                    <?php if ($dk['tanggal_kegiatan_mulai'] == $dk['tanggal_kegiatan_berakhir']): ?>
+                      <td><?php echo tanggal_indo($dk['tanggal_kegiatan_mulai']); ?></td>
+                    <?php endif ?>
+                    <?php if ($dk['tanggal_kegiatan_mulai'] != $dk['tanggal_kegiatan_berakhir']): ?>
+                      <td><?php echo tanggal_indo($dk['tanggal_kegiatan_mulai']); ?> - <?php echo tanggal_indo($dk['tanggal_kegiatan_berakhir']); ?></td>
+                    <?php endif ?>
                     <td><?php echo $dk['alamat']; ?></td>
                     <td>
                       <center><form action="<?php echo base_url()."Kewirausahaan/lihat_arsip_lpj"; ?>" method="POST">

@@ -107,7 +107,7 @@ class REST_API_model extends CI_Model
 
     public function get_subscribe_relawan($where = "")
     {
-        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, k.banner, gk.email, s.status_kegiatan
+        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, k.banner, gk.email, s.status_kegiatan, k.tanggal_kegiatan_berakhir
             from kegiatan k
             join gabung_kegiatan gk
             on k.id_kegiatan=gk.id_kegiatan
@@ -253,6 +253,13 @@ class REST_API_model extends CI_Model
             from pembelian p
             join donatur d
             on p.email=d.email ' . $where);
+        return $data->result_array();
+    }
+
+    //Sertifikat Keaktifan Relawan
+    public function get_sertifikat_relawan($where = "")
+    {
+        $data = $this->db->query('select * from sertifikat_relawan ' . $where);
         return $data->result_array();
     }
 }

@@ -113,9 +113,18 @@ function update_address(lat,lng)
                   <input type="text" class="form-control" placeholder="Minimal Donasi" name="minimal_donasi" id="money" required>
                 </div>
                 <div class="form-group">
-                  <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal kegiatan</label>
+                  <label for="exampleInputEmail1"><i class="fa fa-heart"></i> Bantuan Uang Kas</label>
+                  <input type="text" class="form-control" placeholder="Bantuan Uang Kas" name="uang_kas" id="money2" value="0" required>
+                </div>
+                <div class="form-group">
+                  <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal Dimulainya Kegiatan</label>
                   <!-- <input type="text" class="form-control" placeholder="Tanggal kegiatan" name="tanggal_kegiatan" required> -->
-                  <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" placeholder="Tanggal kegiatan" name="tanggal_kegiatan" required>
+                  <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" placeholder="Tanggal Dimulainya kegiatan" name="tanggal_kegiatan_mulai" required>
+                </div>
+                <div class="form-group">
+                  <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal Berakhirnya Kegiatan</label>
+                  <!-- <input type="text" class="form-control" placeholder="Tanggal kegiatan" name="tanggal_kegiatan" required> -->
+                  <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" placeholder="Tanggal Berakhirnya kegiatan" name="tanggal_kegiatan_berakhir" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-calendar-times-o"></i> Batas Akhir Pendaftaran</label>

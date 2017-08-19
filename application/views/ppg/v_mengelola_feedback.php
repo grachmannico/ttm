@@ -1,3 +1,24 @@
+<?php
+function tanggal_indo($tanggal)
+{
+    $bulan = array(1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    );
+    $split = explode('-', $tanggal);
+    return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+}
+?>
+
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
@@ -32,7 +53,13 @@
                   <?php foreach ($data_kegiatan as $dk): ?>
                   <tr>
                     <td><?php echo $dk['nama_kegiatan']; ?></td>
-                    <td><?php echo $dk['tanggal_kegiatan']; ?></td>
+                    <!-- <td><?php echo $dk['tanggal_kegiatan']; ?></td> -->
+                    <?php if ($dk['tanggal_kegiatan_mulai'] == $dk['tanggal_kegiatan_berakhir']): ?>
+                      <td><?php echo tanggal_indo($dk['tanggal_kegiatan_mulai']); ?>
+                    <?php endif ?>
+                    <?php if ($dk['tanggal_kegiatan_mulai'] != $dk['tanggal_kegiatan_berakhir']): ?>
+                      <td><?php echo tanggal_indo($dk['tanggal_kegiatan_mulai']); ?> - <?php echo tanggal_indo($dk['tanggal_kegiatan_berakhir']); ?>
+                    <?php endif ?>
                     <td><?php echo (double) $dk['rating_relawan']; ?></td>
                     <td><?php echo (double) $dk['rating_donatur']; ?></td>
                     <td>

@@ -1,3 +1,24 @@
+<?php
+function tanggal_indo($tanggal)
+{
+    $bulan = array(1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    );
+    $split = explode('-', $tanggal);
+    return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+}
+?>
+
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
@@ -22,7 +43,7 @@
               <div class="user-block">
                 <img class="img-circle" src="<?php echo base_url() . "assets/"; ?>dist/img/user2-160x160.jpg" alt="User Image">
                 <span class="username"><a href="#"><?php echo $feedback[0]['nama']; ?> (<?php echo $feedback[0]['email']; ?>)</a></span>
-                <span class="description"><?php echo $feedback[0]['tanggal']; ?></span>
+                <span class="description"><?php echo tanggal_indo($feedback[0]['tanggal']); ?></span>
               </div>
               <!-- /.user-block -->
               <!-- <div class="box-tools">
@@ -48,7 +69,7 @@
                 <div class="comment-text">
                       <span class="username">
                         <?php echo $b['nama']; ?> (<?php echo $b['email']; ?>)
-                        <span class="text-muted pull-right"><?php echo $b['tanggal']; ?></span>
+                        <span class="text-muted pull-right"><?php echo tanggal_indo($b['tanggal']); ?></span>
                       </span><!-- /.username -->
                   <?php echo $b['komentar']; ?>
                 </div>

@@ -24,7 +24,7 @@ class Kewirausahaan_model extends CI_Model
 
     public function get_donatur($where = "")
     {
-        $data = $this->db->query('select dr.email, dr.nama, count(dn.email) as total_donasi
+        $data = $this->db->query('select dr.email, dr.nama, coalesce(count(dn.email), 0) as total_donasi
             from donatur dr
             left join donasi dn
             on dr.email=dn.email '
@@ -35,7 +35,10 @@ class Kewirausahaan_model extends CI_Model
 
     public function get_data_donatur($where = "")
     {
-        $data = $this->db->query('select * from donatur ' . $where);
+        $data = $this->db->query('select d.*, j.jenis_kelamin
+            from donatur d
+            join jenis_kelamin j
+            on d.id_jenis_kelamin=j.id_jenis_kelamin ' . $where);
         return $data->result_array();
     }
 
@@ -82,7 +85,7 @@ class Kewirausahaan_model extends CI_Model
 
     public function get_data_pembelian_barang($where = "")
     {
-        $data = $this->db->query('select b.id_barang_garage_sale, b.nama_barang, d.nama, k.qty, b.harga, s.status_pembelian, p.tanggal_pembelian
+        $data = $this->db->query('select b.id_barang_garage_sale, b.nama_barang, d.nama, k.qty, b.harga, s.status_pembelian, p.tanggal_pembelian, p.alamat_pembeli, p.no_hp
             from barang_garage_sale b
             join keranjang_belanja k
             on b.id_barang_garage_sale=k.id_barang_garage_sale
@@ -115,7 +118,7 @@ class Kewirausahaan_model extends CI_Model
 
     public function get_kegiatan($where = "")
     {
-        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, s.status_kegiatan, k.tanggal_kegiatan, k.alamat
+        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, s.status_kegiatan, k.tanggal_kegiatan_mulai, k.tanggal_kegiatan_berakhir, k.alamat
             from kegiatan k
             join status_kegiatan s
             on k.id_status_kegiatan=s.id_status_kegiatan ' . $where);
@@ -171,4 +174,26 @@ class Kewirausahaan_model extends CI_Model
     //         on d.email=dn.email " . $where);
     //     return $data->result_array();
     // }
+
+    public function get_jml_kegiatan($where = "")
+    {
+        $data = $this->db->query('select count(k.id_kegiatan) as jml_kegiatan
+            from kegiatan k ' . $where);
+        return $data->result_array();
+    }
+
+    // dashboard
+    public function get_jml_donatur($where = "")
+    {
+        $data = $this->db->query('select count(d.email) as jml_donatur
+            from donatur d ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_jml_konfirmasi_pembayaran($where = "")
+    {
+        $data = $this->db->query('select coalesce(count(p.id_invoice)) as jml_pembayaran
+            from pembelian p ' . $where);
+        return $data->result_array();
+    }
 }

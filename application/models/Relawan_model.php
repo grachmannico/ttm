@@ -50,12 +50,14 @@ class Relawan_model extends CI_Model
 
     public function get_data_relawan($where = "")
     {
-        $data = $this->db->query('select r.email, r.nama, p.pangkat_divisi, d.divisi, r.pass, r.id_divisi, r.id_pangkat_divisi, r.foto_profil, r.no_hp, r.alamat, r.id_jenis_kelamin, r.tgl_lahir
+        $data = $this->db->query('select r.email, r.nama, p.pangkat_divisi, d.divisi, r.pass, r.id_divisi, r.id_pangkat_divisi, r.foto_profil, r.no_hp, r.alamat, r.id_jenis_kelamin, r.tgl_lahir, j.jenis_kelamin
             from relawan r
             join divisi d
             on r.id_divisi=d.id_divisi
             join pangkat_divisi p
-            on r.id_pangkat_divisi=p.id_pangkat_divisi ' . $where);
+            on r.id_pangkat_divisi=p.id_pangkat_divisi
+            join jenis_kelamin j
+            on r.id_jenis_kelamin=j.id_jenis_kelamin ' . $where);
         return $data->result_array();
     }
 
@@ -105,6 +107,27 @@ class Relawan_model extends CI_Model
     public function get_cek_gabung_kegiatan($where = "")
     {
         $data = $this->db->query('select * from gabung_kegiatan ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_jml_kegiatan($where = "")
+    {
+        $data = $this->db->query('select count(k.id_kegiatan) as jml_kegiatan from kegiatan k ' . $where);
+        return $data->result_array();
+    }
+
+    //Dashboard
+    public function get_jml_relawan($where = "")
+    {
+        $data = $this->db->query('select coalesce(count(r.email) ,0) as jml_relawan
+            from relawan r ' . $where);
+        return $data->result_array();
+    }
+
+    //Serttifikat Keaktifan
+    public function get_sertifikat_relawan($where = "")
+    {
+        $data = $this->db->query('select tahun from sertifikat_relawan ' . $where);
         return $data->result_array();
     }
 }

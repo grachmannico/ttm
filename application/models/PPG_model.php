@@ -24,7 +24,7 @@ class PPG_model extends CI_Model
 
     public function get_kegiatan($where = "")
     {
-        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, s.status_kegiatan, k.id_status_kegiatan, k.tanggal_kegiatan, k.alamat
+        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, s.status_kegiatan, k.id_status_kegiatan, k.tanggal_kegiatan_mulai, k.tanggal_kegiatan_berakhir, k.alamat
             from kegiatan k
             join status_kegiatan s
             on k.id_status_kegiatan=s.id_status_kegiatan ' . $where);
@@ -33,7 +33,7 @@ class PPG_model extends CI_Model
 
     public function get_detail_kegiatan($where = "")
     {
-        $data = $this->db->query('select k.id_kegiatan, k.id_status_kegiatan, k.nama_kegiatan, k.pesan_ajakan, k.deskripsi_kegiatan, k.minimal_relawan, k.minimal_donasi, k.tanggal_kegiatan, k.batas_akhir_pendaftaran, k.alamat, k.lat, k.lng, k.banner, s.status_kegiatan
+        $data = $this->db->query('select k.id_kegiatan, k.id_status_kegiatan, k.nama_kegiatan, k.pesan_ajakan, k.deskripsi_kegiatan, k.minimal_relawan, k.minimal_donasi, k.tanggal_kegiatan_mulai, k.tanggal_kegiatan_berakhir, k.batas_akhir_pendaftaran, k.alamat, k.lat, k.lng, k.banner, s.status_kegiatan
             from kegiatan k
             join status_kegiatan s
             on k.id_status_kegiatan=s.id_status_kegiatan ' . $where);
@@ -71,7 +71,7 @@ class PPG_model extends CI_Model
 
     public function get_data_feedback_kegiatan($where = "")
     {
-        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, k.tanggal_kegiatan, coalesce(avg(r.rating), 0) as rating_relawan, coalesce(avg(d.rating), 0) as rating_donatur
+        $data = $this->db->query('select k.id_kegiatan, k.nama_kegiatan, k.tanggal_kegiatan_mulai, k.tanggal_kegiatan_berakhir, coalesce(avg(r.rating), 0) as rating_relawan, coalesce(avg(d.rating), 0) as rating_donatur
             from kegiatan k
             left join feedback_kegiatan_relawan r
             on k.id_kegiatan=r.id_kegiatan
@@ -199,6 +199,20 @@ class PPG_model extends CI_Model
     public function get_cek_feeback_donatur($where = "")
     {
         $data = $this->db->query('select * from feedback_kegiatan_donatur ' . $where);
+        return $data->result_array();
+    }
+
+    //UANG KAS
+    public function get_uang_kas($where = "")
+    {
+        $data = $this->db->query('select * from donasi ' . $where);
+        return $data->result_array();
+    }
+
+    // Dashboard
+    public function get_jml_kegiatan($where = "")
+    {
+        $data = $this->db->query('select count(k.id_kegiatan) as jml_kegiatan from kegiatan k ' . $where);
         return $data->result_array();
     }
 }

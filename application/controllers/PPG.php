@@ -5,6 +5,18 @@ class PPG extends CI_Controller
     private $def_lat;
     private $def_lng;
 
+    private $persentase_kehadiran;
+    private $persentase_donasi;
+    private $hasil_rating_relawan;
+    private $hasil_rating_donatur;
+    private $persentase_gabung_relawan;
+    private $persentase_rating_relawan;
+    private $persentase_rating_donatur;
+    private $jml_relawan;
+    private $jml_relawan_hadir;
+    private $hasil_analisis;
+    private $kesimpulan;
+
     public function __construct()
     {
         parent::__construct();
@@ -24,7 +36,46 @@ class PPG extends CI_Controller
 
     public function index()
     {
-        $this->load->view("ppg/dashboard_ppg");
+        $akan    = $this->PPG_model->get_jml_kegiatan("where k.id_status_kegiatan = 1");
+        $sedang  = $this->PPG_model->get_jml_kegiatan("where k.id_status_kegiatan = 2");
+        $selesai = $this->PPG_model->get_jml_kegiatan("where k.id_status_kegiatan = 3");
+        $latlng  = $this->PPG_model->get_detail_kegiatan();
+
+        //Start Map
+        $center = $this->def_lat . "," . $this->def_lng;
+        $cfg    = array(
+            'class'                       => 'map-canvas',
+            'map_div_id'                  => 'map-canvas',
+            'center'                      => $center,
+            'zoom'                        => 'auto',
+            'places'                      => true, //Aktifkan pencarian alamat
+            'placesAutocompleteInputID'   => 'cari', //set sumber pencarian input
+            'placesAutocompleteBoundsMap' => true,
+            'placesAutocompleteOnChange'  => 'showmap();', //Aksi ketika pencarian dipilih
+        );
+        $this->googlemaps->initialize($cfg);
+
+        $method = "POST";
+        $target = "PPG/detail_kegiatan";
+        foreach ($latlng as $ll) {
+            $marker = array(
+                'position'           => $ll['lat'] . "," . $ll['lng'],
+                'infowindow_content' => 'Nama Kegiatan: <b>' . $ll['nama_kegiatan'] . '</b><br>Status Kegiatan: ' . $ll['status_kegiatan'] . '<br><br><form action=' . base_url() . $target . ' method= ' . $method . '><button class="btn btn-info btn-block btn-sm" name="kegiatan" value="' . $ll['id_kegiatan'] . '">Lihat Detail Kegiatan <i class="fa fa-arrow-circle-right"></i></button></form>',
+                'animation'          => 'DROP',
+                'draggable'          => false,
+                // 'title'              => 'Coba diDrag',
+                'ondragend'          => "document.getElementById('lat').value = event.latLng.lat();
+                            document.getElementById('lng').value = event.latLng.lng();
+                            showmap();",
+            );
+            $this->googlemaps->add_marker($marker);
+        }
+        $d['map'] = $this->googlemaps->create_map();
+        // $d['lat'] = $this->def_lat;
+        // $d['lng'] = $this->def_lng;
+        //End Map
+
+        $this->load->view("ppg/dashboard_ppg", array('akan' => $akan, 'sedang' => $sedang, 'selesai' => $selesai, 'd' => $d));
         $this->load->view('footer');
     }
 
@@ -47,17 +98,19 @@ class PPG extends CI_Controller
 
     public function tambah_kegiatan()
     {
-        $nama_kegiatan           = $this->input->post("nama_kegiatan");
-        $id_status_kegiatan      = $this->input->post("id_status_kegiatan");
-        $pesan_ajakan            = $this->input->post("pesan_ajakan");
-        $deskripsi_kegiatan      = $this->input->post("deskripsi_kegiatan");
-        $minimal_relawan         = str_replace(str_split('_.'), "", $this->input->post("minimal_relawan"));
-        $minimal_donasi          = str_replace(str_split('_.'), "", $this->input->post("minimal_donasi"));
-        $tanggal_kegiatan        = $this->input->post("tanggal_kegiatan");
-        $batas_akhir_pendaftaran = $this->input->post("batas_akhir_pendaftaran");
-        $alamat                  = $this->input->post("alamat");
-        $lat                     = $this->input->post("lat");
-        $lng                     = $this->input->post("lng");
+        $nama_kegiatan             = $this->input->post("nama_kegiatan");
+        $id_status_kegiatan        = $this->input->post("id_status_kegiatan");
+        $pesan_ajakan              = $this->input->post("pesan_ajakan");
+        $deskripsi_kegiatan        = $this->input->post("deskripsi_kegiatan");
+        $minimal_relawan           = str_replace(str_split('_.'), "", $this->input->post("minimal_relawan"));
+        $minimal_donasi            = str_replace(str_split('_.'), "", $this->input->post("minimal_donasi"));
+        $uang_kas                  = str_replace(str_split('_.'), "", $this->input->post("uang_kas"));
+        $tanggal_kegiatan_mulai    = $this->input->post("tanggal_kegiatan_mulai");
+        $tanggal_kegiatan_berakhir = $this->input->post("tanggal_kegiatan_berakhir");
+        $batas_akhir_pendaftaran   = $this->input->post("batas_akhir_pendaftaran");
+        $alamat                    = $this->input->post("alamat");
+        $lat                       = $this->input->post("lat");
+        $lng                       = $this->input->post("lng");
 
         //Start Map
         $center = $this->def_lat . "," . $this->def_lng;
@@ -88,195 +141,250 @@ class PPG extends CI_Controller
         $d['lng'] = $this->def_lng;
         //End Map
 
-        if ($nama_kegiatan == "" && $id_status_kegiatan == "" && $pesan_ajakan == "" && $deskripsi_kegiatan == "" && $minimal_relawan == "" && $minimal_donasi == "" && $tanggal_kegiatan == "" && $batas_akhir_pendaftaran == "" && $alamat == "" && $lat == "" && $lng == "") {
+        if ($nama_kegiatan == "" && $id_status_kegiatan == "" && $pesan_ajakan == "" && $deskripsi_kegiatan == "" && $minimal_relawan == "" && $minimal_donasi == "" && $tanggal_kegiatan_mulai == "" && $tanggal_kegiatan_berakhir == "" && $batas_akhir_pendaftaran == "" && $alamat == "" && $lat == "" && $lng == "") {
             $this->load->view("ppg/v_form_tambah_kegiatan", $d);
             $this->load->view('footer');
-        } elseif ($nama_kegiatan != "" && $id_status_kegiatan != "" && $pesan_ajakan != "" && $deskripsi_kegiatan != "" && $minimal_relawan != "" && $minimal_donasi != "" && $tanggal_kegiatan != "" && $batas_akhir_pendaftaran != "" && $alamat != "" && $lat != "" && $lng != "") {
+        } elseif ($nama_kegiatan != "" && $id_status_kegiatan != "" && $pesan_ajakan != "" && $deskripsi_kegiatan != "" && $minimal_relawan != "" && $minimal_donasi != "" && $tanggal_kegiatan_mulai != "" && $tanggal_kegiatan_berakhir != "" && $batas_akhir_pendaftaran != "" && $alamat != "" && $lat != "" && $lng != "") {
             $config['upload_path']   = './uploads/gambar_kegiatan/';
             $config['allowed_types'] = 'gif|jpg|png';
             $config['max_size']      = 2048;
             $this->load->library('upload', $config);
 
-            if (!$this->upload->do_upload('banner')) {
-                // $error = array('error' => $this->upload->display_errors());
-                // echo "error";
-                $tambah_kegiatan = array(
-                    'nama_kegiatan'           => $nama_kegiatan,
-                    'id_status_kegiatan'      => $id_status_kegiatan,
-                    'pesan_ajakan'            => $pesan_ajakan,
-                    'deskripsi_kegiatan'      => $deskripsi_kegiatan,
-                    'minimal_relawan'         => $minimal_relawan,
-                    'minimal_donasi'          => $minimal_donasi,
-                    'tanggal_kegiatan'        => $tanggal_kegiatan,
-                    'batas_akhir_pendaftaran' => $batas_akhir_pendaftaran,
-                    'alamat'                  => $alamat,
-                    'lat'                     => $lat,
-                    'lng'                     => $lng,
-                );
-                $execute = $this->PPG_model->insert_data('kegiatan', $tambah_kegiatan);
-                if ($execute >= 1) {
+            $cek_nama_kegiatan = $this->PPG_model->get_kegiatan("where k.nama_kegiatan = '$nama_kegiatan'");
+            if (empty($cek_nama_kegiatan)) {
+                if (!$this->upload->do_upload('banner')) {
+                    // $error = array('error' => $this->upload->display_errors());
+                    // echo "error";
 
-                    //Start FCM Code
-                    $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
-                    $title           = "Kegiatan Baru: " . $nama_kegiatan;
-                    $body            = $pesan_ajakan;
-                    $message         = "null";
-                    $message_type    = "kegiatan";
-                    $intent          = "DetailKegiatanActivity";
-                    $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
-                    $date_rcv        = date("Y-m-d");
+                    $tambah_kegiatan = array(
+                        'nama_kegiatan'             => $nama_kegiatan,
+                        'id_status_kegiatan'        => $id_status_kegiatan,
+                        'pesan_ajakan'              => $pesan_ajakan,
+                        'deskripsi_kegiatan'        => $deskripsi_kegiatan,
+                        'minimal_relawan'           => $minimal_relawan,
+                        'minimal_donasi'            => $minimal_donasi,
+                        'tanggal_kegiatan_mulai'    => $tanggal_kegiatan_mulai,
+                        'tanggal_kegiatan_berakhir' => $tanggal_kegiatan_berakhir,
+                        'batas_akhir_pendaftaran'   => $batas_akhir_pendaftaran,
+                        'alamat'                    => $alamat,
+                        'lat'                       => $lat,
+                        'lng'                       => $lng,
+                    );
+                    $execute = $this->PPG_model->insert_data('kegiatan', $tambah_kegiatan);
+                    if ($execute >= 1) {
 
-                    $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
-                    $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
-                    $data        = $this->PPG_model->get_all_user();
-                    print_r($data);
+                        //Start FCM Code
+                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan' order by k.id_kegiatan desc");
+                        $title           = "Kegiatan Baru: " . $nama_kegiatan;
+                        $body            = $pesan_ajakan;
+                        $message         = "null";
+                        $message_type    = "kegiatan";
+                        $intent          = "DetailKegiatanActivity";
+                        $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
+                        $date_rcv        = date("Y-m-d");
 
-                    $ids = array();
-                    $i   = 0;
-                    foreach ($data as $d) {
-                        $ids[$i] = $d['fcm_token'];
-                        $i++;
+                        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+                        $data        = $this->PPG_model->get_all_user();
+                        print_r($data);
+
+                        $ids = array();
+                        $i   = 0;
+                        foreach ($data as $d) {
+                            $ids[$i] = $d['fcm_token'];
+                            $i++;
+                        }
+
+                        $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                        $fields  = array(
+                            'registration_ids' => $ids,
+                            'data'             => array(
+                                'title'       => $title,
+                                'body'        => $body,
+                                'message'     => $message,
+                                'messagetype' => $message_type,
+                                'intent'      => $intent,
+                                'idtarget'    => $id_target,
+                                'datercv'     => $date_rcv,
+                            ),
+                        );
+
+                        $payload      = json_encode($fields);
+                        $curl_session = curl_init();
+                        curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                        curl_setopt($curl_session, CURLOPT_POST, true);
+                        curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                        curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                        curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                        $result = curl_exec($curl_session);
+                        curl_close($curl_session);
+                        // echo "<hr>";
+                        // print_r($result);
+                        //End FCM Code
+
+                        if ($uang_kas != "") {
+                            $tambah_uang = array(
+                                'email'            => "admin@ttm.com",
+                                'id_status_donasi' => 3,
+                                'id_kegiatan'      => $id_target,
+                                'nominal_donasi'   => $uang_kas,
+                                'tanggal_donasi'   => date("Y-m-d"),
+                            );
+                            $execute = $this->PPG_model->insert_data('donasi', $tambah_uang);
+                            if ($execute >= 1) {
+                                // GO AHEAD
+                            } else {
+                                // Database Error
+                            }
+                        } elseif ($uang_kas == "" || $uang_kas == 0) {
+                            // DO Nothing
+                        }
+
+                        $pesan  = "Sukses Menambah Kegiatan";
+                        $sukses = array('pesan' => $pesan);
+                        $this->session->set_flashdata('success_msg', $sukses);
+                        redirect("PPG/mengelola_kegiatan");
+
+                    } else {
+                        $pesan      = "Gagal Menambah Kegiatan. Silahkan Cek Kembali.";
+                        $url_target = "PPG/tambah_kegiatan";
+                        $name       = "";
+                        $value      = "";
+                        $alert      = array(
+                            'pesan'      => $pesan,
+                            'url_target' => $url_target,
+                            'name'       => $name,
+                            'value'      => $value,
+                        );
+                        $this->load->view("alert", array('alert' => $alert));
+                        $this->load->view("footer");
                     }
-
-                    $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
-                    $fields  = array(
-                        'registration_ids' => $ids,
-                        'data'             => array(
-                            'title'       => $title,
-                            'body'        => $body,
-                            'message'     => $message,
-                            'messagetype' => $message_type,
-                            'intent'      => $intent,
-                            'idtarget'    => $id_target,
-                            'datercv'     => $date_rcv,
-                        ),
-                    );
-
-                    $payload      = json_encode($fields);
-                    $curl_session = curl_init();
-                    curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
-                    curl_setopt($curl_session, CURLOPT_POST, true);
-                    curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
-                    curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
-                    curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-                    curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
-
-                    $result = curl_exec($curl_session);
-                    curl_close($curl_session);
-                    // echo "<hr>";
-                    // print_r($result);
-                    //End FCM Code
-
-                    $pesan  = "Sukses Menambah Kegiatan";
-                    $sukses = array('pesan' => $pesan);
-                    $this->session->set_flashdata('success_msg', $sukses);
-                    redirect("PPG/mengelola_kegiatan");
-
                 } else {
-                    $pesan      = "Gagal Menambah Kegiatan. Silahkan Cek Kembali.";
-                    $url_target = "PPG/tambah_kegiatan";
-                    $name       = "";
-                    $value      = "";
-                    $alert      = array(
-                        'pesan'      => $pesan,
-                        'url_target' => $url_target,
-                        'name'       => $name,
-                        'value'      => $value,
+                    $data            = array('upload_data' => $this->upload->data());
+                    $tambah_kegiatan = array(
+                        'nama_kegiatan'             => $nama_kegiatan,
+                        'id_status_kegiatan'        => $id_status_kegiatan,
+                        'pesan_ajakan'              => $pesan_ajakan,
+                        'deskripsi_kegiatan'        => $deskripsi_kegiatan,
+                        'minimal_relawan'           => $minimal_relawan,
+                        'minimal_donasi'            => $minimal_donasi,
+                        'tanggal_kegiatan_mulai'    => $tanggal_kegiatan_mulai,
+                        'tanggal_kegiatan_berakhir' => $tanggal_kegiatan_berakhir,
+                        'batas_akhir_pendaftaran'   => $batas_akhir_pendaftaran,
+                        'alamat'                    => $alamat,
+                        'lat'                       => $lat,
+                        'lng'                       => $lng,
+                        'banner'                    => $this->upload->data('file_name'),
                     );
-                    $this->load->view("alert", array('alert' => $alert));
-                    $this->load->view("footer");
+                    $execute = $this->PPG_model->insert_data('kegiatan', $tambah_kegiatan);
+                    if ($execute >= 1) {
+
+                        //Start FCM Code
+                        $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
+                        $title           = "Kegiatan Baru: " . $nama_kegiatan;
+                        $body            = $pesan_ajakan;
+                        $message         = "null";
+                        $message_type    = "kegiatan";
+                        $intent          = "DetailKegiatanActivity";
+                        $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
+                        $date_rcv        = date("Y-m-d");
+
+                        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+                        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+                        $data        = $this->PPG_model->get_all_user();
+                        print_r($data);
+
+                        $ids = array();
+                        $i   = 0;
+                        foreach ($data as $d) {
+                            $ids[$i] = $d['fcm_token'];
+                            $i++;
+                        }
+
+                        $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+                        $fields  = array(
+                            'registration_ids' => $ids,
+                            'data'             => array(
+                                'title'       => $title,
+                                'body'        => $body,
+                                'message'     => $message,
+                                'messagetype' => $message_type,
+                                'intent'      => $intent,
+                                'idtarget'    => $id_target,
+                                'datercv'     => $date_rcv,
+                            ),
+                        );
+
+                        $payload      = json_encode($fields);
+                        $curl_session = curl_init();
+                        curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+                        curl_setopt($curl_session, CURLOPT_POST, true);
+                        curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+                        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+                        curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                        curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+                        $result = curl_exec($curl_session);
+                        curl_close($curl_session);
+                        // echo "<hr>";
+                        // print_r($result);
+                        //End FCM Code
+
+                        if ($uang_kas != "") {
+                            $tambah_uang = array(
+                                'email'            => "admin@ttm.com",
+                                'id_status_donasi' => 3,
+                                'id_kegiatan'      => $id_target,
+                                'nominal_donasi'   => $uang_kas,
+                                'tanggal_donasi'   => date("Y-m-d"),
+                            );
+                            $execute = $this->PPG_model->insert_data('donasi', $tambah_uang);
+                            if ($execute >= 1) {
+                                // GO AHEAD
+                            } else {
+                                // Database Error
+                            }
+                        } elseif ($uang_kas == "" || $uang_kas == 0) {
+                            // DO Nothing
+                        }
+
+                        $pesan  = "Sukses Menambah Kegiatan $nama_kegiatan";
+                        $sukses = array('pesan' => $pesan);
+                        $this->session->set_flashdata('success_msg', $sukses);
+
+                        redirect("PPG/mengelola_kegiatan");
+                    } else {
+                        $pesan      = "Gagal Menambah Kegiatan. Silahkan Cek Kembali.";
+                        $url_target = "PPG/tambah_kegiatan";
+                        $name       = "";
+                        $value      = "";
+                        $alert      = array(
+                            'pesan'      => $pesan,
+                            'url_target' => $url_target,
+                            'name'       => $name,
+                            'value'      => $value,
+                        );
+                        $this->load->view("alert", array('alert' => $alert));
+                        $this->load->view("footer");
+                    }
                 }
             } else {
-                $data            = array('upload_data' => $this->upload->data());
-                $tambah_kegiatan = array(
-                    'nama_kegiatan'           => $nama_kegiatan,
-                    'id_status_kegiatan'      => $id_status_kegiatan,
-                    'pesan_ajakan'            => $pesan_ajakan,
-                    'deskripsi_kegiatan'      => $deskripsi_kegiatan,
-                    'minimal_relawan'         => $minimal_relawan,
-                    'minimal_donasi'          => $minimal_donasi,
-                    'tanggal_kegiatan'        => $tanggal_kegiatan,
-                    'batas_akhir_pendaftaran' => $batas_akhir_pendaftaran,
-                    'alamat'                  => $alamat,
-                    'lat'                     => $lat,
-                    'lng'                     => $lng,
-                    'banner'                  => $this->upload->data('file_name'),
+                $pesan      = "Gagal Menambah Kegiatan. Nama Kegiatan Sama, Silahkan Cek Kembali.";
+                $url_target = "PPG/tambah_kegiatan";
+                $name       = "";
+                $value      = "";
+                $alert      = array(
+                    'pesan'      => $pesan,
+                    'url_target' => $url_target,
+                    'name'       => $name,
+                    'value'      => $value,
                 );
-                $execute = $this->PPG_model->insert_data('kegiatan', $tambah_kegiatan);
-                if ($execute >= 1) {
-
-                    //Start FCM Code
-                    $get_id_kegiatan = $this->PPG_model->get_kegiatan("where nama_kegiatan = '$nama_kegiatan'");
-                    $title           = "Kegiatan Baru: " . $nama_kegiatan;
-                    $body            = $pesan_ajakan;
-                    $message         = "null";
-                    $message_type    = "kegiatan";
-                    $intent          = "DetailKegiatanActivity";
-                    $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
-                    $date_rcv        = date("Y-m-d");
-
-                    $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
-                    $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
-                    $data        = $this->PPG_model->get_all_user();
-                    print_r($data);
-
-                    $ids = array();
-                    $i   = 0;
-                    foreach ($data as $d) {
-                        $ids[$i] = $d['fcm_token'];
-                        $i++;
-                    }
-
-                    $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
-                    $fields  = array(
-                        'registration_ids' => $ids,
-                        'data'             => array(
-                            'title'       => $title,
-                            'body'        => $body,
-                            'message'     => $message,
-                            'messagetype' => $message_type,
-                            'intent'      => $intent,
-                            'idtarget'    => $id_target,
-                            'datercv'     => $date_rcv,
-                        ),
-                    );
-
-                    $payload      = json_encode($fields);
-                    $curl_session = curl_init();
-                    curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
-                    curl_setopt($curl_session, CURLOPT_POST, true);
-                    curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
-                    curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
-                    curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-                    curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
-
-                    $result = curl_exec($curl_session);
-                    curl_close($curl_session);
-                    // echo "<hr>";
-                    // print_r($result);
-                    //End FCM Code
-
-                    $pesan  = "Sukses Menambah Kegiatan $nama_kegiatan";
-                    $sukses = array('pesan' => $pesan);
-                    $this->session->set_flashdata('success_msg', $sukses);
-
-                    redirect("PPG/mengelola_kegiatan");
-                } else {
-                    $pesan      = "Gagal Menambah Kegiatan. Silahkan Cek Kembali.";
-                    $url_target = "PPG/tambah_kegiatan";
-                    $name       = "";
-                    $value      = "";
-                    $alert      = array(
-                        'pesan'      => $pesan,
-                        'url_target' => $url_target,
-                        'name'       => $name,
-                        'value'      => $value,
-                    );
-                    $this->load->view("alert", array('alert' => $alert));
-                    $this->load->view("footer");
-                }
+                $this->load->view("alert", array('alert' => $alert));
+                $this->load->view("footer");
             }
         } else {
             $pesan      = "Gagal Menambah Kegiatan. Isi Seluruh Form Yang Tersedia.";
@@ -296,21 +404,24 @@ class PPG extends CI_Controller
 
     public function edit_kegiatan()
     {
-        $edit                    = $this->input->post("edit");
-        $id_kegiatan             = $this->input->post("id_kegiatan");
-        $nama_kegiatan           = $this->input->post("nama_kegiatan");
-        $id_status_kegiatan      = $this->input->post("id_status_kegiatan");
-        $pesan_ajakan            = $this->input->post("pesan_ajakan");
-        $deskripsi_kegiatan      = $this->input->post("deskripsi_kegiatan");
-        $minimal_relawan         = str_replace(str_split('_.'), "", $this->input->post("minimal_relawan"));
-        $minimal_donasi          = str_replace(str_split('_.'), "", $this->input->post("minimal_donasi"));
-        $tanggal_kegiatan        = $this->input->post("tanggal_kegiatan");
-        $batas_akhir_pendaftaran = $this->input->post("batas_akhir_pendaftaran");
-        $alamat                  = $this->input->post("alamat");
-        $lat                     = $this->input->post("lat");
-        $lng                     = $this->input->post("lng");
+        $edit                      = $this->input->post("edit");
+        $id_kegiatan               = $this->input->post("id_kegiatan");
+        $nama_kegiatan             = $this->input->post("nama_kegiatan");
+        $id_status_kegiatan        = $this->input->post("id_status_kegiatan");
+        $pesan_ajakan              = $this->input->post("pesan_ajakan");
+        $deskripsi_kegiatan        = $this->input->post("deskripsi_kegiatan");
+        $minimal_relawan           = str_replace(str_split('_.'), "", $this->input->post("minimal_relawan"));
+        $minimal_donasi            = str_replace(str_split('_.'), "", $this->input->post("minimal_donasi"));
+        $uang_kas                  = str_replace(str_split('_.'), "", $this->input->post("uang_kas"));
+        $tanggal_kegiatan_mulai    = $this->input->post("tanggal_kegiatan_mulai");
+        $tanggal_kegiatan_berakhir = $this->input->post("tanggal_kegiatan_berakhir");
+        $batas_akhir_pendaftaran   = $this->input->post("batas_akhir_pendaftaran");
+        $alamat                    = $this->input->post("alamat");
+        $lat                       = $this->input->post("lat");
+        $lng                       = $this->input->post("lng");
         if ($edit != "") {
             $detail_kegiatan = $this->PPG_model->get_detail_kegiatan("where id_kegiatan = $edit");
+            $data_uang_kas   = $this->PPG_model->get_uang_kas("where id_kegiatan = $edit and email = 'admin@ttm.com'");
 
             //Start Map
             // $center = $detail_kegiatan[0]['lat'] . "," . $detail_kegiatan[0]['lng'];
@@ -345,29 +456,47 @@ class PPG extends CI_Controller
             //End Map
 
             // $this->load->view("ppg/v_form_edit_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'd' => $d));
-            $this->load->view("ppg/v_form_edit_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'd' => $d));
+            $this->load->view("ppg/v_form_edit_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'data_uang_kas' => $data_uang_kas, 'd' => $d));
             $this->load->view('footer');
-        } elseif ($id_kegiatan != "" && $nama_kegiatan != "" && $id_status_kegiatan != "" && $pesan_ajakan != "" && $deskripsi_kegiatan != "" && $minimal_relawan != "" && $minimal_donasi != "" && $tanggal_kegiatan != "" && $batas_akhir_pendaftaran != "" && $alamat != "" && $lat != "" && $lng != "") {
+        } elseif ($id_kegiatan != "" && $nama_kegiatan != "" && $id_status_kegiatan != "" && $pesan_ajakan != "" && $deskripsi_kegiatan != "" && $minimal_relawan != "" && $minimal_donasi != "" && $tanggal_kegiatan_mulai != "" && $tanggal_kegiatan_berakhir != "" && $batas_akhir_pendaftaran != "" && $alamat != "" && $lat != "" && $lng != "") {
             $config['upload_path']   = './uploads/gambar_kegiatan/';
             $config['allowed_types'] = 'gif|jpg|png';
             $config['max_size']      = 2048;
             $this->load->library('upload', $config);
 
+            $data_uang_kas = $this->PPG_model->get_uang_kas("where id_kegiatan = $id_kegiatan and email = 'admin@ttm.com'");
             if (!$this->upload->do_upload('banner')) {
                 // $error = array('error' => $this->upload->display_errors());
                 // echo "error";
+
+                if ($uang_kas != "") {
+                    $update_uang_kas = array(
+                        'nominal_donasi' => $uang_kas,
+                    );
+                    $where   = array('id_donasi' => $data_uang_kas[0]['id_donasi']);
+                    $execute = $this->PPG_model->update_data('donasi', $update_uang_kas, $where);
+                    if ($execute >= 1) {
+                        // GO AHEAD
+                    } else {
+                        // Database Error
+                    }
+                } elseif ($uang_kas == "" || $uang_kas == 0) {
+                    // DO Nothing
+                }
+
                 $update_kegiatan = array(
-                    'nama_kegiatan'           => $nama_kegiatan,
-                    'id_status_kegiatan'      => $id_status_kegiatan,
-                    'pesan_ajakan'            => $pesan_ajakan,
-                    'deskripsi_kegiatan'      => $deskripsi_kegiatan,
-                    'minimal_relawan'         => $minimal_relawan,
-                    'minimal_donasi'          => $minimal_donasi,
-                    'tanggal_kegiatan'        => $tanggal_kegiatan,
-                    'batas_akhir_pendaftaran' => $batas_akhir_pendaftaran,
-                    'alamat'                  => $alamat,
-                    'lat'                     => $lat,
-                    'lng'                     => $lng,
+                    'nama_kegiatan'             => $nama_kegiatan,
+                    'id_status_kegiatan'        => $id_status_kegiatan,
+                    'pesan_ajakan'              => $pesan_ajakan,
+                    'deskripsi_kegiatan'        => $deskripsi_kegiatan,
+                    'minimal_relawan'           => $minimal_relawan,
+                    'minimal_donasi'            => $minimal_donasi,
+                    'tanggal_kegiatan_mulai'    => $tanggal_kegiatan_mulai,
+                    'tanggal_kegiatan_berakhir' => $tanggal_kegiatan_berakhir,
+                    'batas_akhir_pendaftaran'   => $batas_akhir_pendaftaran,
+                    'alamat'                    => $alamat,
+                    'lat'                       => $lat,
+                    'lng'                       => $lng,
                 );
                 $where   = array('id_kegiatan' => $id_kegiatan);
                 $execute = $this->PPG_model->update_data('kegiatan', $update_kegiatan, $where);
@@ -444,20 +573,36 @@ class PPG extends CI_Controller
                     $this->load->view("footer");
                 }
             } else {
+                if ($uang_kas != "") {
+                    $update_uang_kas = array(
+                        'nominal_donasi' => $uang_kas,
+                    );
+                    $where   = array('id_donasi' => $data_uang_kas[0]['id_donasi']);
+                    $execute = $this->PPG_model->update_data('donasi', $update_uang_kas, $where);
+                    if ($execute >= 1) {
+                        // GO AHEAD
+                    } else {
+                        // Database Error
+                    }
+                } elseif ($uang_kas == "" || $uang_kas == 0) {
+                    // DO Nothing
+                }
+
                 $data            = array('upload_data' => $this->upload->data());
                 $update_kegiatan = array(
-                    'nama_kegiatan'           => $nama_kegiatan,
-                    'id_status_kegiatan'      => $id_status_kegiatan,
-                    'pesan_ajakan'            => $pesan_ajakan,
-                    'deskripsi_kegiatan'      => $deskripsi_kegiatan,
-                    'minimal_relawan'         => $minimal_relawan,
-                    'minimal_donasi'          => $minimal_donasi,
-                    'tanggal_kegiatan'        => $tanggal_kegiatan,
-                    'batas_akhir_pendaftaran' => $batas_akhir_pendaftaran,
-                    'alamat'                  => $alamat,
-                    'lat'                     => $lat,
-                    'lng'                     => $lng,
-                    'banner'                  => $this->upload->data('file_name'),
+                    'nama_kegiatan'             => $nama_kegiatan,
+                    'id_status_kegiatan'        => $id_status_kegiatan,
+                    'pesan_ajakan'              => $pesan_ajakan,
+                    'deskripsi_kegiatan'        => $deskripsi_kegiatan,
+                    'minimal_relawan'           => $minimal_relawan,
+                    'minimal_donasi'            => $minimal_donasi,
+                    'tanggal_kegiatan_mulai'    => $tanggal_kegiatan_mulai,
+                    'tanggal_kegiatan_berakhir' => $tanggal_kegiatan_berakhir,
+                    'batas_akhir_pendaftaran'   => $batas_akhir_pendaftaran,
+                    'alamat'                    => $alamat,
+                    'lat'                       => $lat,
+                    'lng'                       => $lng,
+                    'banner'                    => $this->upload->data('file_name'),
                 );
                 $where   = array('id_kegiatan' => $id_kegiatan);
                 $execute = $this->PPG_model->update_data('kegiatan', $update_kegiatan, $where);
@@ -718,7 +863,14 @@ class PPG extends CI_Controller
             $d['lng'] = $this->def_lng;
             //End Map
 
-            $this->load->view("ppg/v_detail_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'jumlah_relawan' => $jumlah_relawan, 'jumlah_donasi' => $jumlah_donasi, 'dokumentasi' => $dokumentasi, 'd' => $d));
+            // $this->load->view("ppg/v_detail_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'jumlah_relawan' => $jumlah_relawan, 'jumlah_donasi' => $jumlah_donasi, 'dokumentasi' => $dokumentasi, 'd' => $d));
+            $this->hasil_analisis_kegiatan($kegiatan);
+            if ($detail_kegiatan[0]['id_status_kegiatan'] == 3 && $this->hasil_rating_relawan != 0 && $this->hasil_rating_donatur) {
+                $this->load->view("ppg/v_detail_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'jumlah_relawan' => $jumlah_relawan, 'jumlah_donasi' => $jumlah_donasi, 'dokumentasi' => $dokumentasi, 'd' => $d, 'persentase_kehadiran' => $this->persentase_kehadiran, 'jml_relawan' => $this->jml_relawan, 'jml_relawan_hadir' => $this->jml_relawan_hadir, 'persentase_donasi' => $this->persentase_donasi, 'persentase_rating_relawan' => $this->persentase_rating_relawan, 'persentase_rating_donatur' => $this->persentase_rating_donatur, 'hasil_rating_relawan' => $this->hasil_rating_relawan, 'hasil_rating_donatur' => $this->hasil_rating_donatur, 'hasil_analisis' => $this->hasil_analisis, 'kesimpulan' => $this->kesimpulan, 'persentase_gabung_relawan' => $this->persentase_gabung_relawan));
+                // } elseif ($detail_kegiatan[0]['id_status_kegiatan'] != 3) {
+            } else {
+                $this->load->view("ppg/v_detail_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'jumlah_relawan' => $jumlah_relawan, 'jumlah_donasi' => $jumlah_donasi, 'dokumentasi' => $dokumentasi, 'd' => $d));
+            }
             $this->load->view('footer');
         } else {
             $pesan      = "Akses Link Secara Ilegal Terdeteksi, Silahkan Kembali.";
@@ -838,9 +990,9 @@ class PPG extends CI_Controller
                     $message         = "null";
                     $message_type    = "dokumentasi";
                     // $intent          = "DetailKegiatanDiikutiActivity";
-                    $intent          = "DokumentasiActivity";
-                    $id_target       = $get_id_kegiatan[0]['id_kegiatan'];
-                    $date_rcv        = date("Y-m-d");
+                    $intent    = "DokumentasiActivity";
+                    $id_target = $get_id_kegiatan[0]['id_kegiatan'];
+                    $date_rcv  = date("Y-m-d");
 
                     $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
                     $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
@@ -1125,10 +1277,31 @@ class PPG extends CI_Controller
         if ($balas != "") {
             $feedback       = $this->PPG_model->get_feedback_kegiatan_relawan("where id_feedback_kegiatan = $balas");
             $balas_feedback = $this->PPG_model->get_balasan_feedback_kegiatan_relawan("where id_feedback_kegiatan = $balas");
+
+            $data_baru = array();
+            $i         = 0;
+            foreach ($balas_feedback as $b) {
+                if ($b['email'] == $this->session->userdata('email')) {
+                    $data_baru[$i]['id_balas_feedback'] = $b['id_balas_feedback'];
+                    $data_baru[$i]['email']             = "admin@ttm.com";
+                    $data_baru[$i]['nama']              = "Admin Turun Tangan Malang";
+                    $data_baru[$i]['komentar']          = $b['komentar'];
+                    $data_baru[$i]['tanggal']           = $b['tanggal'];
+                } else {
+                    $data_baru[$i]['id_balas_feedback'] = $b['id_balas_feedback'];
+                    $data_baru[$i]['email']             = $b['email'];
+                    $data_baru[$i]['nama']              = $b['nama'];
+                    $data_baru[$i]['komentar']          = $b['komentar'];
+                    $data_baru[$i]['tanggal']           = $b['tanggal'];
+                }
+                $i++;
+            }
+
             // for session
             $email_admin = $this->session->userdata('email'); //"kuthu@gmail.com";
             $nama_admin  = $this->session->userdata('nama'); //"si kuthu";
-            $this->load->view("ppg/v_balas_feedback_relawan", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $balas, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
+            // $this->load->view("ppg/v_balas_feedback_relawan", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $balas, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
+            $this->load->view("ppg/v_balas_feedback_relawan", array('feedback' => $feedback, 'balas_feedback' => $data_baru, 'id_feedback_kegiatan' => $balas, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
             $this->load->view('footer');
         } elseif ($id_feedback_kegiatan != "" && $email != "" && $nama != "" && $komentar != "") {
             $balas_komentar = array(
@@ -1141,10 +1314,31 @@ class PPG extends CI_Controller
             if ($execute >= 1) {
                 $feedback       = $this->PPG_model->get_feedback_kegiatan_relawan("where id_feedback_kegiatan = $id_feedback_kegiatan");
                 $balas_feedback = $this->PPG_model->get_balasan_feedback_kegiatan_relawan("where id_feedback_kegiatan = $id_feedback_kegiatan");
+
+                $data_baru = array();
+                $i         = 0;
+                foreach ($balas_feedback as $b) {
+                    if ($b['email'] == $this->session->userdata('email')) {
+                        $data_baru[$i]['id_balas_feedback'] = $b['id_balas_feedback'];
+                        $data_baru[$i]['email']             = "admin@ttm.com";
+                        $data_baru[$i]['nama']              = "Admin Turun Tangan Malang";
+                        $data_baru[$i]['komentar']          = $b['komentar'];
+                        $data_baru[$i]['tanggal']           = $b['tanggal'];
+                    } else {
+                        $data_baru[$i]['id_balas_feedback'] = $b['id_balas_feedback'];
+                        $data_baru[$i]['email']             = $b['email'];
+                        $data_baru[$i]['nama']              = $b['nama'];
+                        $data_baru[$i]['komentar']          = $b['komentar'];
+                        $data_baru[$i]['tanggal']           = $b['tanggal'];
+                    }
+                    $i++;
+                }
+
                 // for session
                 $email_admin = $this->session->userdata('email'); //"kuthu@gmail.com";
                 $nama_admin  = $this->session->userdata('nama'); //"si kuthu";
-                $this->load->view("ppg/v_balas_feedback_relawan", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $id_feedback_kegiatan, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
+                // $this->load->view("ppg/v_balas_feedback_relawan", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $id_feedback_kegiatan, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
+                $this->load->view("ppg/v_balas_feedback_relawan", array('feedback' => $feedback, 'balas_feedback' => $data_baru, 'id_feedback_kegiatan' => $id_feedback_kegiatan, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
                 $this->load->view('footer');
             } else {
                 $pesan      = "Gagal Membalas Feedback. Silahkan Cek Kembali.";
@@ -1187,10 +1381,35 @@ class PPG extends CI_Controller
         if ($balas != "") {
             $feedback       = $this->PPG_model->get_feedback_kegiatan_donatur("where id_feedback_kegiatan = $balas");
             $balas_feedback = $this->PPG_model->get_balasan_feedback_kegiatan_donatur("where id_feedback_kegiatan = $balas");
+
+            $data_baru = array();
+            $i         = 0;
+            foreach ($balas_feedback as $b) {
+                if ($b['email'] == $this->session->userdata('email')) {
+                    $data_baru[$i]['id_balas_feedback'] = $b['id_balas_feedback'];
+                    $data_baru[$i]['email']             = "admin@ttm.com";
+                    $data_baru[$i]['nama']              = "Admin Turun Tangan Malang";
+                    $data_baru[$i]['komentar']          = $b['komentar'];
+                    $data_baru[$i]['tanggal']           = $b['tanggal'];
+                } else {
+                    $data_baru[$i]['id_balas_feedback'] = $b['id_balas_feedback'];
+                    $data_baru[$i]['email']             = $b['email'];
+                    $data_baru[$i]['nama']              = $b['nama'];
+                    $data_baru[$i]['komentar']          = $b['komentar'];
+                    $data_baru[$i]['tanggal']           = $b['tanggal'];
+                }
+                $i++;
+            }
+
             // for session
-            $email_admin = $this->session->userdata('email'); //"kuthu@gmail.com";
-            $nama_admin  = $this->session->userdata('nama'); //"si kuthu";
-            $this->load->view("ppg/v_balas_feedback_donatur", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $balas, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
+            // $email_admin = $this->session->userdata('email'); //"kuthu@gmail.com";
+            // $nama_admin  = $this->session->userdata('nama'); //"si kuthu";
+            // $this->load->view("ppg/v_balas_feedback_donatur", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $balas, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
+
+            // inject
+            $email_admin = "admin@ttm.com";
+            $nama_admin  = "Admin Turun Tangan Malang";
+            $this->load->view("ppg/v_balas_feedback_donatur", array('feedback' => $feedback, 'balas_feedback' => $data_baru, 'id_feedback_kegiatan' => $balas, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
             $this->load->view('footer');
         } elseif ($id_feedback_kegiatan != "" && $email != "" && $nama != "" && $komentar != "") {
             $balas_komentar = array(
@@ -1203,9 +1422,34 @@ class PPG extends CI_Controller
             if ($execute >= 1) {
                 $feedback       = $this->PPG_model->get_feedback_kegiatan_donatur("where id_feedback_kegiatan = $id_feedback_kegiatan");
                 $balas_feedback = $this->PPG_model->get_balasan_feedback_kegiatan_donatur("where id_feedback_kegiatan = $id_feedback_kegiatan");
+
+                // $data_baru = array();
+                // $i         = 0;
+                // foreach ($balas_feedback as $b) {
+                //     if ($b['email'] == $this->session->userdata('email')) {
+                //         $data_baru[$i]['id_balas_feedback'] = $b['id_balas_feedback'];
+                //         $data_baru[$i]['email']             = "admin@ttm.com";
+                //         $data_baru[$i]['nama']              = "Admin Turun Tangan Malang";
+                //         $data_baru[$i]['komentar']          = $b['komentar'];
+                //         $data_baru[$i]['tanggal']           = $b['tanggal'];
+                //     } else {
+                //         $data_baru[$i]['id_balas_feedback'] = $b['id_balas_feedback'];
+                //         $data_baru[$i]['email']             = $b['email'];
+                //         $data_baru[$i]['nama']              = $b['nama'];
+                //         $data_baru[$i]['komentar']          = $b['komentar'];
+                //         $data_baru[$i]['tanggal']           = $b['tanggal'];
+                //     }
+                //     $i++;
+                // }
+
                 // for session
-                $email_admin = $this->session->userdata('email'); //"kuthu@gmail.com";
-                $nama_admin  = $this->session->userdata('nama'); //"si kuthu";
+                // $email_admin = $this->session->userdata('email'); //"kuthu@gmail.com";
+                // $nama_admin  = $this->session->userdata('nama'); //"si kuthu";
+                // $this->load->view("ppg/v_balas_feedback_donatur", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $id_feedback_kegiatan, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
+
+                // inject
+                $email_admin = "admin@ttm.com";
+                $nama_admin  = "Admin Turun Tangan Malang";
                 $this->load->view("ppg/v_balas_feedback_donatur", array('feedback' => $feedback, 'balas_feedback' => $balas_feedback, 'id_feedback_kegiatan' => $id_feedback_kegiatan, 'email' => $email_admin, 'nama' => $nama_admin, 'id_kegiatan' => $id_kegiatan));
                 $this->load->view('footer');
             } else {
@@ -1310,5 +1554,132 @@ class PPG extends CI_Controller
             $this->load->view("alert", array('alert' => $alert));
             $this->load->view("footer");
         }
+    }
+
+    // Hitung-hitung
+    public function hasil_analisis_kegiatan($id_kegiatan = "")
+    {
+        $point                = 0;
+        $this->hasil_analisis = "<b>Hasil evaluasi dari sistem:</b><br>";
+
+        $detail_kegiatan      = $this->PPG_model->get_detail_kegiatan("where k.id_kegiatan = $id_kegiatan");
+        $jumlah_relawan       = $this->PPG_model->get_jumlah_relawan("where k.id_kegiatan = $id_kegiatan");
+        $jumlah_relawan_hadir = $this->PPG_model->get_jumlah_relawan("where k.id_kegiatan = $id_kegiatan and gk.id_status_absensi_relawan = 2");
+        $rating_feedback      = $this->PPG_model->get_data_feedback_kegiatan("where k.id_kegiatan = $id_kegiatan");
+        $jumlah_donasi        = $this->PPG_model->get_jumlah_donasi("and k.id_kegiatan = $id_kegiatan");
+
+        // Hitung Kontribusi Relawan TTM
+        $this->persentase_gabung_relawan = ($jumlah_relawan[0]['jumlah_relawan'] / $detail_kegiatan[0]['minimal_relawan']) * 100;
+        // if ($jumlah_relawan[0]['jumlah_relawan'] < $detail_kegiatan[0]['minimal_relawan']) {
+        if ($this->persentase_gabung_relawan < 70) {
+            $point                = $point + 1;
+            $this->hasil_analisis = $this->hasil_analisis . "Kontibusi relawan tergolong <u>kurang</u>";
+        } elseif ($this->persentase_gabung_relawan >= 70 && $this->persentase_gabung_relawan < 90) {
+            $point                = $point + 2;
+            $this->hasil_analisis = $this->hasil_analisis . "Kontibusi relawan tergolong <u>baik</u>";
+        } elseif ($this->persentase_gabung_relawan >= 90) {
+            $point                = $point + 3;
+            $this->hasil_analisis = $this->hasil_analisis . "Kontibusi relawan tergolong <u>sangat baik</u>/Antusias relawan terhadap kegiatan tinggi";
+        }
+
+        // Hitung Persentase Relawan Yang Hadir
+        if ($jumlah_relawan[0]['jumlah_relawan'] == 0) {
+            $this->persentase_kehadiran = 0;
+        } elseif (empty($jumlah_relawan_hadir[0]['jumlah_relawan'])) {
+            $this->persentase_kehadiran = 0;
+        } elseif (!empty($jumlah_relawan_hadir[0]['jumlah_relawan']) || $jumlah_relawan_hadir[0]['jumlah_relawan'] > 0) {
+            $this->persentase_kehadiran = ($jumlah_relawan_hadir[0]['jumlah_relawan'] / $jumlah_relawan[0]['jumlah_relawan']) * 100;
+        }
+        if ($this->persentase_kehadiran >= 80) {
+            if ($point == 1) {
+                $this->hasil_analisis = $this->hasil_analisis . ", namun ";
+            } elseif ($point >= 2) {
+                $this->hasil_analisis = $this->hasil_analisis . ", ";
+            }
+            $point                = $point + 3;
+            $this->hasil_analisis = $this->hasil_analisis . "mayoritas relawan yang bergabung hadir dalam kegiatan.";
+        } elseif ($this->persentase_kehadiran >= 50 && $this->persentase_kehadiran < 80) {
+            $point                = $point + 2;
+            $this->hasil_analisis = $this->hasil_analisis . ", rata-rata relawan yang bergabung hadir dalam kegiatan.";
+        } elseif ($this->persentase_kehadiran < 50) {
+            if ($point == 3) {
+                $this->hasil_analisis = $this->hasil_analisis . ", namun";
+            } elseif ($point <= 2) {
+                $this->hasil_analisis = $this->hasil_analisis . ", ";
+            }
+            $point                = $point + 1;
+            $this->hasil_analisis = $this->hasil_analisis . ", kurang dari setengah relawan yang bergabung hadir dalam kegiatan.";
+        }
+
+        // Hitung Rating dan Persentase Feedback Relawan
+        $this->hasil_rating_relawan = $rating_feedback[0]['rating_relawan'];
+        if ($this->hasil_rating_relawan >= 4) {
+            $point                = $point + 3;
+            $this->hasil_analisis = $this->hasil_analisis . "<br>Berdasarkan hasil <i>feedback</i> dari relawan didapatkan hasil <u>" . number_format((float) $rating_feedback[0]['rating_relawan'], 2, '.', '') . "</u> dimana dapat disimpulkan bahwa <u>kegiatan berjalan dengan baik dan mendapat respon yang positif dari para relawan.</u>";
+        } elseif ($this->hasil_rating_relawan >= 3 && $this->hasil_rating_relawan < 4) {
+            $point                = $point + 2;
+            $this->hasil_analisis = $this->hasil_analisis . "<br>Berdasarkan hasil <i>feedback</i> dari relawan didapatkan hasil <u>" . number_format((float) $rating_feedback[0]['rating_relawan'], 2, '.', '') . "</u> dimana dapat disimpulkan bahwa <u>kegiatan berjalan dengan cukup baik dan mendapat respon yang cukup positif dari para relawan</u>. Diperlukan evaluasi sehingga dikegiatan berikutnya dapat berjalan lebih baik.";
+        } elseif ($this->hasil_rating_relawan < 3) {
+            $point                = $point + 1;
+            $this->hasil_analisis = $this->hasil_analisis . "<br>Berdasarkan hasil <i>feedback</i> dari relawan didapatkan hasil <u>" . number_format((float) $rating_feedback[0]['rating_relawan'], 2, '.', '') . "</u> dimana dapat disimpulkan bahwa <u>kegiatan berjalan kurang baik dan mendapat respon yang kurang positif dari para relawan</u>. <b>Diperlukan evaluasi lebih lanjut dalam rapat besar berikutnya.</b>";
+        }
+
+        // Hitung Rating dan Persentase Feedback Donatur
+        $this->hasil_rating_donatur = $rating_feedback[0]['rating_donatur'];
+        if ($this->hasil_rating_donatur >= 4) {
+            $point                = $point + 3;
+            $this->hasil_analisis = $this->hasil_analisis . " Berdasarkan hasil <i>feedback</i> dari donatur juga didapatkan hasil <u>" . number_format((float) $rating_feedback[0]['rating_donatur'], 2, '.', '') . "</u> dimana dapat disimpulkan bahwa menurut para donatur, <u>kegiatan tersebut berjalan dengan baik dan mayoritas donatur memberi respon yang positif</u> terhadap kegiatan yang telah dilaksanakan.";
+        } elseif ($this->hasil_rating_donatur >= 3 && $this->hasil_rating_donatur < 4) {
+            $point                = $point + 2;
+            $this->hasil_analisis = $this->hasil_analisis . " Berdasarkan hasil <i>feedback</i> dari donatur juga didapatkan hasil <u>" . number_format((float) $rating_feedback[0]['rating_donatur'], 2, '.', '') . "</u> dimana dapat disimpulkan bahwa menurut para donatur, <u>kegiatan tersebut berjalan dengan cukup baik dan mayoritas donatur memberi respon yang cukup positif</u> terhadap kegiatan yang telah dilaksanakan.";
+        } elseif ($this->hasil_rating_donatur < 3) {
+            $point                = $point + 1;
+            $this->hasil_analisis = $this->hasil_analisis . " Berdasarkan hasil <i>feedback</i> dari donatur juga didapatkan hasil <u>" . number_format((float) $rating_feedback[0]['rating_donatur'], 2, '.', '') . "</u> dimana dapat disimpulkan bahwa menurut para donatur, <u>kegiatan tersebut berjalan kurang baik dan mayoritas donatur memberi respon yang kurang positif</u> terhadap kegiatan yang telah dilaksanakan.";
+        }
+
+        // Hitung Persentase Donasi
+        if (empty($jumlah_donasi[0]['jumlah_donasi'])) {
+            $this->persentase_donasi = 0;
+        } elseif (!empty($jumlah_donasi[0]['jumlah_donasi']) || $jumlah_donasi[0]['jumlah_donasi'] > 0) {
+            $this->persentase_donasi = ($jumlah_donasi[0]['jumlah_donasi'] / $detail_kegiatan[0]['minimal_donasi']) * 100;
+        }
+        if ($this->persentase_donasi > 100) {
+            $point                = $point + 3;
+            $this->hasil_analisis = $this->hasil_analisis . "<br>Dari segi penggalangan dana, hasil donasi yang diberikan oleh para donatur <u>lebih dari cukup</u> untuk mendanai pelaksanaan kegiatan.";
+        } elseif ($this->persentase_donasi >= 80 && $this->persentase_donasi <= 100) {
+            $point                = $point + 3;
+            $this->hasil_analisis = $this->hasil_analisis . "<br>Dari segi penggalangan dana, hasil donasi yang diberikan oleh para donatur <u>sangat cukup</u> untuk mendanai pelaksanaan kegiatan.";
+        } elseif ($this->persentase_donasi >= 50 && $this->persentase_donasi < 80) {
+            $point                = $point + 2;
+            $this->hasil_analisis = $this->hasil_analisis . "<br>Dari segi penggalangan dana, hasil donasi yang diberikan oleh para donatur <u>cukup</u> untuk mendanai pelaksanaan kegiatan.";
+        } elseif ($this->persentase_donasi < 50) {
+            $point                = $point + 1;
+            $this->hasil_analisis = $this->hasil_analisis . "<br>Dari segi penggalangan dana, hasil donasi yang diberikan oleh para donatur <u>kurang cukup</u> untuk mendanai pelaksanaan kegiatan.";
+        }
+
+        // Kesimpulan :)
+        $hasil = $point / 5;
+        if ($hasil >= 2.5) {
+            $this->kesimpulan = "Hasil Penilaian Kegiatan: <b>Baik.</b>";
+        } elseif ($hasil >= 2.0) {
+            $this->kesimpulan = "Hasil Penilaian Kegiatan: <b>Cukup Baik.</b>";
+        } elseif ($hasil < 2.0) {
+            $this->kesimpulan = "Hasil Penilaian Kegiatan: <b>Kurang Baik.</b>";
+        }
+
+        // $this->hasil_rating_relawan      = $rating_feedback[0]['rating_relawan'];
+        // $this->hasil_rating_donatur      = $rating_feedback[0]['rating_donatur'];
+        $this->persentase_rating_relawan = ($this->hasil_rating_relawan / 5) * 100;
+        $this->persentase_rating_donatur = ($this->hasil_rating_donatur / 5) * 100;
+        $this->jml_relawan               = $jumlah_relawan[0]['jumlah_relawan'];
+        if (empty($jumlah_relawan_hadir[0]['jumlah_relawan'])) {
+            $this->jml_relawan_hadir = 0;
+        } elseif (!empty($jumlah_relawan_hadir[0]['jumlah_relawan']) || $jumlah_relawan_hadir[0]['jumlah_relawan'] > 0) {
+            $this->jml_relawan_hadir = $jumlah_relawan_hadir[0]['jumlah_relawan'];
+        }
+
+        // echo $this->kesimpulan . "<br>";
+        // echo $this->hasil_analisis . "<br>";
+        // echo $point;
     }
 }

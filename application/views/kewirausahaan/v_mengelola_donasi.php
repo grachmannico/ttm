@@ -1,3 +1,24 @@
+<?php
+function tanggal_indo($tanggal)
+{
+    $bulan = array(1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    );
+    $split = explode('-', $tanggal);
+    return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+}
+?>
+
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
@@ -43,7 +64,7 @@
                             <td><?php echo $t['nama']; ?></td>
                             <td><?php echo $t['nama_kegiatan']; ?></td>
                             <td><?php echo "Rp. " . number_format($t['nominal_donasi'], 2, ",", "."); ?></td>
-                            <td><?php echo $t['tanggal_donasi']; ?></td>
+                            <td><?php echo tanggal_indo($t['tanggal_donasi']); ?></td>
                             <td><a href="<?php echo base_url()."uploads/konfirmasi_donasi/"; ?><?php echo $t['struk_donasi']; ?>" target="blank"><img src="<?php echo base_url()."uploads/konfirmasi_donasi/"; ?><?php echo $t['struk_donasi']; ?>" alt="" width="150px"></a></td>
                             <td>
                               <div class="col-md-6">
@@ -89,7 +110,7 @@
                           <td><?php echo $t['nama']; ?></td>
                           <td><?php echo $t['nama_kegiatan']; ?></td>
                           <td><?php echo "Rp. " . number_format($t['nominal_donasi'], 2, ",", "."); ?></td>
-                          <td><?php echo $t['tanggal_donasi']; ?></td>
+                          <td><?php echo tanggal_indo($t['tanggal_donasi']); ?></td>
                         </tr>
                         <?php endforeach?>
                       </tfoot>

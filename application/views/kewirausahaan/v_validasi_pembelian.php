@@ -1,3 +1,24 @@
+<?php
+function tanggal_indo($tanggal)
+{
+    $bulan = array(1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    );
+    $split = explode('-', $tanggal);
+    return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+}
+?>
+
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
@@ -33,7 +54,7 @@
                   <tr>
                     <td><?php echo $i['id_invoice']; ?></td>
                     <td><?php echo $i['nama']; ?></td>
-                    <td><?php echo $i['tanggal_pembelian']; ?></td>
+                    <td><?php echo tanggal_indo($i['tanggal_pembelian']); ?></td>
                     <td><a target="blank" href="<?php echo base_url()."uploads/konfirmasi_pembayaran/"; ?><?php echo $i['struk_pembelian']; ?>"><img src="<?php echo base_url()."uploads/konfirmasi_pembayaran/"; ?><?php echo $i['struk_pembelian']; ?>" alt="" width="150px"></a></td>
                     <td>
                       <div class="col-md-12">

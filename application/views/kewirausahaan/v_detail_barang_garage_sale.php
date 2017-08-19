@@ -1,3 +1,24 @@
+<?php
+function tanggal_indo($tanggal)
+{
+    $bulan = array(1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    );
+    $split = explode('-', $tanggal);
+    return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+}
+?>
+
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
@@ -70,7 +91,7 @@
                       <td><?php echo $d['nama']; ?></td>
                       <td><?php echo $d['qty']; ?></td>
                       <td><?php echo $d['status_pembelian']; ?></td>
-                      <td><?php echo $d['tanggal_pembelian']; ?></td>
+                      <td><?php echo tanggal_indo($d['tanggal_pembelian']); ?></td>
                     </tr>
                     <?php endforeach?>
                     </tfoot>

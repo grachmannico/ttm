@@ -58,6 +58,7 @@
     $("#datemask").inputmask("yyyy-mm-dd", {"placeholder": "yyyy-mm-dd"});
     $("#datemask2").inputmask("yyyy-mm-dd", {"placeholder": "yyyy-mm-dd"});
     $("#money").inputmask("999.999.999", { numericInput: true });
+    $("#money2").inputmask("999.999.999", { numericInput: true });
     $("#qty").inputmask("999.999.999", { numericInput: true });
     $("[data-mask]").inputmask();
     CKEDITOR.config.enterMode = CKEDITOR.ENTER_BR;

@@ -1,3 +1,24 @@
+<?php
+function tanggal_indo($tanggal)
+{
+    $bulan = array(1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    );
+    $split = explode('-', $tanggal);
+    return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+}
+?>
+
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
@@ -64,7 +85,7 @@
                         <?php foreach ($dana_keluar as $d): ?>
                         <tr>
                           <td><?php echo $d['nama_dana_keluar']; ?></td>
-                          <td><?php echo $d['tanggal']; ?></td>
+                          <td><?php echo tanggal_indo($d['tanggal']); ?></td>
                           <td><?php echo "Rp. " . number_format($d['nominal_dana_keluar'], 2, ",", "."); ?></td>
                           <td>
                             <?php if (strlen($d['keterangan']) > 50): ?>
@@ -138,9 +159,14 @@
                           <tbody>
                           <?php foreach ($dana_masuk as $d): ?>
                           <tr>
-                            <td><?php echo $d['nama']; ?></td>
+                            <?php if ($d['nama'] == "Admin Turun Tangan Malang"): ?>
+                              <td>Uang Kas Internal Turun Tangan Malang</td>
+                            <?php endif ?>
+                            <?php if ($d['nama'] != "Admin Turun Tangan Malang"): ?>
+                              <td><?php echo $d['nama']; ?></td>
+                            <?php endif ?>
                             <td><?php echo "Rp. " . number_format($d['nominal_donasi'], 2, ",", "."); ?></td>
-                            <td><?php echo $d['tanggal_donasi']; ?></td>
+                            <td><?php echo tanggal_indo($d['tanggal_donasi']); ?></td>
                           </tr>
                           <?php endforeach?>
                           </tfoot>

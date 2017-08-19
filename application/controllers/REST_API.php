@@ -153,6 +153,11 @@ class REST_API extends CI_Controller
         } else {
             $status_bergabung = "no";
         }
+        if ($data_kegiatan[0]['tanggal_kegiatan_mulai'] == $data_kegiatan[0]['tanggal_kegiatan_berakhir']) {
+            $tanggal_kegiatan = $this->tanggal_indo($data_kegiatan[0]['tanggal_kegiatan_mulai']);
+        } else if ($data_kegiatan[0]['tanggal_kegiatan_mulai'] != $data_kegiatan[0]['tanggal_kegiatan_berakhir']) {
+            $tanggal_kegiatan = $this->tanggal_indo($data_kegiatan[0]['tanggal_kegiatan_mulai']) . " - " . $this->tanggal_indo($data_kegiatan[0]['tanggal_kegiatan_berakhir']);
+        }
         $data_detail_kegiatan['id_kegiatan']             = $data_kegiatan[0]['id_kegiatan'];
         $data_detail_kegiatan['nama_kegiatan']           = $data_kegiatan[0]['nama_kegiatan'];
         $data_detail_kegiatan['pesan_ajakan']            = $data_kegiatan[0]['pesan_ajakan'];
@@ -161,8 +166,8 @@ class REST_API extends CI_Controller
         $data_detail_kegiatan['minimal_relawan']         = $data_kegiatan[0]['minimal_relawan'];
         $data_detail_kegiatan['jumlah_donasi']           = $donasi_terkumpul;
         $data_detail_kegiatan['minimal_donasi']          = $data_kegiatan[0]['minimal_donasi'];
-        $data_detail_kegiatan['tanggal_kegiatan']        = $data_kegiatan[0]['tanggal_kegiatan'];
-        $data_detail_kegiatan['batas_akhir_pendaftaran'] = $data_kegiatan[0]['batas_akhir_pendaftaran'];
+        $data_detail_kegiatan['tanggal_kegiatan']        = $tanggal_kegiatan;
+        $data_detail_kegiatan['batas_akhir_pendaftaran'] = $this->tanggal_indo($data_kegiatan[0]['batas_akhir_pendaftaran']);
         $data_detail_kegiatan['alamat']                  = $data_kegiatan[0]['alamat'];
         $data_detail_kegiatan['lat']                     = $data_kegiatan[0]['lat'];
         $data_detail_kegiatan['lng']                     = $data_kegiatan[0]['lng'];
@@ -348,11 +353,55 @@ class REST_API extends CI_Controller
         $id_feedback_kegiatan = $this->input->post("id_feedback_kegiatan");
         $tipe_pengguna        = $this->input->post("tipe_pengguna");
         if ($tipe_pengguna == "relawan") {
-            $balasan = $this->REST_API_model->get_balasan_feedback_relawan("where id_feedback_kegiatan = $id_feedback_kegiatan order by b.id_balas_feedback desc");
+            $balasan   = $this->REST_API_model->get_balasan_feedback_relawan("where id_feedback_kegiatan = $id_feedback_kegiatan order by b.id_balas_feedback");
+            $data_baru = array();
+            $i         = 0;
+            $admin     = $this->REST_API_model->get_relawan("where r.id_pangkat_divisi = 5 and r.id_divisi = 4");
+            foreach ($balasan as $b) {
+                if ($b['email'] == $admin[0]['email']) {
+                    $data_baru[$i]['id_balas_feedback']    = $b['id_balas_feedback'];
+                    $data_baru[$i]['id_feedback_kegiatan'] = $b['id_feedback_kegiatan'];
+                    $data_baru[$i]['email']                = "admin@ttm.com";
+                    $data_baru[$i]['nama']                 = "Admin Turun Tangan Malang";
+                    $data_baru[$i]['komentar']             = $b['komentar'];
+                    $data_baru[$i]['tanggal']              = $b['tanggal'];
+                } else {
+                    $data_baru[$i]['id_balas_feedback']    = $b['id_balas_feedback'];
+                    $data_baru[$i]['id_feedback_kegiatan'] = $b['id_feedback_kegiatan'];
+                    $data_baru[$i]['email']                = $b['email'];
+                    $data_baru[$i]['nama']                 = $b['nama'];
+                    $data_baru[$i]['komentar']             = $b['komentar'];
+                    $data_baru[$i]['tanggal']              = $b['tanggal'];
+                }
+                $i++;
+            }
+            echo json_encode($data_baru);
         } elseif ($tipe_pengguna == "donatur") {
-            $balasan = $this->REST_API_model->get_balasan_feedback_donatur("where id_feedback_kegiatan = $id_feedback_kegiatan order by b.id_balas_feedback desc");
+            $balasan = $this->REST_API_model->get_balasan_feedback_donatur("where id_feedback_kegiatan = $id_feedback_kegiatan order by b.id_balas_feedback");
+            // $data_baru = array();
+            // $i         = 0;
+            // $admin     = $this->REST_API_model->get_relawan("where r.id_pangkat_divisi = 5 and r.id_divisi = 4");
+            // foreach ($balasan as $b) {
+            //     if ($b['email'] == $admin[0]['email']) {
+            //         $data_baru[$i]['id_balas_feedback']    = $b['id_balas_feedback'];
+            //         $data_baru[$i]['id_feedback_kegiatan'] = $b['id_feedback_kegiatan'];
+            //         $data_baru[$i]['email']                = $b['email'];
+            //         $data_baru[$i]['nama']                 = $b['nama'];
+            //         $data_baru[$i]['komentar']             = $b['komentar'];
+            //         $data_baru[$i]['tanggal']              = $b['tanggal'];
+            //     } else {
+            //         $data_baru[$i]['id_balas_feedback']    = $b['id_balas_feedback'];
+            //         $data_baru[$i]['id_feedback_kegiatan'] = $b['id_feedback_kegiatan'];
+            //         $data_baru[$i]['email']                = $b['email'];
+            //         $data_baru[$i]['nama']                 = $b['nama'];
+            //         $data_baru[$i]['komentar']             = $b['komentar'];
+            //         $data_baru[$i]['tanggal']              = $b['tanggal'];
+            //     }
+            //     $i++;
+            // }
+            echo json_encode($balasan);
         }
-        echo json_encode($balasan);
+        // echo json_encode($data_baru);
     }
 
     public function kirim_balasan_feedback()
@@ -635,6 +684,8 @@ class REST_API extends CI_Controller
     public function konfirmasi_pembelian()
     {
         $invoice                 = $this->input->post("invoice");
+        $alamat_pengiriman       = $this->input->post("alamat_pengiriman");
+        $no_hp_pembeli           = $this->input->post("no_hp_pembeli");
         $config['upload_path']   = './uploads/konfirmasi_pembayaran/';
         $config['allowed_types'] = 'gif|jpg|png';
         $config['max_size']      = 2048;
@@ -651,6 +702,8 @@ class REST_API extends CI_Controller
             $update_status_pembelian = array(
                 'id_status_pembelian' => 2,
                 'struk_pembelian'     => $this->upload->data('file_name'),
+                'alamat_pembeli'      => $alamat_pengiriman,
+                'no_hp'               => $no_hp_pembeli,
             );
             $where   = array('id_invoice' => $invoice);
             $execute = $this->REST_API_model->update_data('pembelian', $update_status_pembelian, $where);
@@ -967,5 +1020,50 @@ class REST_API extends CI_Controller
                 }
             }
         }
+    }
+
+    public function tanggal_indo($tanggal)
+    {
+        $bulan = array(1 => 'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember',
+        );
+        $split = explode('-', $tanggal);
+        return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+    }
+
+    public function achievement()
+    {
+        $email       = $this->input->post("email");
+        $achievment1 = $this->REST_API_model->get_sertifikat_relawan("where email = '$email' order by id_sertifikat_relawan desc");
+        $achievment2 = $this->REST_API_model->get_subscribe_relawan("where email = '$email' and id_status_absensi_relawan = 2 order by k.id_kegiatan desc");
+        $i           = 0;
+        $achievment  = array();
+        foreach ($achievment1 as $a) {
+            $achievment[$i]['email']           = $a['email'];
+            $achievment[$i]['id_target']       = $a['tahun'];
+            $achievment[$i]['nama_sertifikat'] = "Sertifikat Keaktifan Relawan TTM Periode" . date("Y");
+            $achievment[$i]['jenis']           = "SAR";
+            $achievment[$i]['tanggal_terbit']  = "Pada Tahun Periode: " . date("Y");
+            $i++;
+        }
+        foreach ($achievment2 as $b) {
+            $achievment[$i]['email']           = $b['email'];
+            $achievment[$i]['id_target']       = $b['id_kegiatan'];
+            $achievment[$i]['nama_sertifikat'] = "Sertifikat Kegiatan" . $b['nama_kegiatan'];
+            $achievment[$i]['jenis']           = "SK";
+            $achievment[$i]['tanggal_terbit']  = "Tanggal: " . $b['tanggal_kegiatan_berakhir'];
+            $i++;
+        }
+        echo json_encode($achievment);
     }
 }

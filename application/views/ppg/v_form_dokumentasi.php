@@ -1,3 +1,24 @@
+<?php
+function tanggal_indo($tanggal)
+{
+    $bulan = array(1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    );
+    $split = explode('-', $tanggal);
+    return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+}
+?>
+
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
@@ -40,7 +61,7 @@
                             <td><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" alt="" width="300px"></td>
                             <td><?php echo $d['nama_dokumentasi']; ?></td>
                             <td><?php echo $d['deskripsi']; ?></td>
-                            <td><?php echo $d['tanggal']; ?></td>
+                            <td><?php echo tanggal_indo($d['tanggal']); ?></td>
                             <td>
                               <div class="col-md-6">
                                 <form action="<?php echo base_url()."PPG/edit_dokumentasi_kegiatan"; ?>" method="POST">
