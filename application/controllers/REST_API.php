@@ -88,10 +88,12 @@ class REST_API extends CI_Controller
                 echo json_encode($json_data);
             } else {
                 $donatur_baru = array(
-                    'nama'      => $nama,
-                    'email'     => $email,
-                    'pass'      => $password,
-                    'fcm_token' => "",
+                    'nama'              => $nama,
+                    'email'             => $email,
+                    'pass'              => $password,
+                    'fcm_token'         => "",
+                    'id_status_donatur' => 1,
+                    'id_jenis_kelamin'  => 1,
                 );
                 $execute = $this->REST_API_model->insert_data('donatur', $donatur_baru);
                 if ($execute >= 1) {
@@ -476,7 +478,7 @@ class REST_API extends CI_Controller
         $id_barang_garage_sale = $this->input->post("id_barang_garage_sale");
         $qty                   = $this->input->post("qty");
         if ($invoice == "" && $email != "") {
-            $date         = (string) date("Y-m-d");
+            $date         = (string) date("YmdHis");
             $invoice      = $email . $date;
             $invoice_baru = array(
                 'id_invoice'          => $invoice,

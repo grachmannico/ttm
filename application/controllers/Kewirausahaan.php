@@ -20,6 +20,7 @@ class Kewirausahaan extends CI_Controller
         if ($this->session->userdata('pangkat_divisi') == "Ketua Divisi" && $this->session->userdata('divisi') == "Kewirausahaan") {
             $this->exp_donasi();
             $this->exp_pembelian();
+            $this->ranking_donatur();
             $this->load->view('header');
             $this->load->view('kewirausahaan/sidebar-kewirausahaan');
         } else {
@@ -30,7 +31,7 @@ class Kewirausahaan extends CI_Controller
     public function index()
     {
         $jumlah_donatur         = $this->Kewirausahaan_model->get_jml_donatur("where d.email != 'admin@ttm.com'");
-        $jumlah_donasi_masuk    = $this->Kewirausahaan_model->get_donatur("and dn.id_status_donasi = 2");
+        $jumlah_donasi_masuk    = $this->Kewirausahaan_model->get_jml_konfirmasi_donasi("and dn.id_status_donasi = 2");
         $jumlah_pembayaran      = $this->Kewirausahaan_model->get_jml_konfirmasi_pembayaran("where p.id_status_pembelian = 2");
         $transaksi_donasi_masuk = $this->Kewirausahaan_model->get_transaksi_donasi("where id_status_donasi = 2 order by tanggal_donasi asc"); //where id_status_donasi = 2
         $this->load->view("kewirausahaan/dashboard_kewirausahaan", array('jumlah_donatur' => $jumlah_donatur, 'jumlah_donasi_masuk' => $jumlah_donasi_masuk, 'jumlah_pembayaran' => $jumlah_pembayaran, 'transaksi_donasi_masuk' => $transaksi_donasi_masuk));
@@ -482,7 +483,7 @@ class Kewirausahaan extends CI_Controller
                 if ($stok_available == $stok_lama[0]['stok_available']) {
                     $stok_terpesan = $stok_lama[0]['stok_terpesan'];
                 } elseif ($stok_available > $stok_lama[0]['stok_available']) {
-                    $stok_terpesan = $stok_available - $stok_lama[0]['stok_available'];
+                    $stok_terpesan = ($stok_available - $stok_lama[0]['stok_available']) + $stok_lama[0]['stok_terpesan'];
                 } elseif ($stok_available < $stok_lama[0]['stok_available']) {
                     $stok_terpesan = $stok_lama[0]['stok_terpesan'];
                 }
@@ -520,7 +521,7 @@ class Kewirausahaan extends CI_Controller
                 if ($stok_available == $stok_lama[0]['stok_available']) {
                     $stok_terpesan = $stok_lama[0]['stok_terpesan'];
                 } elseif ($stok_available > $stok_lama[0]['stok_available']) {
-                    $stok_terpesan = $stok_available - $stok_lama[0]['stok_available'];
+                    $stok_terpesan = ($stok_available - $stok_lama[0]['stok_available']) + $stok_lama[0]['stok_terpesan'];
                 } elseif ($stok_available < $stok_lama[0]['stok_available']) {
                     $stok_terpesan = $stok_lama[0]['stok_terpesan'];
                 }
@@ -1459,15 +1460,17 @@ class Kewirausahaan extends CI_Controller
 
     public function ranking_donatur()
     {
-        $i       = 0;
-        $this->rank    = array();
-        $donatur = $this->Kewirausahaan_model->get_donatur("and dn.id_status_donasi = 3 where not dr.email = 'admin@ttm.com'");
+        $i          = 0;
+        $this->rank = array();
+        $send_msg   = array();
+        $donatur    = $this->Kewirausahaan_model->get_donatur("and dn.id_status_donasi = 3 where not dr.email = 'admin@ttm.com'");
 
         foreach ($donatur as $d) {
             $jml_nominal_donasi         = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$d[email]' and dn.id_status_donasi = 3");
             $jml_transaksi_donasi       = $this->Kewirausahaan_model->get_donatur("where dr.email = '$d[email]' and dn.id_status_donasi > 2");
             $jml_transaksi_donasi_valid = $this->Kewirausahaan_model->get_donatur("where dr.email = '$d[email]' and dn.id_status_donasi = 3");
             $jml_kegiatan               = $this->Kewirausahaan_model->get_jml_kegiatan();
+            $cek_status_donatur         = $this->Kewirausahaan_model->get_data_donatur("where email = '$d[email]'");
 
             // $nilai = ($this->persentase_transfer_valid + $this->persentase_transfer_per_kegiatan) / 2;
 
@@ -1477,6 +1480,31 @@ class Kewirausahaan extends CI_Controller
                 $this->rank[$i]['email']            = $d['email'];
                 $this->rank[$i]['nama']             = $d['nama'];
                 $this->rank[$i]['persentase_hasil'] = ($this->persentase_transfer_valid + $this->persentase_transfer_per_kegiatan) / 2;
+                if ($this->status_donatur == "Donatur Potensial" && $cek_status_donatur[0]['id_status_donatur'] > 1 && $cek_status_donatur[0]['id_status_donatur'] != 2) {
+                    $send_msg[$i]['fcm_token'] = $d['fcm_token'];
+                    $update_data               = array(
+                        'id_status_donatur' => 2,
+                    );
+                    $where   = array('email' => $d['email']);
+                    $execute = $this->Kewirausahaan_model->update_data('donatur', $update_data, $where);
+                    if ($execute >= 1) {
+                        // OK, Go FCM
+                    } else {
+                        // Database Error
+                    }
+                } elseif ($this->status_donatur == "Donatur Aktif" && $cek_status_donatur[0]['id_status_donatur'] > 1 && $cek_status_donatur[0]['id_status_donatur'] != 3) {
+                    $send_msg[$i]['fcm_token'] = $d['fcm_token'];
+                    $update_data               = array(
+                        'id_status_donatur' => 2,
+                    );
+                    $where   = array('email' => $d['email']);
+                    $execute = $this->Kewirausahaan_model->update_data('donatur', $update_data, $where);
+                    if ($execute >= 1) {
+                        // OK, Go FCM
+                    } else {
+                        // Database Error
+                    }
+                }
                 $i++;
             } else {
                 $this->rank[$i]['email']            = $d['email'];
@@ -1485,6 +1513,57 @@ class Kewirausahaan extends CI_Controller
                 $i++;
             }
         }
+
+        //Start FCM Code
+        $title        = "Terima Kasih";
+        $body         = "Anda Kami Nobatkan Sebagai Donatur Tetap Kami. Terima Kasih Telah Berdonasi Pada Komunitas Kami.";
+        $message      = "null";
+        $message_type = "konfirmasi donasi";
+        $intent       = "NotificationFragment";
+        $id_target    = "null";
+        $date_rcv     = date("Y-m-d");
+
+        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+
+        $ids = array();
+        $i   = 0;
+        foreach ($send_msg as $d) {
+            $ids[$i] = $d['fcm_token'];
+            $i++;
+        }
+        if (!empty($ids)) {
+            $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+            $fields  = array(
+                'registration_ids' => $ids,
+                'data'             => array(
+                    'title'       => $title,
+                    'body'        => $body,
+                    'message'     => $message,
+                    'messagetype' => $message_type,
+                    'intent'      => $intent,
+                    'idtarget'    => $id_target,
+                    'datercv'     => $date_rcv,
+                ),
+            );
+
+            $payload      = json_encode($fields);
+            $curl_session = curl_init();
+            curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+            curl_setopt($curl_session, CURLOPT_POST, true);
+            curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+            curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+
+            $result = curl_exec($curl_session);
+            curl_close($curl_session);
+        }
+        // print_r($ids);
+        // echo "<hr>";
+        // print_r($result);
+        //End FCM Code
 
         $this->rank_result = array();
         foreach ($this->rank as $r) {

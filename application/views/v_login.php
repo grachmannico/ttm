@@ -18,10 +18,12 @@
   <link rel="stylesheet" href="<?php echo base_url() . "assets/"; ?>plugins/iCheck/square/blue.css">
 
 </head>
-<body class="hold-transition login-page">
+<!-- <body class="hold-transition login-page" style="background: #d73925"> -->
+<body style="background: #d73925; height: auto;">
 <div class="login-box">
   <div class="login-logo">
-    <a href="#"><b>Turun Tangan</b> Malang</a>
+    <!-- <a href="#"><b>Turun Tangan</b> Malang</a> -->
+    <a href="<?php echo base_url(); ?>"><img src="<?php echo base_url()."uploads/ttm_white.png"; ?>" width="300px"></a>
   </div>
   <div class="login-box-body">
     <!-- <p class="login-box-msg">Sign in to start your session</p> -->
@@ -40,7 +42,7 @@
       </div>
       <div class="row">
         <div class="col-xs-4">
-          <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+          <button type="submit" class="btn btn-danger btn-block btn-flat">Sign In</button>
         </div>
       </div>
     </form>

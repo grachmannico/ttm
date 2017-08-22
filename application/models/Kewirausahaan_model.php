@@ -24,7 +24,7 @@ class Kewirausahaan_model extends CI_Model
 
     public function get_donatur($where = "")
     {
-        $data = $this->db->query('select dr.email, dr.nama, coalesce(count(dn.email), 0) as total_donasi
+        $data = $this->db->query('select dr.email, dr.nama, coalesce(count(dn.email), 0) as total_donasi, dr.fcm_token
             from donatur dr
             left join donasi dn
             on dr.email=dn.email '
@@ -194,6 +194,15 @@ class Kewirausahaan_model extends CI_Model
     {
         $data = $this->db->query('select coalesce(count(p.id_invoice)) as jml_pembayaran
             from pembelian p ' . $where);
+        return $data->result_array();
+    }
+
+    public function get_jml_konfirmasi_donasi($where = "")
+    {
+        $data = $this->db->query('select coalesce(count(dn.email), 0) as total_donasi
+            from donatur dr
+            left join donasi dn
+            on dr.email=dn.email ' . $where);
         return $data->result_array();
     }
 }

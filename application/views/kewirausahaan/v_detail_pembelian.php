@@ -50,16 +50,16 @@ function tanggal_indo($tanggal)
                 <input type="text" class="form-control" value="<?php echo tanggal_indo($invoice[0]['tanggal_pembelian']); ?>" readonly>
               </div>
               <div class="form-group">
-                <label for="exampleInputEmail1"><i class="fa fa-sticky-note"></i> Struk Pembelian</label><br>
-                <a href="<?php echo base_url()."uploads/konfirmasi_pembayaran/"; ?><?php echo $invoice[0]['struk_pembelian']; ?>" target="blank"><img src="<?php echo base_url()."uploads/konfirmasi_pembayaran/"; ?><?php echo $invoice[0]['struk_pembelian']; ?>" alt="" width="150px" target="blank"></a>
-              </div>
-              <div class="form-group">
                 <label for="exampleInputEmail1"><i class="fa fa-send"></i> Alamat Pengiriman Barang</label><br>
                 <input type="text" class="form-control" value="<?php echo $pembelian[0]['alamat_pembeli']; ?>" readonly>
               </div>
               <div class="form-group">
                 <label for="exampleInputEmail1"><i class="fa fa-mobile-phone"></i> Nomor Handphone Yang Bisa Dihubungi</label><br>
                 <input type="text" class="form-control" value="<?php echo $pembelian[0]['no_hp']; ?>" data-inputmask="'mask': ['9999-9999-9999', '+99-999-9999-9999']" data-mask readonly>
+              </div>
+              <div class="form-group">
+                <label for="exampleInputEmail1"><i class="fa fa-sticky-note"></i> Struk Pembelian</label><br>
+                <a href="<?php echo base_url()."uploads/konfirmasi_pembayaran/"; ?><?php echo $invoice[0]['struk_pembelian']; ?>" target="blank"><img src="<?php echo base_url()."uploads/konfirmasi_pembayaran/"; ?><?php echo $invoice[0]['struk_pembelian']; ?>" alt="" width="150px" target="blank"></a>
               </div>
             </div>
           </div>

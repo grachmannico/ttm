@@ -1,3 +1,24 @@
+<?php
+function tanggal_indo($tanggal)
+{
+    $bulan = array(1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    );
+    $split = explode('-', $tanggal);
+    return $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
+}
+?>
+
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
@@ -24,7 +45,7 @@
             <div class="icon">
               <i class="fa fa-black-tie"></i>
             </div>
-            <a href="<?php echo base_url()."Kewirausahaan/mengelola_donatur"; ?>" class="small-box-footer">
+            <a href="<?php echo base_url()."Kewirausahaan/mengelola_donatur"; ?>" class="btn btn-info btn-block">
               Lihat Seluruh Relawan <i class="fa fa-arrow-circle-right"></i>
             </a>
           </div>
@@ -40,7 +61,7 @@
             <div class="icon">
               <i class="fa fa-heart"></i>
             </div>
-            <a href="<?php echo base_url()."Kewirausahaan/mengelola_donasi"; ?>" class="small-box-footer">
+            <a href="<?php echo base_url()."Kewirausahaan/mengelola_donasi"; ?>" class="btn btn-info btn-block">
               Lihat Detail Donasi <i class="fa fa-arrow-circle-right"></i>
             </a>
           </div>
@@ -56,7 +77,7 @@
             <div class="icon">
               <i class="fa fa-shopping-cart"></i>
             </div>
-            <a href="<?php echo base_url()."Kewirausahaan/mengelola_garage_sale"; ?>" class="small-box-footer">
+            <a href="<?php echo base_url()."Kewirausahaan/validasi_pembelian"; ?>" class="btn btn-info btn-block">
               Lihat Detail Pembayaran <i class="fa fa-arrow-circle-right"></i>
             </a>
           </div>
@@ -68,7 +89,7 @@
 
       <div class="row">
         <div class="col-md-9 col-md-push-1">
-          <div class="box box-info">
+          <div class="box box-success">
             <div class="box-header with-border">
               <h3 class="box-title">Donasi Yang Masuk</h3>
 
@@ -83,19 +104,19 @@
                 <table class="table no-margin">
                   <thead>
                   <tr>
-                    <th>Tanggal</th>
-                    <th>Nama</th>
-                    <th>Kegiatan</th>
-                    <th>Nominal</th>
+                    <th><center>Tanggal</center></th>
+                    <th><center>Nama</center></th>
+                    <th><center>Kegiatan</center></th>
+                    <th><center>Nominal</center></th>
                   </tr>
                   </thead>
                   <tbody>  
                   <?php foreach ($transaksi_donasi_masuk as $t): ?>
                   <tr>
-                    <td><?php echo $t['tanggal_donasi']; ?></td>
+                    <td><?php echo tanggal_indo($t['tanggal_donasi']); ?></td>
                     <td><?php echo $t['nama']; ?></td>
                     <td><?php echo $t['nama_kegiatan']; ?></td>
-                    <td><?php echo $t['nominal_donasi']; ?></td>
+                    <td><?php echo "Rp. " . number_format($t['nominal_donasi'], 2, ",", "."); ?></td>
                   </tr>
                   <?php endforeach ?>                
                   </tbody>
@@ -107,7 +128,7 @@
               <p class="label label-danger pull-left">Tidak Ada Donasi Yang Masuk</p>
               <?php endif ?>
               <!-- <a href="javascript:void(0)" class="btn btn-sm btn-info btn-flat pull-left">Place New Order</a> -->
-              <a href="<?php echo base_url()."Kewirausahaan/mengelola_donasi"; ?>" class="btn btn-sm btn-info btn-flat pull-right">Lihat Detail</a>
+              <a href="<?php echo base_url()."Kewirausahaan/mengelola_donasi"; ?>" class="btn btn-sm btn-success btn-flat pull-right">Lihat Detail</a>
             </div>
           </div>
         </div>

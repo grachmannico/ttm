@@ -46,7 +46,10 @@ class REST_API_model extends CI_Model
 
     public function get_donatur($where = "")
     {
-        $data = $this->db->query('select * from donatur ' . $where);
+        $data = $this->db->query('select d.*, s.status_donatur 
+            from donatur d 
+            join status_donatur s
+            on d.id_status_donatur=s.id_status_donatur ' . $where);
         return $data->result_array();
     }
 
