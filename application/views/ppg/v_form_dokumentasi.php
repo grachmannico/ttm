@@ -34,8 +34,8 @@ function tanggal_indo($tanggal)
         <div class="col-md-10 col-md-push-1">
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab">Kelola Dokumentasi</a></li>
-              <li><a href="#tab_2" data-toggle="tab">Tambah Dokumentasi</a></li>
+              <li class="active"><a href="#tab_1" data-toggle="tab"><i class="fa fa-book"></i> Kelola Dokumentasi</a></li>
+              <li><a href="#tab_2" data-toggle="tab"><i class="fa fa-plus"></i> Tambah Dokumentasi</a></li>
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="tab_1">

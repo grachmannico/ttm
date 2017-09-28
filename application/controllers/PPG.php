@@ -225,7 +225,7 @@ class PPG extends CI_Controller
                         // print_r($result);
                         //End FCM Code
 
-                        if ($uang_kas != "") {
+                        if ($uang_kas != "" && $uang_kas != 0) {
                             $tambah_uang = array(
                                 'email'            => "admin@ttm.com",
                                 'id_status_donasi' => 3,
@@ -334,7 +334,7 @@ class PPG extends CI_Controller
                         // print_r($result);
                         //End FCM Code
 
-                        if ($uang_kas != "") {
+                        if ($uang_kas != "" && $uang_kas != 0) {
                             $tambah_uang = array(
                                 'email'            => "admin@ttm.com",
                                 'id_status_donasi' => 3,
@@ -469,19 +469,39 @@ class PPG extends CI_Controller
                 // $error = array('error' => $this->upload->display_errors());
                 // echo "error";
 
-                if ($uang_kas != "") {
-                    $update_uang_kas = array(
-                        'nominal_donasi' => $uang_kas,
-                    );
-                    $where   = array('id_donasi' => $data_uang_kas[0]['id_donasi']);
-                    $execute = $this->PPG_model->update_data('donasi', $update_uang_kas, $where);
-                    if ($execute >= 1) {
-                        // GO AHEAD
-                    } else {
-                        // Database Error
+                if (empty($data_uang_kas)) {
+                    if ($uang_kas != "" && $uang_kas != 0) {
+                        $tambah_uang = array(
+                            'email'            => "admin@ttm.com",
+                            'id_status_donasi' => 3,
+                            'id_kegiatan'      => $id_kegiatan,
+                            'nominal_donasi'   => $uang_kas,
+                            'tanggal_donasi'   => date("Y-m-d"),
+                        );
+                        $execute = $this->PPG_model->insert_data('donasi', $tambah_uang);
+                        if ($execute >= 1) {
+                            // GO AHEAD
+                        } else {
+                            // Database Error
+                        }
+                    } elseif ($uang_kas == "" || $uang_kas == 0) {
+                        // DO Nothing
                     }
-                } elseif ($uang_kas == "" || $uang_kas == 0) {
-                    // DO Nothing
+                } else {
+                    if ($uang_kas != "") {
+                        $update_uang_kas = array(
+                            'nominal_donasi' => $uang_kas,
+                        );
+                        $where   = array('id_donasi' => $data_uang_kas[0]['id_donasi']);
+                        $execute = $this->PPG_model->update_data('donasi', $update_uang_kas, $where);
+                        if ($execute >= 1) {
+                            // GO AHEAD
+                        } else {
+                            // Database Error
+                        }
+                    } elseif ($uang_kas == "") {
+                        // DO Nothing
+                    }
                 }
 
                 $update_kegiatan = array(
@@ -573,19 +593,39 @@ class PPG extends CI_Controller
                     $this->load->view("footer");
                 }
             } else {
-                if ($uang_kas != "") {
-                    $update_uang_kas = array(
-                        'nominal_donasi' => $uang_kas,
-                    );
-                    $where   = array('id_donasi' => $data_uang_kas[0]['id_donasi']);
-                    $execute = $this->PPG_model->update_data('donasi', $update_uang_kas, $where);
-                    if ($execute >= 1) {
-                        // GO AHEAD
-                    } else {
-                        // Database Error
+                if (empty($data_uang_kas)) {
+                    if ($uang_kas != "" && $uang_kas != 0) {
+                        $tambah_uang = array(
+                            'email'            => "admin@ttm.com",
+                            'id_status_donasi' => 3,
+                            'id_kegiatan'      => $id_kegiatan,
+                            'nominal_donasi'   => $uang_kas,
+                            'tanggal_donasi'   => date("Y-m-d"),
+                        );
+                        $execute = $this->PPG_model->insert_data('donasi', $tambah_uang);
+                        if ($execute >= 1) {
+                            // GO AHEAD
+                        } else {
+                            // Database Error
+                        }
+                    } elseif ($uang_kas == "" || $uang_kas == 0) {
+                        // DO Nothing
                     }
-                } elseif ($uang_kas == "" || $uang_kas == 0) {
-                    // DO Nothing
+                } else {
+                    if ($uang_kas != "") {
+                        $update_uang_kas = array(
+                            'nominal_donasi' => $uang_kas,
+                        );
+                        $where   = array('id_donasi' => $data_uang_kas[0]['id_donasi']);
+                        $execute = $this->PPG_model->update_data('donasi', $update_uang_kas, $where);
+                        if ($execute >= 1) {
+                            // GO AHEAD
+                        } else {
+                            // Database Error
+                        }
+                    } elseif ($uang_kas == "") {
+                        // DO Nothing
+                    }
                 }
 
                 $data            = array('upload_data' => $this->upload->data());
@@ -833,6 +873,35 @@ class PPG extends CI_Controller
 
             //Start Map
             // $center = $detail_kegiatan[0]['lat'] . "," . $detail_kegiatan[0]['lng'];
+            // $this->def_lat = $detail_kegiatan[0]['lat'];
+            // $this->def_lng = $detail_kegiatan[0]['lng'];
+            // $center        = $this->def_lat . "," . $this->def_lng;
+            // $cfg           = array(
+            //     'class'                       => 'map-canvas',
+            //     'map_div_id'                  => 'map-canvas',
+            //     'center'                      => $center,
+            //     'zoom'                        => 17,
+            //     'places'                      => true, //Aktifkan pencarian alamat
+            //     'placesAutocompleteInputID'   => 'cari', //set sumber pencarian input
+            //     'placesAutocompleteBoundsMap' => true,
+            //     'placesAutocompleteOnChange'  => 'showmap();', //Aksi ketika pencarian dipilih
+            // );
+            // $this->googlemaps->initialize($cfg);
+
+            // $marker = array(
+            //     'position'  => $center,
+            //     'draggable' => false,
+            //     'title'     => 'Coba diDrag',
+            //     'ondragend' => "document.getElementById('lat').value = event.latLng.lat();
+            //                 document.getElementById('lng').value = event.latLng.lng();
+            //                 showmap();",
+            // );
+            // $this->googlemaps->add_marker($marker);
+
+            // $d['map'] = $this->googlemaps->create_map();
+            // $d['lat'] = $this->def_lat;
+            // $d['lng'] = $this->def_lng;
+
             $this->def_lat = $detail_kegiatan[0]['lat'];
             $this->def_lng = $detail_kegiatan[0]['lng'];
             $center        = $this->def_lat . "," . $this->def_lng;
@@ -847,20 +916,18 @@ class PPG extends CI_Controller
                 'placesAutocompleteOnChange'  => 'showmap();', //Aksi ketika pencarian dipilih
             );
             $this->googlemaps->initialize($cfg);
-
+            $target = "PPG/detail_kegiatan";
             $marker = array(
-                'position'  => $center,
+                'position'  => $detail_kegiatan[0]['lat'] . "," . $detail_kegiatan[0]['lng'],
+                'animation' => 'DROP',
                 'draggable' => false,
-                'title'     => 'Coba diDrag',
                 'ondragend' => "document.getElementById('lat').value = event.latLng.lat();
                             document.getElementById('lng').value = event.latLng.lng();
                             showmap();",
             );
             $this->googlemaps->add_marker($marker);
-
             $d['map'] = $this->googlemaps->create_map();
-            $d['lat'] = $this->def_lat;
-            $d['lng'] = $this->def_lng;
+
             //End Map
 
             // $this->load->view("ppg/v_detail_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'jumlah_relawan' => $jumlah_relawan, 'jumlah_donasi' => $jumlah_donasi, 'dokumentasi' => $dokumentasi, 'd' => $d));
@@ -869,7 +936,7 @@ class PPG extends CI_Controller
                 $this->load->view("ppg/v_detail_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'jumlah_relawan' => $jumlah_relawan, 'jumlah_donasi' => $jumlah_donasi, 'dokumentasi' => $dokumentasi, 'd' => $d, 'persentase_kehadiran' => $this->persentase_kehadiran, 'jml_relawan' => $this->jml_relawan, 'jml_relawan_hadir' => $this->jml_relawan_hadir, 'persentase_donasi' => $this->persentase_donasi, 'persentase_rating_relawan' => $this->persentase_rating_relawan, 'persentase_rating_donatur' => $this->persentase_rating_donatur, 'hasil_rating_relawan' => $this->hasil_rating_relawan, 'hasil_rating_donatur' => $this->hasil_rating_donatur, 'hasil_analisis' => $this->hasil_analisis, 'kesimpulan' => $this->kesimpulan, 'persentase_gabung_relawan' => $this->persentase_gabung_relawan));
                 // } elseif ($detail_kegiatan[0]['id_status_kegiatan'] != 3) {
             } else {
-                $this->load->view("ppg/v_detail_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'jumlah_relawan' => $jumlah_relawan, 'jumlah_donasi' => $jumlah_donasi, 'dokumentasi' => $dokumentasi, 'd' => $d));
+                $this->load->view("ppg/v_detail_kegiatan", array('detail_kegiatan' => $detail_kegiatan, 'jumlah_relawan' => $jumlah_relawan, 'jumlah_donasi' => $jumlah_donasi, 'dokumentasi' => $dokumentasi, 'hasil_rating_relawan' => 0, 'hasil_rating_donatur' => 0, 'd' => $d));
             }
             $this->load->view('footer');
         } else {

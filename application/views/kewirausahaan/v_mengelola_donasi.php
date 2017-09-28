@@ -35,8 +35,8 @@ function tanggal_indo($tanggal)
         <div class="col-md-12">
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab">Konfirmasi Donasi Yang Masuk</a></li>
-              <li><a href="#tab_2" data-toggle="tab">Donasi Yang Akan Masuk</a></li>
+              <li class="active"><a href="#tab_1" data-toggle="tab"><i class="fa fa-check-circle"></i> Konfirmasi Donasi Yang Masuk</a></li>
+              <li><a href="#tab_2" data-toggle="tab"><i class="fa fa-arrow-circle-down"></i> Donasi Yang Akan Masuk</a></li>
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="tab_1">

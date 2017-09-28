@@ -14,8 +14,8 @@
         <div class="col-md-12">
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab">Data Donatur</a></li>
-              <li><a href="#tab_2" data-toggle="tab">Data Donatur Potensial</a></li>
+              <li class="active"><a href="#tab_1" data-toggle="tab"><i class="fa fa-black-tie"></i> Data Donatur</a></li>
+              <li><a href="#tab_2" data-toggle="tab"><i class="fa fa-star"></i> Data Donatur Potensial</a></li>
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="tab_1">
@@ -84,6 +84,7 @@
                               <th><center>Ranking</center></th>
                               <th><center>Nama</center></th>
                               <th><center>Hasil Penilaian</center></th>
+                              <th><center>Action</center></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -104,6 +105,11 @@
                                     <?php endif ?>
                                   </div>
                                 </div>
+                              </td>
+                              <td>
+                                <form action="<?php echo base_url()."Kewirausahaan/detail_donatur"; ?>" method="POST">
+                                  <center><button type="submit" class="btn btn-primary btn-xs" name="donatur" value="<?php echo $t['email']; ?>"><i class="fa fa-black-tie"></i> Detail Donatur</button></center>
+                                </form>
                               </td>
                             </tr>
                             <?php $i++; ?>

@@ -2,8 +2,6 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 class REST_API extends CI_Controller
 {
-    private $json_data;
-
     public function index()
     {
         echo "This is Web Service<br>";
@@ -906,8 +904,8 @@ class REST_API extends CI_Controller
 
                     $result = curl_exec($curl_session);
                     curl_close($curl_session);
-                    // echo "<hr>";
-                    // print_r($result);
+                    echo "<hr>";
+                    print_r($result);
                     //End FCM Code
                 } else {
                     // database error
@@ -1053,7 +1051,7 @@ class REST_API extends CI_Controller
         foreach ($achievment1 as $a) {
             $achievment[$i]['email']           = $a['email'];
             $achievment[$i]['id_target']       = $a['tahun'];
-            $achievment[$i]['nama_sertifikat'] = "Sertifikat Keaktifan Relawan TTM Periode" . date("Y");
+            $achievment[$i]['nama_sertifikat'] = "Sertifikat Keaktifan Relawan TTM Periode " . date("Y");
             $achievment[$i]['jenis']           = "SAR";
             $achievment[$i]['tanggal_terbit']  = "Pada Tahun Periode: " . date("Y");
             $i++;
@@ -1061,7 +1059,7 @@ class REST_API extends CI_Controller
         foreach ($achievment2 as $b) {
             $achievment[$i]['email']           = $b['email'];
             $achievment[$i]['id_target']       = $b['id_kegiatan'];
-            $achievment[$i]['nama_sertifikat'] = "Sertifikat Kegiatan" . $b['nama_kegiatan'];
+            $achievment[$i]['nama_sertifikat'] = "Sertifikat Kegiatan " . $b['nama_kegiatan'];
             $achievment[$i]['jenis']           = "SK";
             $achievment[$i]['tanggal_terbit']  = "Tanggal: " . $b['tanggal_kegiatan_berakhir'];
             $i++;

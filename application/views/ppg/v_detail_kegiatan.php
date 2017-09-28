@@ -21,7 +21,7 @@ function tanggal_indo($tanggal)
 
 <?php echo $d['map']['js'];?>
 
-<script>
+<!-- <script>
 update_address(<?=$d['lat'];?>,<?=$d['lng'];?>); //Set terlebih dahulu alamat lokasi pusat
 function showmap()
 {           
@@ -82,7 +82,7 @@ function update_address(lat,lng)
     }
   });
 }
-</script>
+</script> -->
 
   <div class="content-wrapper">
     <section class="content-header">
@@ -107,13 +107,194 @@ function update_address(lat,lng)
                 <li class="active"><a href="#tab_1" data-toggle="tab">Detail Data Kegiatan</a></li>
                 <li><a href="#tab_2" data-toggle="tab">Dokumentasi Kegiatan</a></li>
               <?php } ?> -->
-              <li class="active"><a href="#tab_3" data-toggle="tab">Stats Kegiatan</a></li>
-              <li><a href="#tab_1" data-toggle="tab">Detail Data Kegiatan</a></li>
-              <li><a href="#tab_2" data-toggle="tab">Dokumentasi Kegiatan</a></li>
+              <li class="active"><a href="#tab_1" data-toggle="tab"><i class="fa fa-list-alt"></i> Detail Data Kegiatan</a></li>
+              <li><a href="#tab_2" data-toggle="tab"><i class="fa fa-book"></i> Dokumentasi Kegiatan</a></li>
+              <li><a href="#tab_3" data-toggle="tab"><i class="fa fa-bar-chart"></i> Stats Kegiatan</a></li>
             </ul>
             <div class="tab-content">
+              <div class="tab-pane active" id="tab_1">
+                <div class="box box-danger">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">Detail Kegiatan</h3>
+                  </div>
+                  <div class="box-body">
+                    <div class="form-group">
+                      <h3><?php echo $detail_kegiatan[0]['nama_kegiatan']; ?></h3>
+                      <p><i>"<?php echo $detail_kegiatan[0]['pesan_ajakan']; ?>"</i></p>
+                      <p class="pull-right">
+                        Kegiatan dilaksanakan pada tanggal 
+                        <u>
+                        <?php if ($detail_kegiatan[0]['tanggal_kegiatan_mulai'] == $detail_kegiatan[0]['tanggal_kegiatan_berakhir']): ?>
+                          <?php echo tanggal_indo($detail_kegiatan[0]['tanggal_kegiatan_mulai']); ?>
+                        <?php endif ?>
+                        <?php if ($detail_kegiatan[0]['tanggal_kegiatan_mulai'] != $detail_kegiatan[0]['tanggal_kegiatan_berakhir']): ?>
+                          <?php echo tanggal_indo($detail_kegiatan[0]['tanggal_kegiatan_mulai']). " sampai " .tanggal_indo($detail_kegiatan[0]['tanggal_kegiatan_berakhir']); ?>
+                        <?php endif ?>
+                        </u>
+                      </p>
+                      <p class="label bg-green"><?php echo $detail_kegiatan[0]['status_kegiatan']; ?></p>
+                    </div>
+                    <?php
+                      $total_relawan = ($jumlah_relawan[0]['jumlah_relawan'] / $detail_kegiatan[0]['minimal_relawan']) * 100;
+                    ?>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="exampleInputEmail1"><i class="fa fa-users"></i> Jumlah Relawan</label>
+                        <p><?php echo $jumlah_relawan[0]['jumlah_relawan']; ?> relawan dari <?php echo $detail_kegiatan[0]['minimal_relawan']; ?> relawan yang dibutuhkan</p>
+                        <div class="progress">
+                          <div class="progress-bar progress-bar-red" role="progressbar" aria-valuenow="<?php echo $total_relawan; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $total_relawan . "%"; ?>">
+                            <span class="sr-only"><?php echo $total_relawan."%"; ?> Complete (success)</span>
+                            <p style="color: black;"><?php echo number_format((float)$total_relawan, 2, '.', ''); ?>%</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <?php
+                      if (!empty($jumlah_donasi)) {
+                        $total_donasi = ($jumlah_donasi[0]['jumlah_donasi'] / $detail_kegiatan[0]['minimal_donasi']) * 100;
+                      } elseif (empty($jumlah_donasi)) {
+                        $total_donasi = (0 / $detail_kegiatan[0]['minimal_donasi']) * 100;
+                      }
+                    ?>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="exampleInputEmail1"><i class="fa fa-heart"></i> Jumlah Donasi</label>
+                        <?php if (!empty($jumlah_donasi)): ?>
+                          <p><?php echo "Rp. " . number_format($jumlah_donasi[0]['jumlah_donasi'], 2, ",", "."); ?> dari <?php echo "Rp. " . number_format($detail_kegiatan[0]['minimal_donasi'], 2, ",", "."); ?></p>
+                        <?php endif ?>
+                        <?php if (empty($jumlah_donasi)): ?>
+                          <p><?php echo "Rp. " . number_format(0, 2, ",", "."); ?> dari <?php echo "Rp. " . number_format($detail_kegiatan[0]['minimal_donasi'], 2, ",", "."); ?></p>
+                        <?php endif ?>
+                        <div class="progress">
+                          <div class="progress-bar progress-bar-green" role="progressbar" aria-valuenow="<?php echo $total_donasi; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $total_donasi . "%"; ?>">
+                            <span class="sr-only"><?php echo $total_donasi."%"; ?> Complete (success)</span>
+                            <p style="color: black;"><?php echo number_format((float)$total_donasi, 2, '.', ''); ?>%</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-map"></i> Lokasi Kegiatan</label>
+                      <br>
+                      <?php echo $detail_kegiatan[0]['alamat']; ?>
+                      <br>
+                      <?php echo $d['map']['html'];?>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-file-text"></i> Deskripsi Kegiatan</label><br>
+                      <?php echo $detail_kegiatan[0]['deskripsi_kegiatan']; ?>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-image"></i> Banner Kegiatan</label><br>
+                      <?php if ($detail_kegiatan[0]['banner'] == ""): ?>
+                        No Image<br>
+                      <?php endif ?>
+                      <?php if ($detail_kegiatan[0]['banner'] != ""): ?>
+                        <center><img src="<?php echo base_url()."uploads/gambar_kegiatan/"; ?><?php echo $detail_kegiatan[0]['banner']; ?>" alt="" width="500px"></center>
+                      <?php endif ?>
+                    </div>
+                    <!-- <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-list-alt"></i> Nama Kegiatan</label>
+                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['nama_kegiatan']; ?>" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-info"></i> Status Kegiatan</label>
+                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['status_kegiatan']; ?>" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-comment"></i> Pesan Ajakan</label>
+                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['pesan_ajakan']; ?>" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-file-text"></i> Deskripsi Kegiatan</label><br>
+                      <?php echo $detail_kegiatan[0]['deskripsi_kegiatan']; ?>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-users"></i> Jumlah Relawan</label>
+                      <input type="text" class="form-control" value="<?php echo $jumlah_relawan[0]['jumlah_relawan']; ?> dari <?php echo $detail_kegiatan[0]['minimal_relawan']; ?>" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-heart"></i> Jumlah Donasi</label>
+                      <?php if (empty($jumlah_donasi)): ?>
+                      <input type="text" class="form-control" value="Rp. 0,00 / <?php echo "Rp. " . number_format($detail_kegiatan[0]['minimal_donasi'], 2, ",", "."); ?>" readonly>
+                      <?php endif ?>
+                      <?php if (!empty($jumlah_donasi)): ?>
+                      <input type="text" class="form-control" value="<?php echo "Rp. " . number_format($jumlah_donasi[0]['jumlah_donasi'], 2, ",", "."); ?> terkumpul dari <?php echo "Rp. " . number_format($detail_kegiatan[0]['minimal_donasi'], 2, ",", "."); ?>" readonly>
+                      <?php endif ?>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal Kegiatan</label>
+                      <?php if ($detail_kegiatan[0]['tanggal_kegiatan_mulai'] == $detail_kegiatan[0]['tanggal_kegiatan_berakhir']): ?>
+                        <input type="text" class="form-control" value="<?php echo tanggal_indo($detail_kegiatan[0]['tanggal_kegiatan_mulai']); ?>" readonly>
+                      <?php endif ?>
+                      <?php if ($detail_kegiatan[0]['tanggal_kegiatan_mulai'] != $detail_kegiatan[0]['tanggal_kegiatan_berakhir']): ?>
+                        <input type="text" class="form-control" value="<?php echo tanggal_indo($detail_kegiatan[0]['tanggal_kegiatan_mulai']). " - " .tanggal_indo($detail_kegiatan[0]['tanggal_kegiatan_berakhir']); ?>" readonly>
+                      <?php endif ?>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-calendar-times-o"></i> Batas Akhir Pendaftaran</label>
+                      <input type="text" class="form-control" value="<?php echo tanggal_indo($detail_kegiatan[0]['batas_akhir_pendaftaran']); ?>" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-compass"></i> Alamat</label>
+                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['alamat']; ?>" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-map"></i> Lokasi</label>
+                      <?php echo $d['map']['html'];?>
+                    </div> -->
+                    <!-- <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-map-marker"></i> Lat</label>
+                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['lat']; ?>" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-map-marker"></i> Lng</label>
+                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['lng']; ?>" readonly>
+                    </div> -->
+                    <!-- <div class="form-group">
+                      <label for="exampleInputEmail1"><i class="fa fa-image"></i> Banner Kegiatan</label><br>
+                      <?php if ($detail_kegiatan[0]['banner'] == ""): ?>
+                        No Image<br>
+                      <?php endif ?>
+                      <?php if ($detail_kegiatan[0]['banner'] != ""): ?>
+                        <img src="<?php echo base_url()."uploads/gambar_kegiatan/"; ?><?php echo $detail_kegiatan[0]['banner']; ?>" alt="" width="500px">
+                      <?php endif ?>
+                    </div> -->
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane" id="tab_2">
+                <div class="box box-danger">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">Dokumentasi Kegiatan</h3>
+                  </div>
+                  <div class="box-body">
+                    <div class="form-group">
+                      
+                      <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                          <th>Gambar Kegiatan</th>
+                          <th>Deskripsi</th>
+                          <th>Tanggal</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($dokumentasi as $d): ?>
+                        <tr>
+                          <td><a href="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" target="_blank"><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" alt="" width="150px"></a></td>
+                          <td><?php echo $d['deskripsi']; ?></td>
+                          <td><?php echo $d['tanggal']; ?></td>
+                        </tr>
+                        <?php endforeach?>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <?php if ($detail_kegiatan[0]['id_status_kegiatan'] == 3 && $hasil_rating_relawan != 0 && $hasil_rating_donatur != 0) { ?>
-              <div class="tab-pane active" id="tab_3">
+              <div class="tab-pane" id="tab_3">
               <center><h3>Informasi Kegiatan: <?php echo $detail_kegiatan[0]['nama_kegiatan']; ?></h3></center>
                 <div class="content">
                   <div class="col-md-12">
@@ -213,7 +394,7 @@ function update_address(lat,lng)
                 </div>
               </div>
               <?php } else { ?>
-              <div class="tab-pane active" id="tab_3">
+              <div class="tab-pane" id="tab_3">
               <center><h3>Informasi Kegiatan: <?php echo $detail_kegiatan[0]['nama_kegiatan']; ?></h3></center>
                 <div class="content">
                   <center>
@@ -223,113 +404,6 @@ function update_address(lat,lng)
                 </div>
               </div>
               <?php } ?>
-              <div class="tab-pane" id="tab_1">
-                <div class="box box-danger">
-                  <div class="box-header with-border">
-                    <h3 class="box-title">Detail Kegiatan</h3>
-                  </div>
-                  <div class="box-body">
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-list-alt"></i> Nama Kegiatan</label>
-                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['nama_kegiatan']; ?>" readonly>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-info"></i> Status Kegiatan</label>
-                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['status_kegiatan']; ?>" readonly>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-comment"></i> Pesan Ajakan</label>
-                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['pesan_ajakan']; ?>" readonly>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-file-text"></i> Deskripsi Kegiatan</label><br>
-                      <?php echo $detail_kegiatan[0]['deskripsi_kegiatan']; ?>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-users"></i> Jumlah Relawan</label>
-                      <input type="text" class="form-control" value="<?php echo $jumlah_relawan[0]['jumlah_relawan']; ?> dari <?php echo $detail_kegiatan[0]['minimal_relawan']; ?>" readonly>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-heart"></i> Jumlah Donasi</label>
-                      <?php if (empty($jumlah_donasi)): ?>
-                      <input type="text" class="form-control" value="Rp. 0,00 / <?php echo "Rp. " . number_format($detail_kegiatan[0]['minimal_donasi'], 2, ",", "."); ?>" readonly>
-                      <?php endif ?>
-                      <?php if (!empty($jumlah_donasi)): ?>
-                      <input type="text" class="form-control" value="<?php echo "Rp. " . number_format($jumlah_donasi[0]['jumlah_donasi'], 2, ",", "."); ?> terkumpul dari <?php echo "Rp. " . number_format($detail_kegiatan[0]['minimal_donasi'], 2, ",", "."); ?>" readonly>
-                      <?php endif ?>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal Kegiatan</label>
-                      <!-- <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['tanggal_kegiatan']; ?>" readonly> -->
-                      <?php if ($detail_kegiatan[0]['tanggal_kegiatan_mulai'] == $detail_kegiatan[0]['tanggal_kegiatan_berakhir']): ?>
-                        <input type="text" class="form-control" value="<?php echo tanggal_indo($detail_kegiatan[0]['tanggal_kegiatan_mulai']); ?>" readonly>
-                      <?php endif ?>
-                      <?php if ($detail_kegiatan[0]['tanggal_kegiatan_mulai'] != $detail_kegiatan[0]['tanggal_kegiatan_berakhir']): ?>
-                        <input type="text" class="form-control" value="<?php echo tanggal_indo($detail_kegiatan[0]['tanggal_kegiatan_mulai']). " - " .tanggal_indo($detail_kegiatan[0]['tanggal_kegiatan_berakhir']); ?>" readonly>
-                      <?php endif ?>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-calendar-times-o"></i> Batas Akhir Pendaftaran</label>
-                      <input type="text" class="form-control" value="<?php echo tanggal_indo($detail_kegiatan[0]['batas_akhir_pendaftaran']); ?>" readonly>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-compass"></i> Alamat</label>
-                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['alamat']; ?>" readonly>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-map"></i> Lokasi</label>
-                      <?php echo $d['map']['html'];?>
-                    </div>
-                    <!-- <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-map-marker"></i> Lat</label>
-                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['lat']; ?>" readonly>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-map-marker"></i> Lng</label>
-                      <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['lng']; ?>" readonly>
-                    </div> -->
-                    <div class="form-group">
-                      <label for="exampleInputEmail1"><i class="fa fa-image"></i> Banner Kegiatan</label><br>
-                      <?php if ($detail_kegiatan[0]['banner'] == ""): ?>
-                        No Image<br>
-                      <?php endif ?>
-                      <?php if ($detail_kegiatan[0]['banner'] != ""): ?>
-                        <img src="<?php echo base_url()."uploads/gambar_kegiatan/"; ?><?php echo $detail_kegiatan[0]['banner']; ?>" alt="" width="500px">
-                      <?php endif ?>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="tab-pane" id="tab_2">
-                <div class="box box-danger">
-                  <div class="box-header with-border">
-                    <h3 class="box-title">Dokumentasi Kegiatan</h3>
-                  </div>
-                  <div class="box-body">
-                    <div class="form-group">
-                      
-                      <table id="example1" class="table table-bordered table-striped">
-                        <thead>
-                        <tr>
-                          <th>Gambar Kegiatan</th>
-                          <th>Deskripsi</th>
-                          <th>Tanggal</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($dokumentasi as $d): ?>
-                        <tr>
-                          <td><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" alt="" width="150px"></td>
-                          <td><?php echo $d['deskripsi']; ?></td>
-                          <td><?php echo $d['tanggal']; ?></td>
-                        </tr>
-                        <?php endforeach?>
-                        </tfoot>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

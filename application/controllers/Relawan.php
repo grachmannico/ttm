@@ -579,10 +579,12 @@ class Relawan extends CI_Controller
     // Hitung-hitung
     public function hasil_analisis_relawan($email = "")
     {
+        $periode = date("Y");
+
         $jumlah_gabung   = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$email'");
         $absen_sukses    = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$email' and id_status_absensi_relawan = 2");
         $semua_absen     = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$email' and id_status_absensi_relawan > 1");
-        $jumlah_kegiatan = $this->Relawan_model->get_jml_kegiatan();
+        $jumlah_kegiatan = $this->Relawan_model->get_jml_kegiatan("where year(k.tanggal_kegiatan_mulai) = $periode and k.id_status_kegiatan != 0");
         $belum_absen     = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$email' and id_status_absensi_relawan = 1");
 
         $this->persentase_gabung_kegiatan = ($absen_sukses[0]['jumlah_gabung_kegiatan'] / $jumlah_kegiatan[0]['jml_kegiatan']) * 100;
@@ -594,37 +596,39 @@ class Relawan extends CI_Controller
             $this->status_relawan = "Relawan Tergolong Kurang Aktif.";
         }
 
-        if ($jumlah_gabung[0]['jumlah_gabung_kegiatan'] >= 3) {
-            if ($absen_sukses[0]['jumlah_gabung_kegiatan'] >= 3) {
-                $this->sertifikat = "y";
-                $this->kontribusi = ($absen_sukses[0]['jumlah_gabung_kegiatan'] / $semua_absen[0]['jumlah_gabung_kegiatan']) * 100;
-                if ($this->kontribusi > 70) {
-                    $this->status_kontribusi = "Tinggi";
-                } elseif ($this->kontribusi >= 50 && $this->kontribusi <= 70) {
-                    $this->status_kontribusi = "Cukup Tinggi";
-                } elseif ($this->kontribusi < 50) {
-                    $this->status_kontribusi = "Rendah";
+        if ($semua_absen[0]['jumlah_gabung_kegiatan'] != 0) {
+            if ($jumlah_gabung[0]['jumlah_gabung_kegiatan'] >= 3) {
+                if ($absen_sukses[0]['jumlah_gabung_kegiatan'] >= 3) {
+                    $this->sertifikat = "y";
+                    $this->kontribusi = ($absen_sukses[0]['jumlah_gabung_kegiatan'] / $semua_absen[0]['jumlah_gabung_kegiatan']) * 100;
+                    if ($this->kontribusi > 70) {
+                        $this->status_kontribusi = "Tinggi";
+                    } elseif ($this->kontribusi >= 50 && $this->kontribusi <= 70) {
+                        $this->status_kontribusi = "Cukup Tinggi";
+                    } elseif ($this->kontribusi < 50) {
+                        $this->status_kontribusi = "Rendah";
+                    }
+                } else {
+                    $this->sertifikat = "n";
+                    $this->kontribusi = ($absen_sukses[0]['jumlah_gabung_kegiatan'] / $semua_absen[0]['jumlah_gabung_kegiatan']) * 100;
+                    if ($this->kontribusi >= 50) {
+                        $this->status_kontribusi = "Cukup Tinggi";
+                    } elseif ($this->kontribusi < 50) {
+                        $this->status_kontribusi = "Rendah";
+                    }
                 }
-            } else {
+            } elseif ($jumlah_gabung[0]['jumlah_gabung_kegiatan'] > 0 && $jumlah_gabung[0]['jumlah_gabung_kegiatan'] < 3) {
                 $this->sertifikat = "n";
                 $this->kontribusi = ($absen_sukses[0]['jumlah_gabung_kegiatan'] / $semua_absen[0]['jumlah_gabung_kegiatan']) * 100;
                 if ($this->kontribusi >= 50) {
-                    $this->status_kontribusi = "Cukup Tinggi";
+                    $this->status_kontribusi = "Tinggi";
                 } elseif ($this->kontribusi < 50) {
-                    $this->status_kontribusi = "Rendah";
+                    $this->status_kontribusi = "Cukup Tinggi";
                 }
+            } elseif ($jumlah_gabung[0]['jumlah_gabung_kegiatan'] == 0) {
+                $this->sertifikat        = "n";
+                $this->status_kontribusi = "Belum Teridentifikasi";
             }
-        } elseif ($jumlah_gabung[0]['jumlah_gabung_kegiatan'] > 0 && $jumlah_gabung[0]['jumlah_gabung_kegiatan'] < 3) {
-            $this->sertifikat = "n";
-            $this->kontribusi = ($absen_sukses[0]['jumlah_gabung_kegiatan'] / $semua_absen[0]['jumlah_gabung_kegiatan']) * 100;
-            if ($this->kontribusi >= 50) {
-                $this->status_kontribusi = "Tinggi";
-            } elseif ($this->kontribusi < 50) {
-                $this->status_kontribusi = "Cukup Tinggi";
-            }
-        } elseif ($jumlah_gabung[0]['jumlah_gabung_kegiatan'] == 0) {
-            $this->sertifikat        = "n";
-            $this->status_kontribusi = "Belum Teridentifikasi";
         }
 
         $this->jml_gabung       = $jumlah_gabung[0]['jumlah_gabung_kegiatan'];

@@ -19,9 +19,9 @@
             <div class="box-body">
               <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
-                  <li class="active"><a href="#tab_1" data-toggle="tab">Data Relawan Belum Diabsen</a></li>
-                  <li><a href="#tab_2" data-toggle="tab">Data Relawan Hadir</a></li>
-                  <li><a href="#tab_3" data-toggle="tab">Data Relawan Tidak Hadir</a></li>
+                  <li class="active"><a href="#tab_1" data-toggle="tab"><i class="fa fa-th-list"></i> Data Relawan Belum Diabsen</a></li>
+                  <li><a href="#tab_2" data-toggle="tab"><i class="fa fa-check-circle"></i> Data Relawan Hadir</a></li>
+                  <li><a href="#tab_3" data-toggle="tab"><i class="fa fa-minus-circle"></i> Data Relawan Tidak Hadir</a></li>
                 </ul>
                 <div class="tab-content">
                   <div class="tab-pane active" id="tab_1">

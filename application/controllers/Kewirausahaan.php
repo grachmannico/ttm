@@ -954,7 +954,7 @@ class Kewirausahaan extends CI_Controller
                 //Start FCM Code
                 $get_id_kegiatan = $this->Kewirausahaan_model->get_kegiatan("where id_kegiatan = '$id_kegiatan'");
                 $title           = "Pengeluaran Dana " . $nama_dana_keluar;
-                $body            = "Pengeluaran Dana Pada Kegiatan $get_kegiatan[0][nama_kegiatan]";
+                $body            = "Pengeluaran Dana Pada Kegiatan " . $get_id_kegiatan[0]['nama_kegiatan'];
                 $message         = "null";
                 $message_type    = "monitor dana";
                 // $intent          = "DetailKegiatanDiikutiActivity";
@@ -1404,12 +1404,13 @@ class Kewirausahaan extends CI_Controller
     // Hitung-hitung
     public function hasil_analisis_donatur($email = "")
     {
-        $point = 0;
+        $point   = 0;
+        $periode = date("Y");
 
         $jml_nominal_donasi              = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$email' and dn.id_status_donasi = 3");
         $jml_transaksi_donasi            = $this->Kewirausahaan_model->get_donatur("where dr.email = '$email' and dn.id_status_donasi > 2");
         $jml_transaksi_donasi_valid      = $this->Kewirausahaan_model->get_donatur("where dr.email = '$email' and dn.id_status_donasi = 3");
-        $jml_kegiatan                    = $this->Kewirausahaan_model->get_jml_kegiatan();
+        $jml_kegiatan                    = $this->Kewirausahaan_model->get_jml_kegiatan("where year(k.tanggal_kegiatan_mulai) = $periode and k.id_status_kegiatan != 0");
         $this->persentase_transfer_valid = ($jml_transaksi_donasi_valid[0]['total_donasi'] / $jml_transaksi_donasi[0]['total_donasi']) * 100;
         if ($this->persentase_transfer_valid >= 80) {
             $point = $point + 3;
@@ -1461,6 +1462,7 @@ class Kewirausahaan extends CI_Controller
     public function ranking_donatur()
     {
         $i          = 0;
+        $periode    = date("Y");
         $this->rank = array();
         $send_msg   = array();
         $donatur    = $this->Kewirausahaan_model->get_donatur("and dn.id_status_donasi = 3 where not dr.email = 'admin@ttm.com'");
@@ -1469,18 +1471,19 @@ class Kewirausahaan extends CI_Controller
             $jml_nominal_donasi         = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$d[email]' and dn.id_status_donasi = 3");
             $jml_transaksi_donasi       = $this->Kewirausahaan_model->get_donatur("where dr.email = '$d[email]' and dn.id_status_donasi > 2");
             $jml_transaksi_donasi_valid = $this->Kewirausahaan_model->get_donatur("where dr.email = '$d[email]' and dn.id_status_donasi = 3");
-            $jml_kegiatan               = $this->Kewirausahaan_model->get_jml_kegiatan();
+            $jml_kegiatan               = $this->Kewirausahaan_model->get_jml_kegiatan("where year(k.tanggal_kegiatan_mulai) = $periode and k.id_status_kegiatan != 0");
             $cek_status_donatur         = $this->Kewirausahaan_model->get_data_donatur("where email = '$d[email]'");
 
             // $nilai = ($this->persentase_transfer_valid + $this->persentase_transfer_per_kegiatan) / 2;
 
-            if (!empty($jml_nominal_donasi) && !empty($jml_transaksi_donasi) && !empty($jml_transaksi_donasi_valid) && !empty($jml_kegiatan)) {
+            // if (!empty($jml_nominal_donasi) && !empty($jml_transaksi_donasi) && !empty($jml_transaksi_donasi_valid) && !empty($jml_kegiatan)) {
+            if (!empty($jml_nominal_donasi) && $jml_transaksi_donasi[0]['total_donasi'] >= 5 && !empty($jml_transaksi_donasi_valid) && !empty($jml_kegiatan)) {
                 // $this->rank[$i]['persentase_hasil'] = $this->persentase_hasil;
                 $this->hasil_analisis_donatur($d['email']);
                 $this->rank[$i]['email']            = $d['email'];
                 $this->rank[$i]['nama']             = $d['nama'];
                 $this->rank[$i]['persentase_hasil'] = ($this->persentase_transfer_valid + $this->persentase_transfer_per_kegiatan) / 2;
-                if ($this->status_donatur == "Donatur Potensial" && $cek_status_donatur[0]['id_status_donatur'] > 1 && $cek_status_donatur[0]['id_status_donatur'] != 2) {
+                if ($this->status_donatur == "Donatur Potensial" && $cek_status_donatur[0]['id_status_donatur'] > 0 && $cek_status_donatur[0]['id_status_donatur'] != 2) {
                     $send_msg[$i]['fcm_token'] = $d['fcm_token'];
                     $update_data               = array(
                         'id_status_donatur' => 2,
@@ -1492,10 +1495,10 @@ class Kewirausahaan extends CI_Controller
                     } else {
                         // Database Error
                     }
-                } elseif ($this->status_donatur == "Donatur Aktif" && $cek_status_donatur[0]['id_status_donatur'] > 1 && $cek_status_donatur[0]['id_status_donatur'] != 3) {
+                } elseif ($this->status_donatur == "Donatur Aktif" && $cek_status_donatur[0]['id_status_donatur'] > 0 && $cek_status_donatur[0]['id_status_donatur'] != 3) {
                     $send_msg[$i]['fcm_token'] = $d['fcm_token'];
                     $update_data               = array(
-                        'id_status_donatur' => 2,
+                        'id_status_donatur' => 3,
                     );
                     $where   = array('email' => $d['email']);
                     $execute = $this->Kewirausahaan_model->update_data('donatur', $update_data, $where);
@@ -1507,9 +1510,9 @@ class Kewirausahaan extends CI_Controller
                 }
                 $i++;
             } else {
-                $this->rank[$i]['email']            = $d['email'];
-                $this->rank[$i]['nama']             = $d['nama'];
-                $this->rank[$i]['persentase_hasil'] = 0;
+                // $this->rank[$i]['email']            = $d['email'];
+                // $this->rank[$i]['nama']             = $d['nama'];
+                // $this->rank[$i]['persentase_hasil'] = 0;
                 $i++;
             }
         }
@@ -1563,6 +1566,7 @@ class Kewirausahaan extends CI_Controller
         // print_r($ids);
         // echo "<hr>";
         // print_r($result);
+        // print_r($send_msg);
         //End FCM Code
 
         $this->rank_result = array();

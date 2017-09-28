@@ -138,13 +138,13 @@ function tanggal_indo($tanggal)
           </div> -->
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab">Data Transaksi Donasi Donatur</a></li>
-              <li><a href="#tab_2" data-toggle="tab">Profil Donatur</a></li>
+              <li class="active"><a href="#tab_1" data-toggle="tab"><i class="fa fa-exchange"></i> Data Transaksi Donasi Donatur</a></li>
+              <li><a href="#tab_2" data-toggle="tab"><i class="fa fa-black-tie"></i> Profil Donatur</a></li>
               <?php if (empty($data_donatur[0]['total_donasi'])): ?>
                 <!-- GONE -->
               <?php endif ?>
-              <?php if (!empty($data_donatur[0]['total_donasi'])): ?>
-                <li><a href="#tab_3" data-toggle="tab">Stats Donatur</a></li>
+              <?php if ($data_donatur[0]['total_donasi'] >= 5): ?>
+                <li><a href="#tab_3" data-toggle="tab"><i class="fa fa-bar-chart"></i> Stats Donatur</a></li>
               <?php endif ?>
             </ul>
             <div class="tab-content">
@@ -176,7 +176,7 @@ function tanggal_indo($tanggal)
                             <th>Nama kegiatan</th>
                             <th>Status Donasi</th>
                             <th>Nominal Donasi</th>
-                            <th>Struk Donasi</th>
+                            <!-- <th>Struk Donasi</th> -->
                             <th>Tanggal Donasi</th>
                           </tr>
                           </thead>
@@ -186,7 +186,7 @@ function tanggal_indo($tanggal)
                             <td><?php echo $d['nama_kegiatan']; ?></td>
                             <td><?php echo $d['status_donasi']; ?></td>
                             <td><?php echo "Rp. " . number_format($d['nominal_donasi'], 2, ",", "."); ?></td>
-                            <td><a href="<?php echo base_url()."uploads/konfirmasi_donasi/" ?><?php echo $d['struk_donasi']; ?>" target="blank"><img src="<?php echo base_url()."uploads/konfirmasi_donasi/" ?><?php echo $d['struk_donasi']; ?>" alt="" width="150px"></a></td>
+                            <!-- <td><a href="<?php echo base_url()."uploads/konfirmasi_donasi/" ?><?php echo $d['struk_donasi']; ?>" target="blank"><img src="<?php echo base_url()."uploads/konfirmasi_donasi/" ?><?php echo $d['struk_donasi']; ?>" alt="" width="150px"></a></td> -->
                             <td><?php echo tanggal_indo($d['tanggal_donasi']); ?></td>
                           </tr>
                           <?php endforeach?>
@@ -213,7 +213,7 @@ function tanggal_indo($tanggal)
                     </div>
                     <div class="form-group">
                       <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal Lahir</label>
-                      <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" value="<?php echo $profil_donatur[0]['tgl_lahir']; ?>" readonly>
+                      <input type="text" class="form-control" value="<?php echo tanggal_indo($profil_donatur[0]['tgl_lahir']); ?>" readonly>
                     </div>
                     <div class="form-group">
                       <label for="exampleInputEmail1"><i class="fa fa-mobile-phone"></i> Nomor Handphone</label>
@@ -308,11 +308,43 @@ function tanggal_indo($tanggal)
                   
                   <br><hr>
                   <h4>Penjelasan:</h4> 
-                  Status Donatur: <br>
+                  <!-- Status Donatur: <br>
                   <ul>
                     <li>Donatur Aktif, dimana Indeks Penilaian Donatur harus mempunyai nilai lebih dari 2.5</li>
                     <li>Donatur Potensial, dimana Indeks Penilaian Donatur harus mempunyai nilai lebih dari 2.0</li>
                     <li>Donatur, dimana Indeks Penilaian Donatur masih memiliki nilai kurang dari atau sama dengan dari 2.0</li>
+                  </ul> -->
+
+                  <b>Persentase Transfer Donatur</b> didapat dari <u>jumlah transaksi donasi yang tervalidasi per jumlah transaksi donasi yang dilakukan oleh donatur.</u><br>
+                  <ul>
+                    <li>
+                      Jika "Persentase Transfer Donatur" mendapat hasil lebih dari atau sama dengan 80%, maka akan mendapat 3 poin.
+                    </li>
+                    <li>
+                      Jika "Persentase Transfer Donatur" mendapat hasil lebih dari atau sama dengan 50%, maka akan mendapat 2 poin.
+                    </li>
+                    <li>
+                      Jika "Persentase Transfer Donatur" mendapat hasil kurang dari 50%, maka akan mendapat 1 poin.
+                    </li>
+                  </ul>
+                  <b>Kemungkinan Donasi Per Kegiatan</b> didapat dari <u>jumlah transaksi donasi yang dilakukan oleh donatur per jumlah semua kegiatan yang diadakan oleh komunitas pada tahun periode <?php echo date("Y"); ?>.</u>
+                  <ul>
+                    <li>
+                      Jika "Kemungkinan Donasi Per Kegiatan" mendapat hasil lebih dari atau sama dengan 50%, maka akan mendapat 3 poin.
+                    </li>
+                    <li>
+                      Jika "Kemungkinan Donasi Per Kegiatan" mendapat hasil lebih dari atau sama dengan 20%, maka akan mendapat 2 poin.
+                    </li>
+                    <li>
+                      Jika "Kemungkinan Donasi Per Kegiatan" mendapat hasil kurang dari 20%, maka akan mendapat 1 poin.
+                    </li>
+                  </ul>
+                  Setelah mendapatkan semua poin, maka akan dihitung untuk mengetahui <b>Status Donatur</b>.<br>
+                  <u>Status Donatur didapat dari jumlah poin "Persentase Transfer Donatur" dan "Kemungkinan Donasi Per Kegiatan" yang kemudian dibagi 2.</u>
+                  <ul>
+                    <li>Donatur Aktif, dimana Indeks Penilaian Donatur harus mempunyai nilai lebih dari 2.5</li>
+                    <li>Donatur Potensial, dimana Indeks Penilaian Donatur harus mempunyai nilai lebih dari 2</li>
+                    <li>Donatur, dimana Indeks Penilaian Donatur masih memiliki nilai kurang dari atau sama dengan dari 2</li>
                   </ul>
                 </div>
               </div>  

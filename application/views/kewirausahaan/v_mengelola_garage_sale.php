@@ -14,7 +14,7 @@
         <div class="col-md-12">
           <div class="box box-danger">
             <div class="box-header">
-              <h3 class="box-title">Data Semua Barang Garage Sale</h3>
+              <h3 class="box-title">Data Semua Barang Garage Sale</h3><a href="<?php echo base_url()."Kewirausahaan/tambah_barang_garage_sale"; ?>" class="btn btn-danger pull-right"><i class="fa fa-plus"></i> Tambah Barang</a>
             </div>
             <div class="box-body">
               <div class="table-responsive">

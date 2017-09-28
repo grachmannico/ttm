@@ -104,9 +104,51 @@ function tanggal_indo($tanggal)
         </div>
         <div class="col-md-6">
           <?php if (!empty($jml_gabung) && !empty($jml_absen_sukses) && !empty($jml_semua_absen)) { ?>
+          <div class="box box-danger collapsed-box box-solid">
+            <div class="box-header with-border">
+              <h3 class="box-title">Keterangan</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i>
+                </button>
+              </div>
+              <!-- /.box-tools -->
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <b>Persentase Kehadiran Relawan</b> didapat dari <u>jumlah kehadiran relawan dalam kegiatan per jumlah kegiatan yang diikuti oleh relawan</u>.<br>
+              <ul>
+                <li>
+                  Jika relawan hadir dalam kegiatan yang diikutinya dengan persentase diatas 70%, maka kontribusi relawan tergolong <b>tinggi</b> dalam kegiatan yang dilaksanakan.
+                </li>
+                <li>
+                  Jika relawan hadir dalam kegiatan yang diikutinya dengan persentase sama dengan atau diatas 50%, maka kontribusi relawan tergolong <b>cukup tinggi</b> dalam kegiatan yang dilaksanakan.
+                </li>
+                <li>
+                  Jika relawan hadir dalam kegiatan yang diikutinya dengan persentase kurang dari 50%, maka kontribusi relawan tergolong <b>rendah</b> dalam kegiatan yang dilaksanakan.
+                </li>
+              </ul>
+              <hr>
+              <b>Persentase Keikutsertaan Seluruh Kegiatan</b> didapat dari jumlah kehadiran relawan dalam kegiatan per jumlah semua kegiatan yang dilaksanakan pada tahun periode <?php echo date("Y"); ?>.
+              <ul>
+                <li>
+                  Jika relawan hadir dalam semua kegiatan TTM dengan persentase diatas 50%, maka relawan tersebut tergolong <b>aktif</b>.
+                </li>
+                <li>
+                  Jika relawan hadir dalam semua kegiatan TTM dengan persentase sama dengan atau diatas 30%, maka relawan tersebut tergolong <b>cukup aktif</b>.
+                </li>
+                <li>
+                  Jika relawan hadir dalam semua kegiatan TTM dengan persentase kurang dari 30%, maka relawan tersebut tergolong <b>kurang aktif</b>.
+                </li>
+              </ul>
+              <hr>
+              Statistik data relawan hanya menunjukkan data pada tahun periode <?php echo date("Y"); ?>.
+            </div>
+            <!-- /.box-body -->
+          </div>
           <div class="box box-danger">
             <div class="box-header with-border">
-              <h3 class="box-title">Statistik Data Relawan</h3>
+              <h3 class="box-title">Statistik Data Relawan Pada Periode <?php echo date("Y"); ?></h3>
             </div>
             <div class="box-body">
               <div class="col-md-12">
@@ -131,14 +173,14 @@ function tanggal_indo($tanggal)
                   <span class="info-box-icon"><i class="fa fa-line-chart"></i></span>
 
                   <div class="info-box-content">
-                    <span class="info-box-text">Persentase Gabung Dalam Kegiatan:</span>
+                    <span class="info-box-text">Persentase Keikutsertaan Seluruh Kegiatan:</span>
                     <span class="info-box-number"><?php echo number_format((float)$persentase_gabung_kegiatan, 2, '.', ''); ?>%</span>
 
                     <div class="progress">
                       <div class="progress-bar" style="width: <?php echo $persentase_gabung_kegiatan; ?>%"></div>
                     </div>
                         <span class="progress-description">
-                          Dari seluruh kegiatan, relawan mengikuti <?php echo $jml_absen_sukses; ?> dari <?php echo $jml_kegiatan; ?> kegiatan
+                          Dari seluruh kegiatan, relawan hadir <?php echo $jml_absen_sukses; ?> kali dari <?php echo $jml_kegiatan; ?> kegiatan
                         </span>
                   </div>
                 </div>
@@ -154,7 +196,7 @@ function tanggal_indo($tanggal)
                   <p class="label label-success pull-right">Relawan Berhak Mendapat Sertifikat Aktif Relawan</p>
                   <?php if (empty($cek_sertifikat)): ?>
                     <form action="<?php echo base_url()."Relawan/sertifikat_aktif_relawan"; ?>" method="POST">
-                      <button type="submit" class="btn btn-success" name="sertifikat" value="<?php echo $data_relawan[0]['email']; ?>"><i class="fa fa-bookmark"></i> Keluarkan Sertifikat</button>
+                      <button type="submit" class="btn btn-success" name="sertifikat" value="<?php echo $data_relawan[0]['email']; ?>"><i class="fa fa-bookmark"></i> Terbitkan Sertifikat</button>
                     </form>
                   <?php endif ?>
                   <?php if (!empty($cek_sertifikat)): ?>

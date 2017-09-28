@@ -31,7 +31,7 @@
                     <?php foreach ($data_kegiatan as $dk): ?>
                     <tr>
                       <td><?php echo $dk['nama_kegiatan']; ?></td>
-                      <td><?php echo $dk['jumlah_relawan']; ?></td>
+                      <td><?php echo $dk['jumlah_relawan']; ?> Relawan</td>
                       <td><center><button type="submit" class="btn btn-primary btn-xs" name="id_kegiatan" value="<?php echo $dk['id_kegiatan']; ?>"><i class="fa fa-check-square"></i> Lakukan Absensi</button></center></td>
                     </tr>
                     <?php endforeach?>

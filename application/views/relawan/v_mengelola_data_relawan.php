@@ -14,14 +14,14 @@
         <div class="col-md-12">
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab">Data Relawan</a></li>
-              <li><a href="#tab_2" data-toggle="tab">Data Statistik Relawan</a></li>
+              <li class="active"><a href="#tab_1" data-toggle="tab"><i class="fa fa-user"></i> Data Relawan</a></li>
+              <li><a href="#tab_2" data-toggle="tab"><i class="fa fa-bar-chart"></i> Data Statistik Relawan</a></li>
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="tab_1">
                 <div class="box box-danger">
                   <div class="box-header">
-                    <h3 class="box-title">Semua Data Relawan</h3>
+                    <h3 class="box-title">Semua Data Relawan</h3><a href="<?php echo base_url()."Relawan/tambah_relawan"; ?>" class="btn btn-danger pull-right"><i class="fa fa-plus"></i> Tambah Data Relawan</a>
                   </div>
                   <div class="box-body">
                     <div class="table-responsive">
@@ -93,13 +93,15 @@
                         <tr>
                           <th><center>Ranking</center></th>
                           <th><center>Nama</center></th>
-                          <th><center>Persentase Kemungkinan Gabung Kegaiatn</center></th>
+                          <th><center>Persentase Kemungkinan Gabung Kegaiatan</center></th>
                           <th><center>Persentase Kehadiran Dalam Kegiatan</center></th>
                           <th><center>Hasil Penilaian</center></th>
+                          <th><center>Action</center></th>
                         </tr>
                         </thead>
                         <tbody>
                         <?php $i = 1; ?>
+                        <?php $relawan_aktif = 0; ?>
                         <?php foreach ($rank as $r): ?>
                         <tr>
                           <td><?php echo $i; ?></td>
@@ -143,7 +145,15 @@
                                   </div>
                                 </div>
                           </td>
+                          <td>
+                            <form action="<?php echo base_url()."Relawan/detail_relawan"; ?>" method="POST">
+                              <center><button type="submit" class="btn btn-primary btn-xs" name="relawan" value="<?php echo $r['email']; ?>"><i class="fa fa-user"></i> Detail Relawan</button></center>
+                            </form>
+                          </td>
                         </tr>
+                        <?php if ($r['persentase_gabung_kegiatan'] >= 30): ?>
+                          <?php $relawan_aktif++; ?>
+                        <?php endif ?>
                         <?php $i++; ?>
                         <?php endforeach?>
                         </tfoot>
@@ -151,8 +161,19 @@
                     </div>
                   </div>
                 </div>
+                <center><p class="badge bg-green">Jumlah Relawan Aktif Saat Ini: <?php echo $relawan_aktif; ?> Relawan.</p><br></center>
+                <hr>
                 <h4>Keterangan:</h4>
-                Penilaian berdasarkan pada persentase kemungkinan relawan bergabung dalam kegiatan dan persentase kehadiran relawan dalam kegiatan yang diikuti.<br> <b>Data statisktik relawan yang ditampilkan hanya relawan yang telah mengikuti dan hadir dalam kegiatan lebih dari 3 kali.</b>
+                Penilaian berdasarkan pada persentase kemungkinan relawan bergabung dalam kegiatan dan persentase kehadiran relawan dalam kegiatan yang diikuti.<br> <b>Data statisktik relawan yang ditampilkan hanya relawan yang telah mengikuti dan hadir dalam kegiatan lebih dari 3 kali.</b><br><br>
+                Relawan dikatakan aktif jika "Persentase Kemungkinan Gabung Kegaiatan" lebih dari sama dengan 30.<br>
+                <ul>
+                  <li>
+                    <b>"Persentase Kemungkinan Gabung Kegaiatan"</b> didapat dari <u>jumlah kehadiran relawan dalam kegiatan per jumlah semua kegiatan yang dilaksanakan</u> oleh komunitas Turun Tangan Malang.
+                  </li>
+                  <li>
+                    <b>"Persentase Kehadiran Dalam Kegiatan"</b> didapat dari <u>jumlah kehadiran relawan dalam kegiatan per jumlah kegiatan yang diikuti oleh relawan.</u>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>

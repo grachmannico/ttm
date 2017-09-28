@@ -34,7 +34,7 @@ function tanggal_indo($tanggal)
         <div class="col-md-12">
           <div class="box box-danger">
             <div class="box-header">
-              <h3 class="box-title">Data Semua Kegiatan</h3>
+              <h3 class="box-title">Data Semua Kegiatan</h3><a href="<?php echo base_url()."PPG/tambah_kegiatan"; ?>" class="btn btn-danger pull-right"><i class="fa fa-plus"></i> Tambah Data Kegiatan</a>
             </div>
             <div class="box-body">
               <div class="table-responsive">

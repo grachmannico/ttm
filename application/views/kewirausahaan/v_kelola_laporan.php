@@ -34,10 +34,13 @@ function tanggal_indo($tanggal)
         <div class="col-md-12">
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#tab_1" data-toggle="tab">Data Laporan Pengeluaran Dana</a></li>
-              <li><a href="#tab_2" data-toggle="tab">Rekap Data Donasi Yang Masuk</a></li>
+              <li class="active"><a href="#tab_1" data-toggle="tab"><i class="fa fa-book"></i> Data Laporan Pengeluaran Dana</a></li>
+              <li><a href="#tab_2" data-toggle="tab"><i class="fa fa-heart"></i> Rekap Data Donasi Yang Masuk</a></li>
               <?php if ($total_dana[0]['total_dana'] != 0): ?>
-                <li><a href="#tab_3" data-toggle="tab">Tambah Data LPJ</a></li>
+                <li><a href="#tab_3" data-toggle="tab"><i class="fa fa-plus-square"></i> Tambah Data LPJ</a></li>
+              <?php endif ?>
+              <?php if ($nama_kegiatan[0]['id_status_kegiatan'] == 3): ?>
+                <li><a href="<?php echo base_url()."Report/print_lpj/$id_kegiatan" ?>" target="_blank"><i class="fa fa-print"></i> Cetak LPJ</a></li>
               <?php endif ?>
             </ul>
             <div class="tab-content">
@@ -158,6 +161,7 @@ function tanggal_indo($tanggal)
                           </thead>
                           <tbody>
                           <?php foreach ($dana_masuk as $d): ?>
+                          <!-- <?php if ($d['nominal_donasi'] != 0): ?> -->
                           <tr>
                             <?php if ($d['nama'] == "Admin Turun Tangan Malang"): ?>
                               <td>Uang Kas Internal Turun Tangan Malang</td>
@@ -168,6 +172,7 @@ function tanggal_indo($tanggal)
                             <td><?php echo "Rp. " . number_format($d['nominal_donasi'], 2, ",", "."); ?></td>
                             <td><?php echo tanggal_indo($d['tanggal_donasi']); ?></td>
                           </tr>
+                          <!-- <?php endif ?> -->
                           <?php endforeach?>
                           </tfoot>
                         </table>

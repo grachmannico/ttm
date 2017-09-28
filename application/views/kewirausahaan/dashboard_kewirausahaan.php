@@ -91,7 +91,7 @@ function tanggal_indo($tanggal)
         <div class="col-md-9 col-md-push-1">
           <div class="box box-success">
             <div class="box-header with-border">
-              <h3 class="box-title">Donasi Yang Masuk</h3>
+              <h3 class="box-title"><i class="fa fa-heart"></i> Donasi Yang Masuk</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
