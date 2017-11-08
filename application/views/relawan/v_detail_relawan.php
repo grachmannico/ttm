@@ -56,7 +56,7 @@ function tanggal_indo($tanggal)
                 <div class="col-sm-6">
                   <div class="description-block">
                     <h5 class="description-header"><?php echo $total_gabung[0]['jumlah_gabung_kegiatan']; ?></h5>
-                    <span class="description-text">Total Kontribusi</span>
+                    <span class="description-text">Kehadiran Relawan</span>
                   </div>
                 </div>
               </div>

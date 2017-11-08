@@ -48,20 +48,20 @@ function tanggal_indo($tanggal)
                       <table id="example1" class="table table-bordered table-striped">
                         <thead>
                         <tr>
+                          <th><center>Tanggal</th>
                           <th><center>Gambar Kegiatan</center></th>
                           <th><center>Nama Dokumentasi</center></th>
                           <th><center>Deskripsi</center></th>
-                          <th><center>Tanggal</th>
                           <th><center>Action</center></th>
                         </tr>
                         </thead>
                         <tbody>
                           <?php foreach ($dokumentasi as $d): ?>
                           <tr>
-                            <td><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" alt="" width="300px"></td>
+                            <td><?php echo tanggal_indo($d['tanggal']); ?></td>
+                            <td><a href="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" target="_blank"><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" alt="" width="300px"></a></td>
                             <td><?php echo $d['nama_dokumentasi']; ?></td>
                             <td><?php echo $d['deskripsi']; ?></td>
-                            <td><?php echo tanggal_indo($d['tanggal']); ?></td>
                             <td>
                               <div class="col-md-6">
                                 <form action="<?php echo base_url()."PPG/edit_dokumentasi_kegiatan"; ?>" method="POST">
@@ -107,7 +107,8 @@ function tanggal_indo($tanggal)
                       </div>
                       <div class="form-group">
                         <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal</label>
-                        <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" placeholder="Tanggal" name="tanggal" required>
+                        <!-- <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" placeholder="Tanggal" name="tanggal" required> -->
+                        <input type="text" class="form-control" placeholder="Tanggal" name="tanggal" id="datepicker" required>
                       </div>
                     </div>
                     <div class="box-footer">

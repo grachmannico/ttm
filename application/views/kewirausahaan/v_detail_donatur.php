@@ -55,7 +55,7 @@ function tanggal_indo($tanggal)
                     <?php if (!empty($data_donatur)): ?>
                       <h5 class="description-header"><?php echo $data_donatur[0]['total_donasi']; ?></h5>
                     <?php endif ?>
-                    <span class="description-text">Jumlah Transaksi Donasi</span>
+                    <span class="description-text">Jumlah Transaksi Donasi Valid</span>
                   </div>
                 </div>
                 <div class="col-sm-6">
@@ -160,12 +160,12 @@ function tanggal_indo($tanggal)
                         <form action="<?php echo base_url()."Kewirausahaan/detail_donatur"; ?>" method="POST">
                           Tampilkan Status Donasi: 
                           <select class="form-control" name="id_status_donasi">
-                            <option value="3" selected>Transfes Valid</option>
+                            <option value="0" selected>Tampilkan Semua</option>
+                            <option value="3">Transfes Valid</option>
                             <option value="1">Proses Transfer</option>
                             <option value="2">Konfirmasi Transfer</option>
                             <option value="4">Transfer Lewat Batas Waktu</option>
                             <option value="5">Transfer Tidak Valid</option>
-                            <option value="0">Tampilkan Semua</option>
                           </select>
                           <input type="hidden" name="donatur" value="<?php echo $profil_donatur[0]['email']; ?>">
                           <button type="submit" class="btn btn-danger">Cari</button>
@@ -230,10 +230,8 @@ function tanggal_indo($tanggal)
                   </div>
                 </div>
               </div>
-              <?php if (empty($data_donatur[0]['total_donasi'])): ?>
-                <!-- GONE -->
-              <?php endif ?>
-              <?php if (!empty($data_donatur[0]['total_donasi'])): ?>
+              
+              
               <div class="tab-pane" id="tab_3">
                 <div class="content">
                   <div class="col-md-6">
@@ -348,7 +346,7 @@ function tanggal_indo($tanggal)
                   </ul>
                 </div>
               </div>  
-              <?php endif ?>
+              
             </div>
           </div>
         </div>

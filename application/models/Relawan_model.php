@@ -63,7 +63,7 @@ class Relawan_model extends CI_Model
 
     public function get_total_gabung_kegiatan($where = "")
     {
-        $data = $this->db->query('select count(gk.id_gabung_kegiatan) as jumlah_gabung_kegiatan
+        $data = $this->db->query('select coalesce(count(gk.id_gabung_kegiatan), 0) as jumlah_gabung_kegiatan
             from relawan r
             right join gabung_kegiatan gk
             on r.email=gk.email
@@ -71,6 +71,17 @@ class Relawan_model extends CI_Model
             on gk.id_kegiatan=k.id_kegiatan ' . $where );
         return $data->result_array();
     }
+
+    // public function get_total_gabung_kegiatan_v2($where = "")
+    // {
+    //     $data = $this->db->query('select coalesce(count(gk.id_gabung_kegiatan), 0) as jumlah_gabung_kegiatan
+    //         from relawan r
+    //         right join gabung_kegiatan gk
+    //         on r.email=gk.email
+    //         join kegiatan k
+    //         on gk.id_kegiatan=k.id_kegiatan ' . $where );
+    //     return $data->result_array();
+    // }
 
     public function get_detail_data_relawan($where = "")
     {

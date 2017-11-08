@@ -41,8 +41,8 @@ class Report extends CI_Controller
     {
         $this->load->library('pdfgenerator');
         $data_kegiatan         = $this->PPG_model->get_detail_kegiatan("where k.id_kegiatan = $id_kegiatan");
-        $data_pengeluaran_dana = $this->Kewirausahaan_model->get_laporan_pengeluaran("where id_kegiatan = $id_kegiatan");
-        $dokumentasi_kegiatan  = $this->PPG_model->get_dokumentasi_kegiatan("where id_kegiatan = $id_kegiatan");
+        $data_pengeluaran_dana = $this->Kewirausahaan_model->get_laporan_pengeluaran("where id_kegiatan = $id_kegiatan order by tanggal asc");
+        $dokumentasi_kegiatan  = $this->PPG_model->get_dokumentasi_kegiatan("where id_dokumentasi in(select min(id_dokumentasi) from dokumentasi group by tanggal) and id_kegiatan = $id_kegiatan order by tanggal asc");
         $total_donasi          = $this->Kewirausahaan_model->get_total_donasi("where id_kegiatan = $id_kegiatan and id_status_donasi = 3");
         $jumlah_relawan        = $this->PPG_model->get_jumlah_relawan("where k.id_kegiatan = $id_kegiatan and gk.id_status_absensi_relawan = 2");
         $html                  = $this->load->view('ppg/v_coba_lpj', array('data_kegiatan' => $data_kegiatan, 'data_pengeluaran_dana' => $data_pengeluaran_dana, 'dokumentasi_kegiatan' => $dokumentasi_kegiatan, 'total_donasi' => $total_donasi, 'jumlah_relawan' => $jumlah_relawan), true);

@@ -40,7 +40,8 @@
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal</label>
-                  <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" value="<?php echo $dokumentasi[0]['tanggal']; ?>" name="tanggal" required>
+                  <!-- <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" value="<?php echo $dokumentasi[0]['tanggal']; ?>" name="tanggal" required> -->
+                  <input type="text" class="form-control" value="<?php echo $dokumentasi[0]['tanggal']; ?>" name="tanggal" id="datepicker" required>
                 </div>
               </div>
               <div class="box-footer">

@@ -30,7 +30,7 @@
                         <tr>
                           <th><center>Email</center></th>
                           <th><center>Nama</center></th>
-                          <th><center>Total Transaksi Donasi</center></th>
+                          <th><center>Total Transaksi Donasi Valid</center></th>
                           <th><center>Action</center></th>
                         </tr>
                         </thead>
@@ -81,7 +81,7 @@
                           <table id="example2" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                              <th><center>Ranking</center></th>
+                              <th><center>No</center></th>
                               <th><center>Nama</center></th>
                               <th><center>Hasil Penilaian</center></th>
                               <th><center>Action</center></th>
@@ -121,7 +121,7 @@
                     </div>
                 </div>
                 <h4>Keterangan:</h4>
-                Penilaian berdasarkan pada persentase transfer donasi yang valid dan persentase kemungkinan donatur berdonasi setiap ada kegiatan yang diadakan.
+                Penilaian berdasarkan pada persentase transfer donasi yang valid dan persentase kemungkinan donatur berdonasi setiap ada kegiatan yang diadakan. Data Donatur yang ditampilkan hanya donatur yang telah melakukan transaksi donasi minimal 5 kali.
               </div>
             </div>
           </div>

@@ -139,12 +139,12 @@ function update_address(lat,lng)
                     ?>
                     <div class="col-md-6">
                       <div class="form-group">
-                        <label for="exampleInputEmail1"><i class="fa fa-users"></i> Jumlah Relawan</label>
+                        <label for="exampleInputEmail1"><i class="fa fa-users"></i> Jumlah Relawan</label> <label class="badge bg-red pull-right"><?php echo number_format((float)$total_relawan, 2, '.', ''); ?>%</label>
                         <p><?php echo $jumlah_relawan[0]['jumlah_relawan']; ?> relawan dari <?php echo $detail_kegiatan[0]['minimal_relawan']; ?> relawan yang dibutuhkan</p>
                         <div class="progress">
                           <div class="progress-bar progress-bar-red" role="progressbar" aria-valuenow="<?php echo $total_relawan; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $total_relawan . "%"; ?>">
                             <span class="sr-only"><?php echo $total_relawan."%"; ?> Complete (success)</span>
-                            <p style="color: black;"><?php echo number_format((float)$total_relawan, 2, '.', ''); ?>%</p>
+                            <!-- <p style="color: black;"><?php echo number_format((float)$total_relawan, 2, '.', ''); ?>%</p> -->
                           </div>
                         </div>
                       </div>
@@ -160,6 +160,12 @@ function update_address(lat,lng)
                       <div class="form-group">
                         <label for="exampleInputEmail1"><i class="fa fa-heart"></i> Jumlah Donasi</label>
                         <?php if (!empty($jumlah_donasi)): ?>
+                          <label class="badge bg-green pull-right"><?php echo number_format((float)$total_donasi, 2, '.', ''); ?>%</label>
+                        <?php endif ?>
+                        <?php if (empty($jumlah_donasi)): ?>
+                          <label class="badge bg-green pull-right"><?php echo number_format(0, 2, '.', ''); ?>%</label>
+                        <?php endif ?>
+                        <?php if (!empty($jumlah_donasi)): ?>
                           <p><?php echo "Rp. " . number_format($jumlah_donasi[0]['jumlah_donasi'], 2, ",", "."); ?> dari <?php echo "Rp. " . number_format($detail_kegiatan[0]['minimal_donasi'], 2, ",", "."); ?></p>
                         <?php endif ?>
                         <?php if (empty($jumlah_donasi)): ?>
@@ -168,7 +174,7 @@ function update_address(lat,lng)
                         <div class="progress">
                           <div class="progress-bar progress-bar-green" role="progressbar" aria-valuenow="<?php echo $total_donasi; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $total_donasi . "%"; ?>">
                             <span class="sr-only"><?php echo $total_donasi."%"; ?> Complete (success)</span>
-                            <p style="color: black;"><?php echo number_format((float)$total_donasi, 2, '.', ''); ?>%</p>
+                            <!-- <p style="color: black;"><?php echo number_format((float)$total_donasi, 2, '.', ''); ?>%</p> -->
                           </div>
                         </div>
                       </div>
@@ -274,17 +280,17 @@ function update_address(lat,lng)
                       <table id="example1" class="table table-bordered table-striped">
                         <thead>
                         <tr>
+                          <th>Tanggal</th>
                           <th>Gambar Kegiatan</th>
                           <th>Deskripsi</th>
-                          <th>Tanggal</th>
                         </tr>
                         </thead>
                         <tbody>
                         <?php foreach ($dokumentasi as $d): ?>
                         <tr>
-                          <td><a href="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" target="_blank"><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" alt="" width="150px"></a></td>
+                          <td><?php echo tanggal_indo($d['tanggal']); ?></td>
+                          <td><a href="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" target="_blank"><img src="<?php echo base_url()."uploads/dokumentasi/"; ?><?php echo $d['gambar_dokumentasi']; ?>" alt="" width="100%"></a></td>
                           <td><?php echo $d['deskripsi']; ?></td>
-                          <td><?php echo $d['tanggal']; ?></td>
                         </tr>
                         <?php endforeach?>
                         </tfoot>

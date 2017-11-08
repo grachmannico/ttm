@@ -491,7 +491,7 @@ class Relawan extends CI_Controller
         $relawan = $this->input->post("relawan");
         if ($relawan != "") {
             $data_relawan   = $this->Relawan_model->get_data_relawan("where email = '$relawan'");
-            $total_gabung   = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$relawan'");
+            $total_gabung   = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$relawan' and gk.id_status_absensi_relawan = 2");
             $detail_data    = $this->Relawan_model->get_detail_data_relawan("where r.email = '$relawan'");
             $cek_sertifikat = $this->Relawan_model->get_sertifikat_relawan("where email = '$relawan' and tahun =" . date("Y"));
             $this->hasil_analisis_relawan($relawan);
@@ -649,24 +649,34 @@ class Relawan extends CI_Controller
         $this->rank = array();
         $relawan    = $this->Relawan_model->get_data_relawan("where r.id_pangkat_divisi != 8 and r.id_pangkat_divisi != 6");
         foreach ($relawan as $r) {
-            $cek_gabung = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$r[email]'");
-            $cek_absen  = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$r[email]' and id_status_absensi_relawan > 1");
-            if ($cek_gabung[0]['jumlah_gabung_kegiatan'] >= 3 && $cek_absen[0]['jumlah_gabung_kegiatan'] >= 3) {
-                $this->hasil_analisis_relawan($r['email']);
-                $this->rank[$i]['email']                      = $r['email'];
-                $this->rank[$i]['nama']                       = $r['nama'];
-                $this->rank[$i]['persentase_gabung_kegiatan'] = $this->persentase_gabung_kegiatan;
-                $this->rank[$i]['kontribusi']                 = $this->kontribusi;
-                $this->rank[$i]['hasil']                      = ($this->persentase_gabung_kegiatan + $this->kontribusi) / 2;
+            // $cek_gabung = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$r[email]' and id_status_absensi_relawan = 2");
+            // $cek_absen  = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$r[email]' and id_status_absensi_relawan > 1");
+            $cek_absen = $this->Relawan_model->get_total_gabung_kegiatan("where r.email = '$r[email]' and id_status_absensi_relawan = 2");
+            // if ($cek_gabung[0]['jumlah_gabung_kegiatan'] >= 3 && $cek_absen[0]['jumlah_gabung_kegiatan'] >= 3) {
+            $this->hasil_analisis_relawan($r['email']);
+            $this->rank[$i]['email']                      = $r['email'];
+            $this->rank[$i]['nama']                       = $r['nama'];
+            $this->rank[$i]['jml_hadir']                  = $cek_absen[0]['jumlah_gabung_kegiatan'];
+            $this->rank[$i]['persentase_gabung_kegiatan'] = $this->persentase_gabung_kegiatan;
+            $this->rank[$i]['kontribusi']                 = $this->kontribusi;
+            if ($cek_absen >= 3) {
+                $this->rank[$i]['hasil'] = ($this->persentase_gabung_kegiatan + $this->kontribusi) / 2;
+            } else {
+                $this->rank[$i]['hasil'] = 0;
             }
+            // }
             $i++;
         }
         $this->rank_result = array();
         foreach ($this->rank as $r) {
             $this->rank_result[] = $r['hasil'];
         }
-        array_multisort($this->rank_result, SORT_DESC, $this->rank);
-        // print_r($this->rank);
+        foreach ($this->rank as $r) {
+            $rank_attendance[] = $r['jml_hadir'];
+        }
+        // array_multisort($rank_attendance, SORT_DESC, $this->rank_result, SORT_DESC, $this->rank);
+        // array_multisort($this->rank_result, SORT_DESC, $this->rank);
+        array_multisort($rank_attendance, SORT_DESC, $this->rank);
     }
 
     public function sertifikat_aktif_relawan()

@@ -231,7 +231,7 @@ class PPG extends CI_Controller
                                 'id_status_donasi' => 3,
                                 'id_kegiatan'      => $id_target,
                                 'nominal_donasi'   => $uang_kas,
-                                'tanggal_donasi'   => date("Y-m-d"),
+                                'tanggal_donasi'   => $batas_akhir_pendaftaran,
                             );
                             $execute = $this->PPG_model->insert_data('donasi', $tambah_uang);
                             if ($execute >= 1) {
@@ -340,7 +340,7 @@ class PPG extends CI_Controller
                                 'id_status_donasi' => 3,
                                 'id_kegiatan'      => $id_target,
                                 'nominal_donasi'   => $uang_kas,
-                                'tanggal_donasi'   => date("Y-m-d"),
+                                'tanggal_donasi'   => $batas_akhir_pendaftaran,
                             );
                             $execute = $this->PPG_model->insert_data('donasi', $tambah_uang);
                             if ($execute >= 1) {
@@ -476,7 +476,7 @@ class PPG extends CI_Controller
                             'id_status_donasi' => 3,
                             'id_kegiatan'      => $id_kegiatan,
                             'nominal_donasi'   => $uang_kas,
-                            'tanggal_donasi'   => date("Y-m-d"),
+                            'tanggal_donasi'   => $batas_akhir_pendaftaran,
                         );
                         $execute = $this->PPG_model->insert_data('donasi', $tambah_uang);
                         if ($execute >= 1) {
@@ -600,7 +600,7 @@ class PPG extends CI_Controller
                             'id_status_donasi' => 3,
                             'id_kegiatan'      => $id_kegiatan,
                             'nominal_donasi'   => $uang_kas,
-                            'tanggal_donasi'   => date("Y-m-d"),
+                            'tanggal_donasi'   => $batas_akhir_pendaftaran,
                         );
                         $execute = $this->PPG_model->insert_data('donasi', $tambah_uang);
                         if ($execute >= 1) {
@@ -1018,7 +1018,7 @@ class PPG extends CI_Controller
         } else if ($id_kegiatan != "" && $deskripsi != "" && $tanggal != "" && $nama_dokumentasi != "") {
             $config['upload_path']   = './uploads/dokumentasi/';
             $config['allowed_types'] = 'gif|jpg|png';
-            $config['max_size']      = 2048;
+            $config['max_size']      = 20480;
             $this->load->library('upload', $config);
 
             if (!$this->upload->do_upload('gambar')) {
@@ -1158,7 +1158,7 @@ class PPG extends CI_Controller
         } elseif ($id_dokumentasi != "" && $id_kegiatan != "" && $deskripsi != "" && $tanggal != "" && $nama_dokumentasi != "") {
             $config['upload_path']   = './uploads/dokumentasi/';
             $config['allowed_types'] = 'gif|jpg|png';
-            $config['max_size']      = 2048;
+            $config['max_size']      = 20480;
             $this->load->library('upload', $config);
 
             if (!$this->upload->do_upload('gambar')) {

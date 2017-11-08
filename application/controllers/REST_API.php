@@ -2,6 +2,34 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 class REST_API extends CI_Controller
 {
+    // public function __construct()
+    // {
+    //     parent::__construct();
+    //     $this->check();
+    // }
+
+    // public function check() {
+    //     $CI =& get_instance();
+    //     $key = $CI->input->post("key");
+    //     if ($key != "ocin") {
+    //         $json_data['auth'] = "error";
+    //         echo json_encode($json_data);
+    //         die();
+    //     }
+    // }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $CI      = &get_instance();
+        $keyAPI = $CI->input->post("keyAPI");
+        if ($keyAPI != "448fe35e6645e3c31f5c67f2cb868216") {
+            $json_data['auth'] = "error";
+            echo json_encode($json_data);
+            die();
+        }
+    }
+
     public function index()
     {
         echo "This is Web Service<br>";
@@ -126,10 +154,10 @@ class REST_API extends CI_Controller
         // }
 
         if ($id_status_kegiatan == 0) {
-            $data_kegiatan = $this->REST_API_model->get_kegiatan("where id_status_kegiatan != 0");
+            $data_kegiatan = $this->REST_API_model->get_kegiatan("where id_status_kegiatan != 0 order by tanggal_kegiatan_mulai desc");
             echo json_encode($data_kegiatan);
         } elseif ($id_status_kegiatan != 0) {
-            $data_kegiatan = $this->REST_API_model->get_kegiatan("where id_status_kegiatan = $id_status_kegiatan");
+            $data_kegiatan = $this->REST_API_model->get_kegiatan("where id_status_kegiatan = $id_status_kegiatan order by tanggal_kegiatan_mulai desc");
             echo json_encode($data_kegiatan);
         }
     }
@@ -721,60 +749,60 @@ class REST_API extends CI_Controller
     {
         $email       = $this->input->post("email");
         $id_kegiatan = $this->input->post("id_kegiatan");
-        $lpj         = $this->REST_API_model->get_laporan_pengeluaran("where m.id_kegiatan = $id_kegiatan order by m.id_monitor_dana_kegiatan desc");
-        $this->load->view("rest_api/v_detail_monitor_dana", array('lpj' => $lpj));
+        $lpj         = $this->REST_API_model->get_laporan_pengeluaran("where m.id_kegiatan = $id_kegiatan order by tanggal desc, id_monitor_dana_kegiatan desc");
+        // $this->load->view("rest_api/v_detail_monitor_dana", array('lpj' => $lpj));
         echo json_encode($lpj);
     }
 
     public function dokumentasi()
     {
         $id_kegiatan = $this->input->post("id_kegiatan");
-        $dokumentasi = $this->REST_API_model->get_dokumentasi("where d.id_kegiatan = $id_kegiatan");
+        $dokumentasi = $this->REST_API_model->get_dokumentasi("where d.id_kegiatan = $id_kegiatan order by tanggal desc, id_dokumentasi desc");
         echo json_encode($dokumentasi);
     }
 
-    public function send_notification()
-    {
-        $title = $this->input->post("title");
-        $body  = $this->input->post("body");
+    // public function send_notification()
+    // {
+    //     $title = $this->input->post("title");
+    //     $body  = $this->input->post("body");
 
-        echo $title . "<br>";
-        echo $body . "<br>";
+    //     echo $title . "<br>";
+    //     echo $body . "<br>";
 
-        $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
-        $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
-        $data        = $this->REST_API_model->get_relawan();
+    //     $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
+    //     $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
+    //     $data        = $this->REST_API_model->get_relawan();
 
-        $ids = array();
-        $i   = 0;
-        foreach ($data as $d) {
-            $ids[$i] = $d['fcm_token'];
-            $i++;
-        }
+    //     $ids = array();
+    //     $i   = 0;
+    //     foreach ($data as $d) {
+    //         $ids[$i] = $d['fcm_token'];
+    //         $i++;
+    //     }
 
-        $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
-        $fields  = array(
-            'registration_ids' => $ids,
-            'data'             => array(
-                'title' => $title,
-                'body'  => $body,
-            ),
-        );
-        $payload      = json_encode($fields);
-        $curl_session = curl_init();
-        curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
-        curl_setopt($curl_session, CURLOPT_POST, true);
-        curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-        curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+    //     $headers = array('Authorization:key=' . $server_key, 'Content-Type:application/json');
+    //     $fields  = array(
+    //         'registration_ids' => $ids,
+    //         'data'             => array(
+    //             'title' => $title,
+    //             'body'  => $body,
+    //         ),
+    //     );
+    //     $payload      = json_encode($fields);
+    //     $curl_session = curl_init();
+    //     curl_setopt($curl_session, CURLOPT_URL, $path_to_fcm);
+    //     curl_setopt($curl_session, CURLOPT_POST, true);
+    //     curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+    //     curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+    //     curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+    //     curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    //     curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
 
-        $result = curl_exec($curl_session);
-        curl_close($curl_session);
-        echo "<hr>";
-        print_r($result);
-    }
+    //     $result = curl_exec($curl_session);
+    //     curl_close($curl_session);
+    //     echo "<hr>";
+    //     print_r($result);
+    // }
 
     public function exp_donasi($email)
     {
@@ -862,6 +890,18 @@ class REST_API extends CI_Controller
                 $where   = array('id_invoice' => $d['id_invoice']);
                 $execute = $this->REST_API_model->update_data('pembelian', $update_status_pembelian, $where);
                 if ($execute >= 1) {
+                    //TESTING -> PASSED
+                    $pembelian = $this->Kewirausahaan_model->get_data_pembelian_barang("where p.id_invoice = '$d[id_invoice]'");
+                    foreach ($pembelian as $p) {
+                        $barang               = $this->Kewirausahaan_model->get_barang("where id_barang_garage_sale = $p[id_barang_garage_sale]");
+                        $qty_sebelum          = $barang[0]['stok_terpesan'];
+                        $update_stok_terpesan = array(
+                            'stok_terpesan' => $qty_sebelum + $p['qty'],
+                        );
+                        $where   = array('id_barang_garage_sale' => $p['id_barang_garage_sale']);
+                        $execute = $this->Kewirausahaan_model->update_data('barang_garage_sale', $update_stok_terpesan, $where);
+                    }
+
                     // ok, fcm start here
                     //Start FCM Code
                     $title        = "Pembelian Barang Garage Sale Anda Dibatalkan";
@@ -1045,7 +1085,7 @@ class REST_API extends CI_Controller
     {
         $email       = $this->input->post("email");
         $achievment1 = $this->REST_API_model->get_sertifikat_relawan("where email = '$email' order by id_sertifikat_relawan desc");
-        $achievment2 = $this->REST_API_model->get_subscribe_relawan("where email = '$email' and id_status_absensi_relawan = 2 order by k.id_kegiatan desc");
+        $achievment2 = $this->REST_API_model->get_subscribe_relawan("where email = '$email' and id_status_absensi_relawan = 2 and k.id_status_kegiatan = 3 order by k.id_kegiatan desc");
         $i           = 0;
         $achievment  = array();
         foreach ($achievment1 as $a) {

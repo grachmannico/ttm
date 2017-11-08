@@ -2,7 +2,7 @@
   <footer class="main-footer">
     <!-- To the right -->
     <div class="pull-right hidden-xs">
-      website gua udah siap yooooooo
+      Sistem Informasi Manajemen Donasi dan Relawan <b>(SIMDR)</b>
     </div>
     <!-- Default to the left -->
     <strong>Copyright &copy; 2017 <a href="#">Turun Tangan Malang</a>.</strong> All rights reserved.
@@ -53,13 +53,23 @@
     // });
     //Date picker
     $('#datepicker').datepicker({
-      autoclose: true
+      autoclose: true,
+      format: 'yyyy-mm-dd'
+    });
+    $('#datepicker2').datepicker({
+      autoclose: true,
+      format: 'yyyy-mm-dd'
+    });
+    $('#datepicker3').datepicker({
+      autoclose: true,
+      format: 'yyyy-mm-dd'
     });
     $("#datemask").inputmask("yyyy-mm-dd", {"placeholder": "yyyy-mm-dd"});
     $("#datemask2").inputmask("yyyy-mm-dd", {"placeholder": "yyyy-mm-dd"});
     $("#money").inputmask("999.999.999", { numericInput: true });
     $("#money2").inputmask("999.999.999", { numericInput: true });
     $("#qty").inputmask("999.999.999", { numericInput: true });
+    $("#number").inputmask("999", { numericInput: true });
     $("[data-mask]").inputmask();
     CKEDITOR.config.enterMode = CKEDITOR.ENTER_BR;
     CKEDITOR.config.autoParagraph = false;

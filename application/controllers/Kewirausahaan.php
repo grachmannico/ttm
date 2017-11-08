@@ -116,7 +116,7 @@ class Kewirausahaan extends CI_Controller
         if ($id_status_donasi == "" && $donatur != "") {
             $profil_donatur                     = $this->Kewirausahaan_model->get_data_donatur("where email = '$donatur'");
             $data_donatur                       = $this->Kewirausahaan_model->get_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
-            $data_donasi_donatur                = $this->Kewirausahaan_model->get_data_donasi_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
+            $data_donasi_donatur                = $this->Kewirausahaan_model->get_data_donasi_donatur("where dr.email = '$donatur'");
             $data_jumlah_nominal_donasi_donatur = $this->Kewirausahaan_model->get_jumlah_nominal_donasi_donatur("where dr.email = '$donatur' and dn.id_status_donasi = 3");
             if (empty($data_donatur[0]['total_donasi'])) {
                 $this->load->view("kewirausahaan/v_detail_donatur", array('profil_donatur' => $profil_donatur, 'data_donatur' => $data_donatur, 'data_donasi_donatur' => $data_donasi_donatur, 'data_jumlah_nominal_donasi_donatur' => $data_jumlah_nominal_donasi_donatur));
@@ -369,7 +369,7 @@ class Kewirausahaan extends CI_Controller
         $nama_barang    = $this->input->post("nama_barang");
         $deskripsi      = $this->input->post("deskripsi");
         $harga          = str_replace(str_split('_.'), "", $this->input->post("harga"));
-        $stok_available = $this->input->post("stok_available");
+        $stok_available = str_replace(str_split('_.'), "", $this->input->post("stok_available"));
         if ($nama_barang == "" && $deskripsi == "" && $harga == "" && $stok_available == "") {
             $this->load->view("kewirausahaan/v_form_tambah_barang_garage_sale");
             $this->load->view('footer');
@@ -465,7 +465,7 @@ class Kewirausahaan extends CI_Controller
         $nama_barang           = $this->input->post("nama_barang");
         $deskripsi             = $this->input->post("deskripsi");
         $harga                 = str_replace(str_split('_.'), "", $this->input->post("harga"));
-        $stok_available        = $this->input->post("stok_available");
+        $stok_available        = str_replace(str_split('_.'), "", $this->input->post("stok_available"));
         if ($edit != "") {
             $barang = $this->Kewirausahaan_model->get_barang("where id_barang_garage_sale = $edit");
             $this->load->view("kewirausahaan/v_form_edit_barang_garage_sale", array('barang' => $barang));
@@ -485,7 +485,7 @@ class Kewirausahaan extends CI_Controller
                 } elseif ($stok_available > $stok_lama[0]['stok_available']) {
                     $stok_terpesan = ($stok_available - $stok_lama[0]['stok_available']) + $stok_lama[0]['stok_terpesan'];
                 } elseif ($stok_available < $stok_lama[0]['stok_available']) {
-                    $stok_terpesan = $stok_lama[0]['stok_terpesan'];
+                    $stok_terpesan = $stok_lama[0]['stok_terpesan'] - ($stok_lama[0]['stok_available'] - $stok_available);
                 }
                 $update_barang = array(
                     'nama_barang'    => $nama_barang,
@@ -523,7 +523,8 @@ class Kewirausahaan extends CI_Controller
                 } elseif ($stok_available > $stok_lama[0]['stok_available']) {
                     $stok_terpesan = ($stok_available - $stok_lama[0]['stok_available']) + $stok_lama[0]['stok_terpesan'];
                 } elseif ($stok_available < $stok_lama[0]['stok_available']) {
-                    $stok_terpesan = $stok_lama[0]['stok_terpesan'];
+                    // $stok_terpesan = $stok_lama[0]['stok_terpesan'];
+                    $stok_terpesan = $stok_lama[0]['stok_terpesan'] - ($stok_lama[0]['stok_available'] - $stok_available);
                 }
                 $update_barang = array(
                     'nama_barang'    => $nama_barang,
@@ -1260,6 +1261,18 @@ class Kewirausahaan extends CI_Controller
                 $where   = array('id_invoice' => $d['id_invoice']);
                 $execute = $this->Kewirausahaan_model->update_data('pembelian', $update_status_pembelian, $where);
                 if ($execute >= 1) {
+                    //TESTING -> PASSED
+                    $pembelian = $this->Kewirausahaan_model->get_data_pembelian_barang("where p.id_invoice = '$d[id_invoice]'");
+                    foreach ($pembelian as $p) {
+                        $barang               = $this->Kewirausahaan_model->get_barang("where id_barang_garage_sale = $p[id_barang_garage_sale]");
+                        $qty_sebelum          = $barang[0]['stok_terpesan'];
+                        $update_stok_terpesan = array(
+                            'stok_terpesan' => $qty_sebelum + $p['qty'],
+                        );
+                        $where   = array('id_barang_garage_sale' => $p['id_barang_garage_sale']);
+                        $execute = $this->Kewirausahaan_model->update_data('barang_garage_sale', $update_stok_terpesan, $where);
+                    }
+
                     // ok, fcm start here
                     //Start FCM Code
                     $title        = "Pembelian Barang Garage Sale Anda Dibatalkan";
@@ -1507,6 +1520,17 @@ class Kewirausahaan extends CI_Controller
                     } else {
                         // Database Error
                     }
+                } elseif ($this->status_donatur == "Donatur"  && $cek_status_donatur[0]['id_status_donatur'] > 0 && $cek_status_donatur[0]['id_status_donatur'] != 1) {
+                    $update_data               = array(
+                        'id_status_donatur' => 1,
+                    );
+                    $where   = array('email' => $d['email']);
+                    $execute = $this->Kewirausahaan_model->update_data('donatur', $update_data, $where);
+                    if ($execute >= 1) {
+                        // OK, Go FCM
+                    } else {
+                        // Database Error
+                    }
                 }
                 $i++;
             } else {
@@ -1519,7 +1543,7 @@ class Kewirausahaan extends CI_Controller
 
         //Start FCM Code
         $title        = "Terima Kasih";
-        $body         = "Anda Kami Nobatkan Sebagai Donatur Tetap Kami. Terima Kasih Telah Berdonasi Pada Komunitas Kami.";
+        $body         = "Anda Kami Tetapkan Sebagai Donatur Tetap Kami. Terima Kasih Telah Berdonasi Pada Komunitas Kami.";
         $message      = "null";
         $message_type = "konfirmasi donasi";
         $intent       = "NotificationFragment";

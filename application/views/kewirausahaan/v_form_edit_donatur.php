@@ -32,7 +32,8 @@
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal Lahir</label>
                   <!-- <input type="text" class="form-control" placeholder="Tanggal kegiatan" name="tanggal_kegiatan" required> -->
-                  <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" value="<?php echo $data_donatur[0]['tgl_lahir']; ?>" name="tgl_lahir" required>
+                  <!-- <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" value="<?php echo $data_donatur[0]['tgl_lahir']; ?>" name="tgl_lahir" required> -->
+                  <input type="text" class="form-control" value="<?php echo $data_donatur[0]['tgl_lahir']; ?>" name="tgl_lahir" id="datepicker" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-mobile-phone"></i> Nomor Handphone</label>

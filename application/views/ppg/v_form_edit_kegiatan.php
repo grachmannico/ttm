@@ -118,7 +118,7 @@ function update_address(lat,lng)
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-users"></i> Minimal Relawan</label>
-                  <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['minimal_relawan']; ?>" name="minimal_relawan" id="qty" required>
+                  <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['minimal_relawan']; ?>" name="minimal_relawan" id="number" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-heart"></i> Minimal Donasi</label>
@@ -136,17 +136,20 @@ function update_address(lat,lng)
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal Dimulainya Kegiatan</label>
                   <!-- <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['tanggal_kegiatan']; ?>" name="tanggal_kegiatan" required> -->
-                  <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" value="<?php echo $detail_kegiatan[0]['tanggal_kegiatan_mulai']; ?>" name="tanggal_kegiatan_mulai" required>
+                  <!-- <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" value="<?php echo $detail_kegiatan[0]['tanggal_kegiatan_mulai']; ?>" name="tanggal_kegiatan_mulai" required> -->
+                  <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['tanggal_kegiatan_mulai']; ?>" name="tanggal_kegiatan_mulai" id="datepicker" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal Berakhirnya Kegiatan</label>
                   <!-- <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['tanggal_kegiatan']; ?>" name="tanggal_kegiatan" required> -->
-                  <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" value="<?php echo $detail_kegiatan[0]['tanggal_kegiatan_berakhir']; ?>" name="tanggal_kegiatan_berakhir" required>
+                  <!-- <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" value="<?php echo $detail_kegiatan[0]['tanggal_kegiatan_berakhir']; ?>" name="tanggal_kegiatan_berakhir" required> -->
+                  <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['tanggal_kegiatan_berakhir']; ?>" name="tanggal_kegiatan_berakhir" id="datepicker2" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-calendar-times-o"></i> Batas Akhir Pendaftaran</label>
                   <!-- <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['batas_akhir_pendaftaran']; ?>" name="batas_akhir_pendaftaran" required> -->
-                  <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask2" value="<?php echo $detail_kegiatan[0]['batas_akhir_pendaftaran']; ?>" name="batas_akhir_pendaftaran" required>
+                  <!-- <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask2" value="<?php echo $detail_kegiatan[0]['batas_akhir_pendaftaran']; ?>" name="batas_akhir_pendaftaran" required> -->
+                  <input type="text" class="form-control" value="<?php echo $detail_kegiatan[0]['batas_akhir_pendaftaran']; ?>" name="batas_akhir_pendaftaran" id="datepicker3" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-compass"></i> Alamat</label>

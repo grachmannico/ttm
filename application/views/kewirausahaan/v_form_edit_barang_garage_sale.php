@@ -33,7 +33,7 @@
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-cubes"></i> Stok</label>
-                  <input type="text" class="form-control" value="<?php echo $barang[0]['stok_available']; ?>" name="stok_available" required>
+                  <input type="text" class="form-control" value="<?php echo $barang[0]['stok_available']; ?>" name="stok_available" id="number" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-image"></i> Gambar Barang</label><br>

@@ -142,7 +142,7 @@ function tanggal_indo($tanggal)
 				<td><?php echo $dk['nama_dokumentasi']; ?> (<?php echo tanggal_indo($dk['tanggal']); ?>)</td>
 			</tr>
 			<tr>
-				<td><img src="<?php echo FCPATH . "/uploads/dokumentasi/"; ?><?php echo $dk['gambar_dokumentasi']; ?>" alt="" style="max-width: 600px;"></td>
+				<td><img src="<?php echo FCPATH . "/uploads/dokumentasi/"; ?><?php echo $dk['gambar_dokumentasi']; ?>" alt="" style="max-width: 600px; max-height: 300px;"></td>
 			</tr>
 			<tr>
 				<td>Deskripsi: <?php echo $dk['deskripsi']; ?></td>

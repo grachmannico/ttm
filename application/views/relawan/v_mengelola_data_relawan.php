@@ -91,10 +91,11 @@
                       <table id="example2" class="table table-bordered table-striped">
                         <thead>
                         <tr>
-                          <th><center>Ranking</center></th>
+                          <th><center>No</center></th>
                           <th><center>Nama</center></th>
-                          <th><center>Persentase Kemungkinan Gabung Kegaiatan</center></th>
-                          <th><center>Persentase Kehadiran Dalam Kegiatan</center></th>
+                          <!-- <th><center>Persentase Kemungkinan Gabung Kegaiatan</center></th>
+                          <th><center>Persentase Kehadiran Dalam Kegiatan</center></th> -->
+                          <th><center>Jumlah Kehadiran</center></th>
                           <th><center>Hasil Penilaian</center></th>
                           <th><center>Action</center></th>
                         </tr>
@@ -106,7 +107,7 @@
                         <tr>
                           <td><?php echo $i; ?></td>
                           <td><?php echo $r['nama']; ?></td>
-                          <td>
+                          <!-- <td>
                             <div class="progress">
                                   <div class="progress-bar progress-bar-green" role="progressbar" aria-valuenow="<?php echo $r['persentase_gabung_kegiatan']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $r['persentase_gabung_kegiatan']."%"; ?>">
                                     <span class="sr-only"><?php echo $r['persentase_gabung_kegiatan']."%"; ?> Complete (success)</span>
@@ -118,8 +119,8 @@
                                     <?php endif ?>
                                   </div>
                                 </div>
-                          </td>
-                          <td>
+                          </td> -->
+                          <!-- <td>
                             <div class="progress">
                                   <div class="progress-bar progress-bar-green" role="progressbar" aria-valuenow="<?php echo $r['kontribusi']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $r['kontribusi']."%"; ?>">
                                     <span class="sr-only"><?php echo $r['kontribusi']."%"; ?> Complete (success)</span>
@@ -131,19 +132,25 @@
                                     <?php endif ?>
                                   </div>
                                 </div>
-                          </td>
+                          </td> -->
+                          <td><center><?php echo $r['jml_hadir']; ?></center></td>
                           <td>
+                            <?php if ($r['jml_hadir'] >= 3): ?>
                             <div class="progress">
-                                  <div class="progress-bar progress-bar-green" role="progressbar" aria-valuenow="<?php echo $r['hasil']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $r['hasil']."%"; ?>">
-                                    <span class="sr-only"><?php echo $r['hasil']."%"; ?> Complete (success)</span>
-                                    <?php if ($r['hasil'] != 0): ?>
-                                      <p><?php echo number_format((float)$r['hasil'], 2, '.', ''); ?></p>
-                                    <?php endif ?>
-                                    <?php if ($r['hasil'] == 0): ?>
-                                      <p style="color: black;"><?php echo number_format((float)$r['hasil'], 2, '.', ''); ?></p>
-                                    <?php endif ?>
-                                  </div>
-                                </div>
+                              <div class="progress-bar progress-bar-green" role="progressbar" aria-valuenow="<?php echo $r['hasil']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $r['hasil']."%"; ?>">
+                                <span class="sr-only"><?php echo $r['hasil']."%"; ?> Complete (success)</span>
+                                <?php if ($r['hasil'] != 0): ?>
+                                  <p><?php echo number_format((float)$r['hasil'], 2, '.', ''); ?></p>
+                                <?php endif ?>
+                                <?php if ($r['hasil'] == 0): ?>
+                                  <p style="color: black;"><?php echo number_format((float)$r['hasil'], 2, '.', ''); ?></p>
+                                <?php endif ?>
+                              </div>
+                            </div>
+                            <?php endif ?>
+                            <?php if ($r['jml_hadir'] < 3): ?>
+                              <center><p class="badge bg-danger">Belum Dilakukan Penilaian</p></center>
+                            <?php endif ?>
                           </td>
                           <td>
                             <form action="<?php echo base_url()."Relawan/detail_relawan"; ?>" method="POST">
@@ -151,7 +158,8 @@
                             </form>
                           </td>
                         </tr>
-                        <?php if ($r['persentase_gabung_kegiatan'] >= 30): ?>
+                        <?php // if ($r['persentase_gabung_kegiatan'] >= 30): ?>
+                        <?php if ($r['jml_hadir'] >= 3): ?>
                           <?php $relawan_aktif++; ?>
                         <?php endif ?>
                         <?php $i++; ?>
@@ -164,8 +172,10 @@
                 <center><p class="badge bg-green">Jumlah Relawan Aktif Saat Ini: <?php echo $relawan_aktif; ?> Relawan.</p><br></center>
                 <hr>
                 <h4>Keterangan:</h4>
-                Penilaian berdasarkan pada persentase kemungkinan relawan bergabung dalam kegiatan dan persentase kehadiran relawan dalam kegiatan yang diikuti.<br> <b>Data statisktik relawan yang ditampilkan hanya relawan yang telah mengikuti dan hadir dalam kegiatan lebih dari 3 kali.</b><br><br>
-                Relawan dikatakan aktif jika "Persentase Kemungkinan Gabung Kegaiatan" lebih dari sama dengan 30.<br>
+                Penilaian berdasarkan pada persentase kemungkinan relawan bergabung dalam kegiatan dan persentase kehadiran relawan dalam kegiatan yang diikuti.<br>
+                Relawan aktif adalah relawan yang hadir dalam kegiatan minimal 3 kali.<br>
+                <!-- <b>Data statisktik relawan yang ditampilkan hanya relawan yang telah mengikuti dan hadir dalam kegiatan minimal 3 kali.</b><br><br> -->
+                <!-- Relawan dikatakan aktif jika "Persentase Kemungkinan Gabung Kegaiatan" lebih dari sama dengan 30.<br>
                 <ul>
                   <li>
                     <b>"Persentase Kemungkinan Gabung Kegaiatan"</b> didapat dari <u>jumlah kehadiran relawan dalam kegiatan per jumlah semua kegiatan yang dilaksanakan</u> oleh komunitas Turun Tangan Malang.
@@ -173,7 +183,7 @@
                   <li>
                     <b>"Persentase Kehadiran Dalam Kegiatan"</b> didapat dari <u>jumlah kehadiran relawan dalam kegiatan per jumlah kegiatan yang diikuti oleh relawan.</u>
                   </li>
-                </ul>
+                </ul> -->
               </div>
             </div>
           </div>

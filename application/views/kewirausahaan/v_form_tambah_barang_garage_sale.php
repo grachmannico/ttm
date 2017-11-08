@@ -33,7 +33,7 @@
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-cubes"></i> Stok</label>
-                  <input type="text" class="form-control" placeholder="Stok" name="stok_available" required>
+                  <input type="text" class="form-control" placeholder="Stok" name="stok_available" id="number" required>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1"><i class="fa fa-image"></i> Gambar Barang</label>

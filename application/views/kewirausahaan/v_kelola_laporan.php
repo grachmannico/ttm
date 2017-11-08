@@ -59,15 +59,17 @@ function tanggal_indo($tanggal)
                       $jml_keluar = $jml_dana_keluar[0]['jml_dana_keluar'];
                       $jml_masuk = $total_dana[0]['total_dana'];
                       $progress_b = (($jml_masuk - $jml_keluar) / $jml_masuk) * 100;
+                      $sisa = $jml_masuk - $jml_keluar;
                     ?>
                     <div class="box-header with-border">
                       <h5>Dana Yang Dikeluarkan Sejumlah <u><?php echo "Rp. " . number_format($jml_keluar, 2, ",", "."); ?></u> dari Total <u><?php echo "Rp. " . number_format($jml_masuk, 2, ",", "."); ?></u> Dana Yang Masuk</h5>
                       <div class="progress">
                         <div class="progress-bar progress-bar-green" role="progressbar" aria-valuenow="<?php echo $progress_b; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $progress_b."%"; ?>">
                           <span class="sr-only"><?php echo $progress_b."%"; ?> Complete (success)</span>
-                          <?php echo "Sisa Dana: " . $progress_b."%"; ?>
+                          <!-- <?php echo "Sisa Dana: " . $progress_b."%"; ?> -->
                         </div>
                       </div>
+                      <?php echo "Sisa Dana: " . $progress_b."%" . " (<b><u>Rp. " . number_format($sisa, 2, ",", ".") . "</u></b>)"; ?>
                     </div>
                   <?php endif ?>
                   <div class="box-body">
@@ -77,8 +79,8 @@ function tanggal_indo($tanggal)
                         <table id="example1" class="table table-bordered table-striped">
                         <thead>
                         <tr>
-                          <th><center>Nama Dana Keluar</center></th>
                           <th><center>Tanggal</center></th>
+                          <th><center>Nama Dana Keluar</center></th>
                           <th><center>Nominal Dana Keluar</center></th>
                           <th><center>Keterangan</center></th>
                           <th><center>Action</center></th>
@@ -87,16 +89,17 @@ function tanggal_indo($tanggal)
                         <tbody>
                         <?php foreach ($dana_keluar as $d): ?>
                         <tr>
-                          <td><?php echo $d['nama_dana_keluar']; ?></td>
                           <td><?php echo tanggal_indo($d['tanggal']); ?></td>
+                          <td><?php echo $d['nama_dana_keluar']; ?></td>
                           <td><?php echo "Rp. " . number_format($d['nominal_dana_keluar'], 2, ",", "."); ?></td>
                           <td>
-                            <?php if (strlen($d['keterangan']) > 50): ?>
-                              <?php echo substr($d['keterangan'], 0, 50). " ..."; ?>
-                            <?php endif ?>
-                            <?php if (strlen($d['keterangan']) <= 50): ?>
-                              <?php echo $d['keterangan']; ?>
-                            <?php endif ?>
+                            <!-- <?php if (strlen($d['keterangan']) > 50): ?> -->
+                              <!-- <?php echo substr($d['keterangan'], 0, 50). " ..."; ?> -->
+                            <!-- <?php endif ?> -->
+                            <!-- <?php if (strlen($d['keterangan']) <= 50): ?> -->
+                              <!-- <?php echo $d['keterangan']; ?> -->
+                            <!-- <?php endif ?> -->
+                            <?php echo $d['keterangan']; ?>
                           </td>
                           <td>
                             <div class="col-md-12">
@@ -199,7 +202,8 @@ function tanggal_indo($tanggal)
                       <div class="form-group">
                         <label for="exampleInputEmail1"><i class="fa fa-calendar-check-o"></i> Tanggal</label>
                         <!-- <input type="text" class="form-control" placeholder="Tanggal" name="tanggal" required> -->
-                        <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" placeholder="Tanggal" name="tanggal" required>
+                        <!-- <input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask id="datemask" placeholder="Tanggal" name="tanggal" required> -->
+                        <input type="text" class="form-control" placeholder="Tanggal" name="tanggal" id="datepicker" required>
                       </div>
                       <div class="form-group">
                         <label for="exampleInputEmail1"><i class="fa fa-money"></i> Nominal Dana Keluar</label>
