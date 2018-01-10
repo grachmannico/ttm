@@ -140,36 +140,57 @@ class PPG_model extends CI_Model
 
     public function get_all_user($where = "")
     {
-        $data = $this->db->query("select email, fcm_token
-            from relawan
-            where fcm_token != ''
-            union all
-            select email, fcm_token
-            from donatur d
-            where fcm_token != ''");
-        return $data->result_array();
+        if ($where != "") {
+            $data = $this->db->query("select r.email, r.fcm_token, k.id_kegiatan
+                from relawan r
+                join gabung_kegiatan g
+                on r.email=g.email
+                join kegiatan k
+                on g.id_kegiatan=k.id_kegiatan
+                where fcm_token != '' and " . $where .
+                " union all
+                select d.email, d.fcm_token, k.id_kegiatan
+                from donatur d
+                join donasi dn
+                on d.email=dn.email
+                join kegiatan k
+                on dn.id_kegiatan=k.id_kegiatan
+                where fcm_token != '' and " . $where .
+                " group by k.id_kegiatan");
+            return $data->result_array();
+        } else {
+            // Original code
+            $data = $this->db->query("select email, fcm_token
+                from relawan
+                where fcm_token != ''
+                union all
+                select email, fcm_token
+                from donatur d
+                where fcm_token != ''");
+            return $data->result_array();
+        }
     }
 
-    public function get_subs_all_user($where = "")
-    {
-        $data = $this->db->query("select r.email, r.fcm_token, k.id_kegiatan
-            from relawan r
-            join gabung_kegiatan g
-            on r.email=g.email
-            join kegiatan k
-            on g.id_kegiatan=k.id_kegiatan
-            where fcm_token != '' and " . $where .
-            " union all
-            select d.email, d.fcm_token, k.id_kegiatan
-            from donatur d
-            join donasi dn
-            on d.email=dn.email
-            join kegiatan k
-            on dn.id_kegiatan=k.id_kegiatan
-            where fcm_token != '' and " . $where .
-            " group by k.id_kegiatan");
-        return $data->result_array();
-    }
+    // public function get_subs_all_user($where = "")
+    // {
+    //     $data = $this->db->query("select r.email, r.fcm_token, k.id_kegiatan
+    //         from relawan r
+    //         join gabung_kegiatan g
+    //         on r.email=g.email
+    //         join kegiatan k
+    //         on g.id_kegiatan=k.id_kegiatan
+    //         where fcm_token != '' and " . $where .
+    //         " union all
+    //         select d.email, d.fcm_token, k.id_kegiatan
+    //         from donatur d
+    //         join donasi dn
+    //         on d.email=dn.email
+    //         join kegiatan k
+    //         on dn.id_kegiatan=k.id_kegiatan
+    //         where fcm_token != '' and " . $where .
+    //         " group by k.id_kegiatan");
+    //     return $data->result_array();
+    // }
 
     //ON DELETE KEGIATAN & ARSIP
     public function get_cek_gabung_relawan($where = "")

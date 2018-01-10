@@ -677,6 +677,7 @@ class Relawan extends CI_Controller
         // array_multisort($rank_attendance, SORT_DESC, $this->rank_result, SORT_DESC, $this->rank);
         // array_multisort($this->rank_result, SORT_DESC, $this->rank);
         array_multisort($rank_attendance, SORT_DESC, $this->rank);
+        // print_r($this->rank);
     }
 
     public function sertifikat_aktif_relawan()

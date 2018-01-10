@@ -534,7 +534,7 @@ class PPG extends CI_Controller
 
                     $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
                     $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
-                    $data        = $this->PPG_model->get_all_user();
+                    $data        = $this->PPG_model->get_all_user("k.id_kegiatan = $id_kegiatan");
                     print_r($data);
 
                     $ids = array();
@@ -661,7 +661,7 @@ class PPG extends CI_Controller
                     $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
                     $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
                     // $data        = $this->PPG_model->get_all_user();
-                    $data = $this->PPG_model->get_subs_all_user("k.id_kegiatan = $id_kegiatan");
+                    $data = $this->PPG_model->get_all_user("k.id_kegiatan = $id_kegiatan");
                     print_r($data);
 
                     $ids = array();
@@ -767,7 +767,7 @@ class PPG extends CI_Controller
                     $this->load->view("alert", array('alert' => $alert));
                     $this->load->view("footer");
                 }
-            } elseif (!empty($cek_gabung_relawan) || !empty($cek_donasi)) {
+            } elseif ((!empty($cek_gabung_relawan) || !empty($cek_donasi)) || (empty($cek_gabung_relawan) || !empty($cek_donasi)) || (!empty($cek_gabung_relawan) || empty($cek_donasi))) {
                 if ($status_kegiatan[0]['id_status_kegiatan'] == 1) {
                     //Start FCM Code
                     $title        = "Kegiatan " . $status_kegiatan[0]['nama_kegiatan'] . " Dibatalkan";
@@ -781,7 +781,7 @@ class PPG extends CI_Controller
                     $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
                     $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
                     // $data        = $this->PPG_model->get_all_user();
-                    $data = $this->PPG_model->get_subs_all_user("k.id_kegiatan = $hapus");
+                    $data = $this->PPG_model->get_all_user("k.id_kegiatan = $hapus");
                     print_r($data);
 
                     $ids = array();
@@ -1063,7 +1063,7 @@ class PPG extends CI_Controller
 
                     $path_to_fcm = "http://fcm.googleapis.com/fcm/send";
                     $server_key  = "AAAAePlAp50:APA91bH6EsjQE1M3XszHIahm50NRB2HSSz-jrfrxJZooRakGgaF0RvH0zLeHU6x7dhrnn8EpWTxIIUDqRxoH8X1FzmzBCmMvAmA0JujfkGLmgR17jfDYY5wwQOLkQmgjhJlORNGrqk2s";
-                    $data        = $this->PPG_model->get_subs_all_user("k.id_kegiatan = $id_kegiatan");
+                    $data        = $this->PPG_model->get_all_user("k.id_kegiatan = $id_kegiatan");
                     print_r($data);
 
                     $ids = array();
